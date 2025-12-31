@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_pumpkin_thud_5",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.139943,
+  "exportDir":"",
+  "name":"snd_pumpkin_thud_5",
+  "parent":{
+    "name":"Snd Pump Thuds",
+    "path":"folders/Sounds/Snd Mask/Snd Pumpkin/Snd Big/Snd Pump Thuds.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_pumpkin_thud_5.wav",
+  "volume":0.25,
+}

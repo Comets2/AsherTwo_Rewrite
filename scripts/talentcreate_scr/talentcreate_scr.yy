@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"talentcreate_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"talentcreate_scr",
+  "parent":{
+    "name":"Talent",
+    "path":"folders/Scripts/Me/Talent.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

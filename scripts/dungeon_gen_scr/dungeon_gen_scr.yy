@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"dungeon_gen_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"dungeon_gen_scr",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_burger_passive_collect_1",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.468787,
+  "exportDir":"",
+  "name":"snd_burger_passive_collect_1",
+  "parent":{
+    "name":"Snd Passive",
+    "path":"folders/Sounds/Snd Mask/Snd Burger/Snd Passive.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_burger_passive_collect_1.wav",
+  "volume":0.15,
+}

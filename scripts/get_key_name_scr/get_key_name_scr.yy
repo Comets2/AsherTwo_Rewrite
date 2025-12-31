@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"get_key_name_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"get_key_name_scr",
+  "parent":{
+    "name":"Control",
+    "path":"folders/Scripts/Control.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

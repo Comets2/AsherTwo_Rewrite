@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_witch_broom_2",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":22.348448,
+  "exportDir":"",
+  "name":"snd_witch_broom_2",
+  "parent":{
+    "name":"Snd Broom",
+    "path":"folders/Sounds/Snd Mask/Snd Witch/Snd Broom.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_witch_broom_2.wav",
+  "volume":0.05,
+}

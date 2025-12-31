@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_burger_burger_chomp_2",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.573073,
+  "exportDir":"",
+  "name":"snd_burger_burger_chomp_2",
+  "parent":{
+    "name":"Snd Burger",
+    "path":"folders/Sounds/Snd Mask/Snd Burger/Snd Burger.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_burger_burger_chomp_2.wav",
+  "volume":0.16,
+}

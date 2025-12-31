@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"dungeon_transition_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"dungeon_transition_scr",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_pumpkin_pump_cry_2",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":1.993639,
+  "exportDir":"",
+  "name":"snd_pumpkin_pump_cry_2",
+  "parent":{
+    "name":"Snd Pump",
+    "path":"folders/Sounds/Snd Mask/Snd Pumpkin/Snd Pump.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_pumpkin_pump_cry_2.ogg",
+  "volume":0.4,
+}

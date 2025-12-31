@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"me_control_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"me_control_scr",
+  "parent":{
+    "name":"Me",
+    "path":"folders/Scripts/Me.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

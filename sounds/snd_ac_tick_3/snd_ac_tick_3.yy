@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_ac_tick_3",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.105442,
+  "exportDir":"",
+  "name":"snd_ac_tick_3",
+  "parent":{
+    "name":"Ticks",
+    "path":"folders/Sounds/Snd Arcade/Ticks.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_ac_tick_3.wav",
+  "volume":0.2,
+}

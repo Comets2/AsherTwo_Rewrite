@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"talentui_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"talentui_scr",
+  "parent":{
+    "name":"Talent",
+    "path":"folders/Scripts/Me/Talent.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_pet_bat_attack_1",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.358821,
+  "exportDir":"",
+  "name":"snd_pet_bat_attack_1",
+  "parent":{
+    "name":"Snd Bat",
+    "path":"folders/Sounds/Snd Pet/Snd Fly/Snd Bat.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_pet_bat_attack_1.wav",
+  "volume":0.07,
+}

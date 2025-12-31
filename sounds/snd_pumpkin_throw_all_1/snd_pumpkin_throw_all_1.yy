@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_pumpkin_throw_all_1",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":2.33568,
+  "exportDir":"",
+  "name":"snd_pumpkin_throw_all_1",
+  "parent":{
+    "name":"Snd Throw",
+    "path":"folders/Sounds/Snd Mask/Snd Pumpkin/Snd Throw.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_pumpkin_throw_all_1.wav",
+  "volume":0.85,
+}

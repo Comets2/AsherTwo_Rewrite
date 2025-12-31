@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_bee_swarm_1",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.439694,
+  "exportDir":"",
+  "name":"snd_bee_swarm_1",
+  "parent":{
+    "name":"Snd Swarm",
+    "path":"folders/Sounds/Snd Mask/Snd Bee/Snd Swarm.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_bee_swarm_1.wav",
+  "volume":0.2,
+}

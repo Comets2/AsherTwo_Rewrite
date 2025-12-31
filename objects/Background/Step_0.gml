@@ -1,0 +1,50 @@
+if(animthree<400){
+	animthree+=0.05
+}else{
+animthree=0
+}
+if(animthreetick==0){
+	if(animthreey<4){
+	animthreey+=0.01
+	}else{
+	animthreetick=1
+	}
+}else{
+	if(animthreey>-4){
+	animthreey-=0.01
+	}else{
+	animthreetick=0
+	}
+}
+
+if(anim<animamount){
+	anim+=1
+	if(anim==animamount-amt*3||anim==animamount-amt*1){
+	animtick=1
+	}else{
+		if(anim==animamount-amt*2){
+		animtick=2
+		}else{
+	
+		}	
+	}
+}else{
+anim=0
+animtick=0
+}
+
+if(animtwo<animamount){
+	animtwo+=1
+	if(animtwo==animamount-amt*3||animtwo==animamount-amt*1){
+	animticktwo=1
+	}else{
+		if(animtwo==animamount-amt*2){
+		animticktwo=2
+		}else{
+	
+		}	
+	}
+}else{
+animtwo=0
+animticktwo=0
+}

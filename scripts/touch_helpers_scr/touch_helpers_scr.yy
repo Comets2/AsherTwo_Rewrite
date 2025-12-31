@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"touch_helpers_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"touch_helpers_scr",
+  "parent":{
+    "name":"Control",
+    "path":"folders/Scripts/Control.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

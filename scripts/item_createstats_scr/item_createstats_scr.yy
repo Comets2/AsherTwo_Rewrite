@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"item_createstats_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"item_createstats_scr",
+  "parent":{
+    "name":"Items",
+    "path":"folders/Scripts/Control/Items.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

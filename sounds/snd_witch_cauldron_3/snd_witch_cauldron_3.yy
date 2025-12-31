@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_witch_cauldron_3",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.607664,
+  "exportDir":"",
+  "name":"snd_witch_cauldron_3",
+  "parent":{
+    "name":"Cauldron",
+    "path":"folders/Sounds/Snd Mask/Snd Witch/Cauldron.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_witch_cauldron_3.wav",
+  "volume":0.16,
+}

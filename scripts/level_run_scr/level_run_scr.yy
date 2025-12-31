@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"level_run_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"level_run_scr",
+  "parent":{
+    "name":"Control",
+    "path":"folders/Scripts/Control.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

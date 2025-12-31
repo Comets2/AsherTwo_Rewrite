@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_enemy_yell_3",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.449206,
+  "exportDir":"",
+  "name":"snd_enemy_yell_3",
+  "parent":{
+    "name":"Snd Yell ",
+    "path":"folders/Sounds/Snd Enemy/Snd Yell .yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_enemy_yell_3.wav",
+  "volume":0.1,
+}

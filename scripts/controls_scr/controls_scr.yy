@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"controls_scr",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"controls_scr",
+  "parent":{
+    "name":"Control",
+    "path":"folders/Scripts/Control.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
