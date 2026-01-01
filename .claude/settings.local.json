@@ -6,7 +6,12 @@
       "Bash(git init:*)",
       "Bash(gh auth:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(dir /s \"C:\\\\Users\\\\danie\\\\GameMakerProjects\\\\AsherTwo\\\\AsherTwo_Rewrite\")",
+      "Bash(findstr:*)",
+      "Bash(awk:*)",
+      "Bash(cat:*)"
     ]
   }
 }

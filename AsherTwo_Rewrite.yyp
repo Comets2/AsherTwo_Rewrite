@@ -200,6 +200,7 @@
     {"id":{"name":"part_run_scr","path":"scripts/part_run_scr/part_run_scr.yy",},},
     {"id":{"name":"perlin_noise_2d","path":"scripts/perlin_noise_2d/perlin_noise_2d.yy",},},
     {"id":{"name":"perlin_noise_init","path":"scripts/perlin_noise_init/perlin_noise_init.yy",},},
+    {"id":{"name":"rogue_scr","path":"scripts/rogue_scr/rogue_scr.yy",},},
     {"id":{"name":"talentcreate_scr","path":"scripts/talentcreate_scr/talentcreate_scr.yy",},},
     {"id":{"name":"talentui_scr","path":"scripts/talentui_scr/talentui_scr.yy",},},
     {"id":{"name":"touch_helpers_scr","path":"scripts/touch_helpers_scr/touch_helpers_scr.yy",},},

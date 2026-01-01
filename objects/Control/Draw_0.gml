@@ -30,11 +30,11 @@ if(pause == 20){
 		colorgold, colorgold, colorgoldlight, colorgoldlight, 1)
 
 	// Menu items
-	var menu_items = ["Adventure", "Arcade", "Options"]
+	var menu_items = ["Adventure", "Arcade", "Rogue", "Options"]
 	var menu_start_y = yps + 55
-	var menu_spacing = 20
+	var menu_spacing = 16
 
-	for(var i = 0; i < 3; i++){
+	for(var i = 0; i < 4; i++){
 		var item_y = menu_start_y + (i * menu_spacing)
 		var item_x = xps + 127 - 20
 
@@ -199,6 +199,125 @@ if(pause == 22){
 }
 #endregion
 
+#region Fish Marble Character Selection (pause == 25)
+if(pause == 25){
+	// Draw background
+	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
+
+	// Title
+	draw_text_ext_transformed_color(xps + 127 - 45, yps + 15, "SELECT CHARACTER", 0, 1000, 0.55, 0.55, 0,
+		colorgold, colorgold, colorgold, colorgold, 1)
+
+	// Character positions
+	var crab_x = xps + 70
+	var squid_x = xps + 180
+	var char_y = yps + 75
+
+	// Draw selection indicator (animated arrow)
+	var arrow_offset = sin(title_anim * 0.1) * 3
+	var selected_x = (fish_char_selection == 0) ? crab_x : squid_x
+	draw_sprite_ext(map_icons_spr, 32, selected_x - 5, char_y - 30 + arrow_offset, 0.6, 0.6, 90, c_white, 1)
+
+	// Draw Crab character
+	if(fish_char_selection == 0){
+		// Selected - larger and gold border
+		draw_sprite_ext(abil_crab_spr, 224, crab_x, char_y, 1.5, 1.5, 0, c_white, 1)
+		draw_text_ext_transformed_color(crab_x - 10, char_y + 25, "CRAB", 0, 1000, 0.5, 0.5, 0,
+			colorgold, colorgold, colorgold, colorgold, 1)
+	}else{
+		// Not selected - smaller and gray
+		draw_sprite_ext(abil_crab_spr, 224, crab_x, char_y, 1.2, 1.2, 0, c_gray, 0.7)
+		draw_text_ext_transformed_color(crab_x - 10, char_y + 22, "CRAB", 0, 1000, 0.4, 0.4, 0,
+			colorgray, colorgray, colorgray, colorgray, 0.7)
+	}
+
+	// Draw Squid character
+	if(fish_char_selection == 1){
+		// Selected - larger and gold border
+		draw_sprite_ext(abil_crab_spr, 252, squid_x, char_y, 1.5, 1.5, 0, c_white, 1)
+		draw_text_ext_transformed_color(squid_x - 12, char_y + 25, "SQUID", 0, 1000, 0.5, 0.5, 0,
+			colorgold, colorgold, colorgold, colorgold, 1)
+	}else{
+		// Not selected - smaller and gray
+		draw_sprite_ext(abil_crab_spr, 252, squid_x, char_y, 1.2, 1.2, 0, c_gray, 0.7)
+		draw_text_ext_transformed_color(squid_x - 12, char_y + 22, "SQUID", 0, 1000, 0.4, 0.4, 0,
+			colorgray, colorgray, colorgray, colorgray, 0.7)
+	}
+
+	// Instructions
+	draw_text_ext_transformed_color(xps + 127 - 45, yps + 115, "< LEFT / RIGHT >", 0, 1000, 0.4, 0.4, 0,
+		c_white, c_white, c_white, c_white, 0.8)
+	draw_text_ext_transformed_color(xps + 127 - 50, yps + 130, "Press SPACE to confirm", 0, 1000, 0.35, 0.35, 0,
+		colorgray, colorgray, colorgray, colorgray, 0.7)
+}
+#endregion
+
+#region Rogue Level Selection (pause == 23)
+if(pause == 23){
+	// Draw background
+	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
+
+	// Title
+	draw_text_ext_transformed_color(xps + 127 - 35, yps + 15, "ROGUE MODE", 0, 1000, 0.55, 0.55, 0,
+		colorgold, colorgold, colorgold, colorgold, 1)
+
+	// Subtitle
+	draw_text_ext_transformed_color(xps + 127 - 40, yps + 30, "Select Stage", 0, 1000, 0.4, 0.4, 0,
+		c_white, c_white, c_white, c_white, 0.8)
+
+	// Level list (only Forest for now)
+	var rogue_levels = ["Forest"]
+
+	for(var r = 0; r < 1; r++){
+		var rogue_y = yps + 55 + (r * 18)
+		var rogue_x = xps + 127 - 20
+
+		if(r == rogue_selection){
+			// Selection indicator
+			var arrow_offset = sin(title_anim * 0.1) * 2
+			draw_sprite_ext(map_icons_spr, 32, rogue_x - 20 + arrow_offset, rogue_y + 2, 0.5, 0.5, 0, c_white, 1)
+
+			// Highlighted text
+			draw_text_ext_transformed_color(rogue_x, rogue_y, rogue_levels[r], 0, 1000, 0.5, 0.5, 0,
+				colorgold, colorgold, colorgold, colorgold, 1)
+		}else{
+			draw_text_ext_transformed_color(rogue_x, rogue_y, rogue_levels[r], 0, 1000, 0.45, 0.45, 0,
+				colorgray, colorgray, colorgray, colorgray, 1)
+		}
+	}
+
+	// Mode description
+	draw_text_ext_transformed_color(xps + 127 - 55, yps + 85, "Endless waves - Survive!", 0, 1000, 0.35, 0.35, 0,
+		colorgoldlight, colorgoldlight, colorgoldlight, colorgoldlight, 0.9)
+
+	// Back prompt
+	draw_text_ext_transformed_color(xps + 127 - 35, yps + 130, "Press ESC to go back",
+		0, 1000, 0.35, 0.35, 0, colorgray, colorgray, colorgray, colorgray, 0.7)
+}
+#endregion
+
+#region Rogue Game Over (pause == 24)
+if(pause == 24){
+	// Draw background
+	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
+
+	// Game Over title
+	draw_text_ext_transformed_color(xps + 127 - 35, yps + 30, "GAME OVER", 0, 1000, 0.7, 0.7, 0,
+		colorred, colorred, colorred, colorred, 1)
+
+	// Stats display
+	draw_text_ext_transformed_color(xps + 127 - 30, yps + 60, "Wave: " + string(rogue_wave), 0, 1000, 0.5, 0.5, 0,
+		colorgold, colorgold, colorgold, colorgold, 1)
+
+	draw_text_ext_transformed_color(xps + 127 - 30, yps + 80, "Level: " + string(rogue_level), 0, 1000, 0.5, 0.5, 0,
+		c_white, c_white, c_white, c_white, 1)
+
+	// Continue prompt
+	draw_text_ext_transformed_color(xps + 127 - 50, yps + 115, "Press SPACE to continue",
+		0, 1000, 0.4, 0.4, 0, colorgray, colorgray, colorgray, colorgray, 0.8)
+}
+#endregion
+
 #region In Game
 if(pause==0){
 	if(xpos<0){
@@ -242,6 +361,90 @@ draw_text_transformed(xps,yps+40,(Me.damagedonethree)/(Me.dpstimertwo/60),0.5,0.
 //draw_text_transformed(xps,yps+50,camtarget.x+(camtarget.x-camtargettwo.x)/2,0.5,0.5,0)
 //draw_text_transformed(xps,yps+65,mapyspot,0.5,0.5,0)
 }
+
+// Rogue Mode HUD
+if(rogue_mode){
+	// Wave counter (top left)
+	draw_text_ext_transformed_color(xps + 5, yps + 5, "Wave " + string(rogue_wave),
+		0, 1000, 0.45, 0.45, 0, colorgold, colorgold, colorgold, colorgold, 1)
+
+	// Wave starting indicator
+	if(rogue_wave_timer > 0 && !rogue_wave_active){
+		draw_text_ext_transformed_color(xps + 5, yps + 15, "Next wave in " + string(floor(rogue_wave_timer/60)+1) + "...",
+			0, 1000, 0.35, 0.35, 0, c_white, c_white, c_white, c_white, 0.8)
+	}
+
+	// XP Bar
+	var xp_bar_x = xps + 5
+	var xp_bar_y = yps + 130
+	var xp_bar_width = 50
+	var xp_fill = min((rogue_xp / rogue_xp_needed), 1) * xp_bar_width
+
+	// Bar background
+	draw_set_alpha(0.5)
+	draw_rectangle_color(xp_bar_x, xp_bar_y, xp_bar_x + xp_bar_width, xp_bar_y + 5,
+		c_black, c_black, c_black, c_black, false)
+	draw_set_alpha(1)
+
+	// Bar fill
+	if(xp_fill > 0){
+		draw_rectangle_color(xp_bar_x, xp_bar_y, xp_bar_x + xp_fill, xp_bar_y + 5,
+			colorgold, colorgold, colorgoldlight, colorgoldlight, false)
+	}
+
+	// Level indicator
+	draw_text_ext_transformed_color(xp_bar_x + xp_bar_width + 5, xp_bar_y - 2, "Lv." + string(rogue_level),
+		0, 1000, 0.35, 0.35, 0, c_white, c_white, c_white, c_white, 1)
+
+	// Card selection overlay
+	if(rogue_pause == 1){
+		// Darken background
+		draw_set_alpha(0.6)
+		draw_rectangle_color(xps, yps, xps + 255, yps + 143, c_black, c_black, c_black, c_black, false)
+		draw_set_alpha(1)
+
+		// Title
+		draw_text_ext_transformed_color(xps + 127 - 30, yps + 20, "LEVEL UP!",
+			0, 1000, 0.6, 0.6, 0, colorgold, colorgold, colorgold, colorgold, 1)
+
+		// Draw cards
+		var card_spacing = 45
+		var card_start_x = xps + 127 - ((levelupselecttotal_rogue - 1) * card_spacing / 2)
+
+		for(var i = 0; i < levelupselecttotal_rogue; i++){
+			var card_x = card_start_x + (i * card_spacing)
+			var card_y = yps + 65
+
+			// Card background
+			draw_sprite_ext(arcade_bee_big, 345, card_x, card_y, 0.55, 0.55, 0, c_white, 1)
+
+			if(i == rogue_card_select){
+				// Selected card highlight
+				draw_sprite_ext(arcade_bee_big, 346, card_x, card_y, 0.55, 0.55, 0, c_white, 1)
+
+				// Card icon (animated)
+				var bounce = sin(title_anim * 0.15) * 2
+				draw_sprite_ext(arcade_bee_big, 357 + rogueArray[1, i+1], card_x, card_y + bounce, 0.55, 0.55, 0, c_white, 1)
+
+				// Card name (gold)
+				draw_text_ext_transformed_color(card_x - 15, card_y + 22, rogueArray[2, i+1],
+					0, 1000, 0.35, 0.35, 0, colorgold, colorgold, colorgold, colorgold, 1)
+			}else{
+				// Unselected card icon
+				draw_sprite_ext(arcade_bee_big, 357 + rogueArray[1, i+1], card_x, card_y, 0.55, 0.55, 0, c_white, 0.7)
+
+				// Card name (gray)
+				draw_text_ext_transformed_color(card_x - 15, card_y + 22, rogueArray[2, i+1],
+					0, 1000, 0.35, 0.35, 0, colorgray, colorgray, colorgray, colorgray, 1)
+			}
+		}
+
+		// Instructions
+		draw_text_ext_transformed_color(xps + 127 - 45, yps + 115, "Press SPACE to select",
+			0, 1000, 0.35, 0.35, 0, c_white, c_white, c_white, c_white, 0.8)
+	}
+}
+
 //Ketchup Ground
 with(Abil){
 	if(pin==29||pin==21){
@@ -2242,26 +2445,26 @@ if(pause==10){
 	if(arcadetype==1){
 		
 		
-	draw_sprite_ext(maptest_spr,72,xps-0.5+acvartwentythree,yps-0.5,1,1,0,c_white,1)	
-	draw_sprite_ext(maptest_spr,71,xps-0.5+acvartwentythree,yps-0.5+acvartwentyfive,1,1,0,c_white,1)	
+	draw_sprite_ext(maptest_spr,72,xps-0.5+bgWaveOffsetX,yps-0.5,1,1,0,c_white,1)	
+	draw_sprite_ext(maptest_spr,71,xps-0.5+bgWaveOffsetX,yps-0.5+bgBobOffsetY,1,1,0,c_white,1)	
 	
 	draw_sprite_ext(maptest_spr,62,xps-0.5,yps-0.5,1,1,0,c_white,1)	
 
 	
-	//draw_text_transformed(xps+24+30,yps+3+30,acvartwelve,0.5,0.5,0)
+	//draw_text_transformed(xps+24+30,yps+3+30,currentWheelSegment,0.5,0.5,0)
 	
-	//draw_text_transformed(xps+24+30,yps+3+30,acvarnine,0.5,0.5,0)
-	//draw_text_transformed(xps+24+30,yps+3+40,acvartwelve,0.5,0.5,0)
-	if(acvartwentysix==0){
+	//draw_text_transformed(xps+24+30,yps+3+30,wheelAngle,0.5,0.5,0)
+	//draw_text_transformed(xps+24+30,yps+3+40,currentWheelSegment,0.5,0.5,0)
+	if(bonusWheelActive==0){
 		chance=6
 		chancetwo=5
-		draw_sprite_ext(arc_fish_spin_spr,1,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,acvarnine,c_white,1)	
-		draw_sprite_ext(arc_fish_spin_spr,14+acvartwelve,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,acvarnine,c_white,1)	
+		draw_sprite_ext(arc_fish_spin_spr,1,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,wheelAngle,c_white,1)	
+		draw_sprite_ext(arc_fish_spin_spr,14+currentWheelSegment,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,wheelAngle,c_white,1)	
 		
-		if(acvartwelve>=1&&acvartwelve<2){
-			draw_sprite_ext(arc_fish_spin_spr,64+crabtype+7,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,acvarnine,c_white,1)	
+		if(currentWheelSegment>=1&&currentWheelSegment<2){
+			draw_sprite_ext(arc_fish_spin_spr,64+crabtype+7,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,wheelAngle,c_white,1)	
 		}else{
-			draw_sprite_ext(arc_fish_spin_spr,64+crabtype,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,acvarnine,c_white,1)	
+			draw_sprite_ext(arc_fish_spin_spr,64+crabtype,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,wheelAngle,c_white,1)	
 		}
 		
 		draw_sprite_ext(arc_fish_spin_spr,2,xps-0.5+204+chancetwo+4,yps-0.5+30-0.5-chance,1,1,0,c_white,1)	
@@ -2277,16 +2480,16 @@ if(pause==10){
 	yps=camy-camytwo	
 
 	//Insert Token Sign
-		//draw_sprite_ext(arc_fish_big_spin_spr,23+acvartwentysixtwo,xps-0.5+126,yps-0.5+72-acvartwentyseven,1,1,0,c_white,1)
-		draw_sprite_ext(arc_fish_big_spin_spr,46+acvarsigntwo,xps-0.5+126,yps-0.5+72-49+acvarsign,1,1,0,c_white,1)
+		//draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,0,c_white,1)
+		draw_sprite_ext(arc_fish_big_spin_spr,46+insertTokenSignFrame,xps-0.5+126,yps-0.5+72-49+insertTokenSignY,1,1,0,c_white,1)
 
-	if(acvarnineteen>0){
+	if(hoopHighlightTimer>0){
 		chance=2
 	}else{
 		chance=0
 	}
 	
-	draw_sprite_ext(arc_fish_spin_spr,24+chance,xps-0.5+126+acvarfourteen,yps-0.5+55,1,1,0,c_white,1)	
+	draw_sprite_ext(arc_fish_spin_spr,24+chance,xps-0.5+126+hoopXOffset,yps-0.5+55,1,1,0,c_white,1)	
 
 	chancetwo=0
 	for(i=0;i<5;i+=1){
@@ -2326,39 +2529,40 @@ if(pause==10){
 		}
 	}	
 	
-	draw_sprite_ext(arc_fish_spin_spr,25+chance,xps-0.5+126+acvarfourteen,yps-0.5+55,1,1,0,c_white,1)	
+	draw_sprite_ext(arc_fish_spin_spr,25+chance,xps-0.5+126+hoopXOffset,yps-0.5+55,1,1,0,c_white,1)	
 
 	//Particles
 	with(Part){
-		draw_sprite_ext(sprite_index,image_index,x,y,1,1,image_angle,c_white,1)
+		var _pdir = variable_instance_exists(id, "dir") ? dir : 1
+		draw_sprite_ext(sprite_index,image_index,x,y,_pdir,1,image_angle,c_white,1)
 	}
 
 
-	if(acvartwentysix==1){
+	if(bonusWheelActive==1){
 		
 		
-		draw_sprite_ext(arc_fish_spin_spr,1,xps-0.5+204+5,yps-0.5+30-6,1,1,acvartwentynine,c_white,1)	
-		draw_sprite_ext(arc_fish_spin_spr,14+acvarthirty,xps-0.5+204+5,yps-0.5+30-6,1,1,acvartwentynine,c_white,1)	
+		draw_sprite_ext(arc_fish_spin_spr,1,xps-0.5+204+5,yps-0.5+30-6,1,1,savedWheelAngle,c_white,1)	
+		draw_sprite_ext(arc_fish_spin_spr,14+savedWheelSegment,xps-0.5+204+5,yps-0.5+30-6,1,1,savedWheelAngle,c_white,1)	
 		draw_sprite_ext(arc_fish_spin_spr,2,xps-0.5+204+9,yps-0.5+30-6.5,1,1,0,c_white,1)	
 		
-		draw_sprite_ext(arc_fish_spin_spr,64+crabtype,xps-0.5+204+5,yps-0.5+30-6,1,1,acvartwentynine,c_white,1)	
+		draw_sprite_ext(arc_fish_spin_spr,64+crabtype,xps-0.5+204+5,yps-0.5+30-6,1,1,savedWheelAngle,c_white,1)	
 		
 		draw_sprite_ext(maptest_spr,75,xps-0.5,yps-0.5,1,1,0,c_white,1)	
 		
 		
-		if(acvartwentyeight!=3){
-			draw_sprite_ext(arc_fish_big_spin_spr,23+acvartwentysixtwo,xps-0.5+126,yps-0.5+72-acvartwentyseven,1,1,0,c_white,1)
+		if(bonusWheelState!=3){
+			draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,0,c_white,1)
 			
-			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-acvartwentyseven,1,1,acvarnine,c_white,1)	
-			draw_sprite_ext(arc_fish_big_spin_spr,14+acvartwelve,xps-0.5+126,yps-0.5+72-acvartwentyseven,1,1,acvarnine,c_white,1)	
-			draw_sprite_ext(arc_fish_big_spin_spr,2,xps-0.5+126,yps-0.5+71-acvartwentyseven,1,1,0,c_white,1)	
+			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
+			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
+			draw_sprite_ext(arc_fish_big_spin_spr,2,xps-0.5+126,yps-0.5+71-bonusWheelTransitionY,1,1,0,c_white,1)	
 				
 		}else{
-			draw_sprite_ext(arc_fish_big_spin_spr,23+acvartwentysixtwo,xps-0.5+126,yps-0.5+71-150+acvartwentyseven,1,1,0,c_white,1)	
+			draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+71-150+bonusWheelTransitionY,1,1,0,c_white,1)	
 			
-			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-150+acvartwentyseven,1,1,acvarnine,c_white,1)	
-			draw_sprite_ext(arc_fish_big_spin_spr,14+acvartwelve,xps-0.5+126,yps-0.5+72-150+acvartwentyseven,1,1,acvarnine,c_white,1)	
-			draw_sprite_ext(arc_fish_big_spin_spr,2,xps-0.5+126,yps-0.5+71-150+acvartwentyseven,1,1,0,c_white,1)		
+			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
+			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
+			draw_sprite_ext(arc_fish_big_spin_spr,2,xps-0.5+126,yps-0.5+71-150+bonusWheelTransitionY,1,1,0,c_white,1)		
 			
 		}
 	}	
@@ -2386,29 +2590,29 @@ if(pause==10){
 	}
 
 	//Crab
-	draw_sprite_ext(abil_crab_spr,acvartwentyonetwo+floor(acvartwentyone/30)+chance,xps-0.5+28,yps-0.5+12,1,1,0,c_white,1)	
+	draw_sprite_ext(abil_crab_spr,crabAnimBase+floor(crabAnimFrame/30)+chance,xps-0.5+28,yps-0.5+12,1,1,0,c_white,1)	
 	
 	//Rarity
 	draw_sprite_ext(map_icons_spr,80+invenArray[31,16]+(arcadepetrarity*3),xps+29.5,yps-0.5+12,1,1,0,c_white,1)
 
 	//Cannons
 	draw_sprite_ext(arc_fish_spin_spr,28,xps-0.5+24,yps-0.5+82,1,1,0,c_white,1)	
-	draw_sprite_ext(arc_fish_spin_spr,29,xps-0.5+24,yps-0.5+82,1,1,acvarsixteen,c_white,1)	
+	draw_sprite_ext(arc_fish_spin_spr,29,xps-0.5+24,yps-0.5+82,1,1,cannonAngle,c_white,1)	
 	draw_sprite_ext(arc_fish_spin_spr,30,xps-0.5+24,yps-0.5+82,1,1,0,c_white,1)	
 
 	draw_sprite_ext(arc_fish_spin_spr,28,xps-0.5+24+207,yps-0.5+82,-1,1,0,c_white,1)	
-	draw_sprite_ext(arc_fish_spin_spr,29,xps-0.5+24+207,yps-0.5+82,-1,1,acvarsixteen*-1,c_white,1)	
+	draw_sprite_ext(arc_fish_spin_spr,29,xps-0.5+24+207,yps-0.5+82,-1,1,cannonAngle*-1,c_white,1)	
 	draw_sprite_ext(arc_fish_spin_spr,30,xps-0.5+24+207,yps-0.5+82,-1,1,0,c_white,1)	
 
 	//Spin Points
-	for(i=0;i<acvareighteen;i+=1){
+	for(i=0;i<spinPointsAccumulated;i+=1){
 		draw_sprite_ext(abil_crab_spr,192,xps-0.5+246,yps-0.5+36-i*4,-1,1,0,c_white,1)
 		draw_sprite_ext(abil_crab_spr,194,xps-0.5+246,yps-0.5+36-i*4,-1,1,0,c_white,1)
 	}
 
 	
 	//Spin Number
-	draw_text_transformed(xps+244,yps+15-0.5,acvarseven-acvareleven,0.5,0.5,0)		
+	draw_text_transformed(xps+244,yps+15-0.5,spinsAvailable-isSpinning,0.5,0.5,0)		
 	
 	//Coin/Token
 	draw_text_transformed(xps+244,yps+114,tokens,0.5,0.5,0)
@@ -2419,10 +2623,10 @@ if(pause==10){
 
 	/*
 	draw_text_transformed(xps+24,yps+3,"Tickets",0.5,0.5,0)
-	draw_text_transformed(xps+24+30,yps+3,acvarfour,0.5,0.5,0)
+	draw_text_transformed(xps+24+30,yps+3,totalTickets,0.5,0.5,0)
 
 	draw_text_transformed(xps+24,yps+3+20,"Plays",0.5,0.5,0)
-	draw_text_transformed(xps+24+30,yps+3+20,acvarsix,0.5,0.5,0)	
+	draw_text_transformed(xps+24+30,yps+3+20,playsRemaining,0.5,0.5,0)	
 	*/
 	
 	//Tickets
@@ -2455,31 +2659,30 @@ if(pause==10){
 
 
 	//Tickets Count
-	draw_text_transformed(xps+25+2-(string_length(acvarfour)*2.3),yps+110,acvarfour,0.5,0.5,0)
+	draw_text_transformed(xps+25+2-(string_length(totalTickets)*2.3),yps+110,totalTickets,0.5,0.5,0)
 	
-	if(acvartwenty>0){
-		draw_text_transformed(xps+25+2-(string_length(acvartwenty)*2.3),yps+110-15,acvartwenty,0.5,0.5,0)	
+	if(pendingTickets>0){
+		draw_text_transformed(xps+25+2-(string_length(pendingTickets)*2.3),yps+110-15,pendingTickets,0.5,0.5,0)	
 	}
 	
 
 	
 	//Test
 	
-	draw_text_transformed(xps+225=20+1.5,yps+110,acvartwentyeight,0.5,0.5,0)
-	draw_text_transformed(xps+225=20+1.5,yps+110-10,acvartwentyseven,0.5,0.5,0)
+	draw_text_transformed(xps+225=20+1.5,yps+110,bonusWheelState,0.5,0.5,0)
+	draw_text_transformed(xps+225=20+1.5,yps+110-10,bonusWheelTransitionY,0.5,0.5,0)
 	
 	//Play Count
 	draw_sprite_ext(arc_fish_spin_spr,35,xps+214+15-0.5,yps+103+18-0.5,1,1,0,c_white,1)	
 
 	
 	//Token
-	if(acvarthirtythree>0){
-		draw_sprite_ext(arc_fish_spin_spr,36+tokentype,xps+226,yps+110+acvarthirtythree,1,1,tokenangle,c_white,1)	
+	if(tokenDropAnimation>0){
+		draw_sprite_ext(arc_fish_spin_spr,36+tokentype,xps+226,yps+110+tokenDropAnimation,1,1,tokenangle,c_white,1)	
 	}	
 	draw_sprite_ext(arc_fish_spin_spr,34,xps+214+15-0.5,yps+103+18-0.5,1,1,0,c_white,1)	
-	draw_text_transformed(xps+225+1.5-(string_length(acvarsix)*1.5),yps+110,acvarsix,0.5,0.5,0)
-	
-	
+	draw_text_transformed(xps+225+1.5-(string_length(playsRemaining)*1.5),yps+110,playsRemaining,0.5,0.5,0)
+
 	}else{
 	
 		//BeeHive Arcade
@@ -2587,8 +2790,8 @@ if(pause==10){
 
 		//Tickets Count
 			draw_text_transformed(xps,yps+100,"Lvl",0.5,0.5,0)
-			draw_text_transformed(xps+2+10,yps+100,acvarfour,0.5,0.5,0)
-			draw_text_transformed(xps+10+20+2,yps+100,acvarfive,0.5,0.5,0)
+			draw_text_transformed(xps+2+10,yps+100,totalTickets,0.5,0.5,0)
+			draw_text_transformed(xps+10+20+2,yps+100,bonusRollActive,0.5,0.5,0)
 		
 		if(instance_exists(playerbee)){
 				draw_text_transformed(xps,yps+100+30,"AS",0.5,0.5,0)

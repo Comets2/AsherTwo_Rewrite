@@ -1,5 +1,6 @@
 sprite_index=me_spr
 image_speed=0
+mespr=me_spr
 
 charvar_scr()
 hp=12
@@ -20,6 +21,7 @@ dpstimertwo=0
 damagedone=0
 damagedonetwo=0
 damagedonethree=0
+passive=0
 passivetwo=0
 passivethree=0
 passivefour=0
@@ -44,6 +46,12 @@ controls=0
 dies=0
 deathtick=0
 deathcd=0
+
+// Rogue Mode stats
+rogue_statatt = 0      // Attack bonus
+rogue_statsped = 0     // Speed bonus
+rogue_statattsped = 0  // Attack speed bonus
+rogue_statpower = 0    // Health/Power bonus
 
 
 

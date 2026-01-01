@@ -32,6 +32,12 @@ function level_run_scr() {
 	*/
 #endregion
 
+	// Rogue mode uses its own run script
+	if(rogue_mode){
+		rogue_run_scr()
+		return
+	}
+
 	if(pause==0){
 	stagetimer+=1
 	}

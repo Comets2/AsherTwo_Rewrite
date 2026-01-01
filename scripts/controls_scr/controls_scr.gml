@@ -1,4 +1,54 @@
 function controls_scr(){
+	// Capture mouse input FIRST - before anything else can consume it
+	var _rawLeftPressed = mouse_check_button_pressed(mb_left)
+	var _rawRightPressed = mouse_check_button_pressed(mb_right)
+	global.mouse_left_held = mouse_check_button(mb_left)
+	global.mouse_right_held = mouse_check_button(mb_right)
+
+	// Click buffer system - if button is newly held (wasn't held last frame), treat as pressed
+	// This catches clicks that mouse_check_button_pressed() might miss
+	if(!variable_global_exists("_mouse_left_was_held")) global._mouse_left_was_held = false
+	if(!variable_global_exists("_mouse_right_was_held")) global._mouse_right_was_held = false
+
+	var _leftNewlyHeld = global.mouse_left_held && !global._mouse_left_was_held
+	var _rightNewlyHeld = global.mouse_right_held && !global._mouse_right_was_held
+
+	// Use either raw pressed OR newly held (backup detection)
+	global.mouse_left_pressed = _rawLeftPressed || _leftNewlyHeld
+	global.mouse_right_pressed = _rawRightPressed || _rightNewlyHeld
+
+	// Update "was held" for next frame
+	global._mouse_left_was_held = global.mouse_left_held
+	global._mouse_right_was_held = global.mouse_right_held
+
+	// Console logging for mouse input debugging
+	if(global.mouse_left_pressed){
+		var _src = _rawLeftPressed ? "pressed()" : "newly_held"
+		show_debug_message(">>> MOUSE LEFT PRESSED at t=" + string(current_time) + " focus=" + string(window_has_focus()) + " src=" + _src)
+	}
+	if(global.mouse_right_pressed){
+		var _src = _rawRightPressed ? "pressed()" : "newly_held"
+		show_debug_message(">>> MOUSE RIGHT PRESSED at t=" + string(current_time) + " focus=" + string(window_has_focus()) + " src=" + _src)
+	}
+	// Log held-but-not-pressed (indicates click on previous frame, still holding)
+	if(global.mouse_left_held && !global.mouse_left_pressed){
+		// Only log once per hold, not every frame - use a static flag
+		if(!variable_global_exists("_debug_left_hold_logged") || !global._debug_left_hold_logged){
+			show_debug_message("    LEFT HELD (not pressed) at t=" + string(current_time))
+			global._debug_left_hold_logged = true
+		}
+	}else{
+		global._debug_left_hold_logged = false
+	}
+	if(global.mouse_right_held && !global.mouse_right_pressed){
+		if(!variable_global_exists("_debug_right_hold_logged") || !global._debug_right_hold_logged){
+			show_debug_message("    RIGHT HELD (not pressed) at t=" + string(current_time))
+			global._debug_right_hold_logged = true
+		}
+	}else{
+		global._debug_right_hold_logged = false
+	}
+
 	global.con_h_up=keyboard_check(global.consave_up)
 
 	global.con_p_up=keyboard_check_pressed(global.consave_up)
@@ -187,6 +237,14 @@ function controls_scr(){
 	global.conp_p_shl=gamepad_button_check_pressed(gamep1,gp_shoulderl)
 	global.conp_h_shr=gamepad_button_check(gamep1,gp_shoulderr)
 	global.conp_h_shl=gamepad_button_check(gamep1,gp_shoulderl)
+
+	// Analog stick raw axis values for direct movement
+	global.conp_axis_lh = gamepad_axis_value(gamep1, gp_axislh)
+	global.conp_axis_lv = gamepad_axis_value(gamep1, gp_axislv)
+
+	// Deadzone handling
+	if(abs(global.conp_axis_lh) < 0.2) global.conp_axis_lh = 0
+	if(abs(global.conp_axis_lv) < 0.2) global.conp_axis_lv = 0
 
 	// Touch input handling
 	// Initialize touch variables if they don't exist

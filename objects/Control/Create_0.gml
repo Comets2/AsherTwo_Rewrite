@@ -88,6 +88,21 @@ falloff_factor=2000
 
 	// Arcade Selection variables
 	arcade_selection = 0
+	fish_char_selection = 0  // 0 = Crab, 1 = Squid
+
+	// Rogue Mode variables
+	rogue_selection = 0      // Level selection (0=Forest)
+	rogue_mode = false       // Flag for rogue mode active
+	rogue_wave = 0           // Current wave number
+	rogue_xp = 0             // XP collected for level ups
+	rogue_level = 1          // Current player level
+	rogue_xp_needed = 10     // XP needed for next level
+	rogue_pause = 0          // 0=gameplay, 1=card selection
+	rogue_card_select = 0    // Currently selected card
+	levelupselecttotal_rogue = 3  // Number of cards to show
+	rogue_wave_timer = 0     // Timer until next wave
+	rogue_wave_active = false // Is a wave currently in progress
+	rogue_enemies_remaining = 0  // Enemies left in current wave
 
 	// Sound Settings
 	global.master_volume = 1.0
@@ -265,6 +280,16 @@ global.conp_p_down=0
 global.conp_p_right=0
 global.conp_p_left=0
 
+// Mouse input captured in controls_scr (Begin Step)
+global.mouse_left_pressed = false
+global.mouse_right_pressed = false
+global.mouse_left_held = false
+global.mouse_right_held = false
+global._mouse_left_was_held = false
+global._mouse_right_was_held = false
+global._debug_left_hold_logged = false
+global._debug_right_hold_logged = false
+
 controls_scr()
 
 // Default values for variables that may be accessed before game_start_scr() runs
@@ -278,45 +303,51 @@ border = 0
 roomArray[0,0] = 0
 
 // Arcade variables (initialized here so Draw doesn't error before arcade_scr runs)
-acvartimer = 0
-acvarthree = 0
-acvarfour = 0
-acvarfive = 0
-acvarsign = 0
-acvarsigntwo = 0
-acvarsix = 0
-acvarseven = 0
-acvareight = 0
-acvarnine = 0
-acvarten = 0
-acvareleven = 0
-acvartwelve = 0
-acvarthirteen = 0
-acvarfourteen = 0
-acvarfifteen = 0
-acvarsixteen = 0
-acvarseventeen = 0
-acvareighteen = 0
-acvarnineteen = 0
-acvartwenty = 0
-acvartwentyone = 0
-acvartwentyonetwo = 0
-acvartwentyonethree = 0
-acvartwentyonefour = 0
-acvartwentyonefive = 0
-acvartwentyonestable = 0
-acvartwentytwo = 0
-acvartwentythree = 0
-acvartwentyfour = 0
-acvartwentyfive = 0
-acvartwentysix = 0
-acvartwentysixtwo = 0
-acvartwentyseven = 0
-acvartwentyeight = 0
-acvartwentynine = 0
-acvarthirty = 0
-acvarthirtythree = 0
-acvardur = 0
+gameTimer = 0
+bonusFishToDispense = 0
+totalTickets = 0
+bonusRollActive = 0
+insertTokenSignY = 0
+insertTokenSignFrame = 0
+playsRemaining = 0
+spinsAvailable = 0
+wheelSpinTimer = 0
+wheelAngle = 0
+wheelRotationSpeed = 0
+isSpinning = 0
+currentWheelSegment = 0
+spinDecelerating = 0
+hoopXOffset = 0
+hoopDirection = 0
+cannonAngle = 0
+cannonDirection = 0
+cannonCooldown = 0
+spinPointsAccumulated = 0
+hoopHighlightTimer = 0
+pendingTickets = 0
+crabAnimFrame = 0
+crabAnimBase = 0
+crabAnimDuration = 0
+crabAnimSpeed = 0
+crabCelebrateState = 0
+crabAnimDefault = 0
+bgWaveDirection = 0
+bgWaveOffsetX = 0
+bgBobDirection = 0
+bgBobOffsetY = 0
+bonusWheelActive = 0
+bonusWheelFrame = 0
+bonusWheelTransitionY = 0
+bonusWheelState = 0
+savedWheelAngle = 0
+savedWheelSegment = 0
+tokenDropAnimation = 0
+dispenseDuration = 0
+fishBoardTickTimer = 0
+fishBoardTickInterval = 0
+canStopSpin = 0
+lastSegmentForSound = 0
+spinSoundPlayed = 0
 crabtype = 0
 arcadepet = 0
 arcadepetrarity = 0
@@ -326,11 +357,31 @@ arcwave = 0
 arcwavetimer = 0
 tokens = 0
 arcpause = 0
+
+// Debug: Click tracking variables
+debugClickLog = []
+debugClickEnabled = true  // Set to false to disable debug display
+debugLastAction = "None"
+debugClickCount = 0
+debugActionCount = 0
+
 // Initialize arcadeArray with enough indices
 for(var i = 0; i < 150; i++){
 	for(var j = 0; j < 10; j++){
 		arcadeArray[i,j] = 0
 	}
+}
+
+// Initialize rogueArray for card selection (similar to arcadeArray)
+for(var i = 0; i < 10; i++){
+	rogueArray[1,i] = 0   // Card type
+	rogueArray[2,i] = ""  // Card name
+}
+
+// Initialize rogue spawn points array
+for(var i = 0; i < 10; i++){
+	rogueSpawnArray[i,0] = 0  // X position
+	rogueSpawnArray[i,1] = 0  // Y position
 }
 
 // Initialize invenArray with default values (for arcade mode before game starts)

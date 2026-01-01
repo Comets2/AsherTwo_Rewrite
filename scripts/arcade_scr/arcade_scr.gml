@@ -1,5 +1,32 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+
+// === FISH MARBLE GAME CONSTANTS ===
+
+// Fish sprite frames (abil_crab_spr)
+#macro FISH_FRAME_NORMAL         53
+#macro FISH_FRAME_SHOOTER        54
+#macro FISH_FRAME_BONUS_5        185
+#macro FISH_FRAME_BONUS_10       186
+#macro FISH_FRAME_BONUS_15       187
+#macro FISH_FRAME_CRAB_BASE      224
+#macro FISH_FRAME_SQUID_BASE     252
+
+// Wheel sprite frames (arc_fish_spin_spr)
+#macro WHEEL_FRAME_BASE          1
+#macro WHEEL_FRAME_POINTER       2
+#macro WHEEL_FRAME_SEGMENT_BASE  14
+#macro HOOP_FRAME_NORMAL         24
+#macro CANNON_FRAME_BASE         28
+#macro CANNON_FRAME_BARREL       29
+#macro CANNON_FRAME_FRONT        30
+
+// Game balance
+#macro STARTING_PLAYS            10
+#macro WHEEL_TIMER_START         300
+#macro FISH_GRAVITY              0.035
+#macro FISH_LAUNCH_SPEED         3.0
+
 function arcade_scr(){
 
 xps=camx-camxtwo
@@ -9,6 +36,13 @@ yps=camy-camytwo
 
 	//Fish Marble Game
 	if(arcadetype==1){
+
+		// Use global mouse state captured in controls_scr (Begin Step - runs before any Step code)
+		var _mouseLeftPressed = global.mouse_left_pressed
+		var _mouseRightPressed = global.mouse_right_pressed
+		var _mouseLeftHeld = global.mouse_left_held
+		var _mouseRightHeld = global.mouse_right_held
+		var _mouseClickConsumed = false  // Flag to track if click was used by wheel
 
 		if(invenArray[31,15]+1<299){
 			invenArray[31,15]+=1
@@ -49,7 +83,7 @@ yps=camy-camytwo
 			eventtwo=0
 			
 			arcadepet=0
-			arcadepetrarity=choose(0,1,2,3,4)
+			arcadepetrarity=0
 
 			for(i=0;i<100;i+=1){
 				created=instance_create_depth(xps+50+10+random(206-50-20),yps+105+random(15),0,Arcade)
@@ -125,89 +159,89 @@ yps=camy-camytwo
 				}
 			}			
 			
-			acvartimer=0
+			gameTimer=0
 			
-			acvarone=100
-			acvartwo=100
+			fishBoardTickTimer=100
+			fishBoardTickInterval=100
 			
 			//Bonus
-			acvarthree=0
+			bonusFishToDispense=0
 			
 			//Tickets
-			acvarfour=0
+			totalTickets=0
 			//Bonus Roll
-			acvarfive=0
+			bonusRollActive=0
 			//Plays
-			acvarsix=15
-			acvarsix=10
+			playsRemaining=15
+			playsRemaining=10
 			
 			//Insert token 
-			acvarsign=0
-			acvarsigntwo=0
+			insertTokenSignY=0
+			insertTokenSignFrame=0
 			
 			//Bonus Que
-			acvarseven=0
-			acvareight=300
-			acvarnine=irandom(360)
-			acvarten=random_range(4,7)
-			acvareleven=0
-			acvartwelve=abs(floor((acvarnine-360)/45)+1)
-			acvarthirteen=0
-			acvarthirteentwo=1
+			spinsAvailable=0
+			wheelSpinTimer=300
+			wheelAngle=irandom(360)
+			wheelRotationSpeed=random_range(4,7)
+			isSpinning=0
+			currentWheelSegment=abs(floor((wheelAngle-360)/45)+1)
+			spinDecelerating=0
+			spinSoundPlayed=1
 			
-			acvarfourteen=0
-			acvarfifteen=choose(0,1)
+			hoopXOffset=0
+			hoopDirection=choose(0,1)
 			
 			//Cannon Angle
-			acvarsixteen=3
-			acvarseventeen=0
-			
+			cannonAngle=3
+			cannonDirection=0
+			cannonCooldown=0
+
 			//Number till spin
-			acvareighteen=0
+			spinPointsAccumulated=0
 			
 			//Hoop highlight
-			acvarnineteen=0
+			hoopHighlightTimer=0
 			
 			//Tickets yet to come out
-			acvartwenty=0
-			
-			//Crab
-			crabtype=0
-			acvartwentyone=0
+			pendingTickets=0
+
+			//Crab/Squid character (crabtype set in character selection)
+			crabAnimFrame=0
 			if(crabtype==0){
-				acvartwentyonetwo=224
+				crabAnimBase=224
 			}else{
-				acvartwentyonetwo=252
+				crabAnimBase=252
 			}
 			
-			acvartwentyonestable=acvartwentyonetwo
-			acvartwentyonethree=30*3
-			acvartwentyonefour=1
-			acvartwentyonefive=0
+			crabAnimDefault=crabAnimBase
+			crabAnimDuration=30*3
+			crabAnimSpeed=1
+			crabCelebrateState=0
 			
 			//Background
-			acvartwentytwo=0
-			acvartwentythree=0
-			acvartwentyfour=0
-			acvartwentyfive=0
+			bgWaveDirection=0
+			bgWaveOffsetX=0
+			bgBobDirection=0
+			bgBobOffsetY=0
 			
 			//Bonus Wheel
-			acvartwentysix=0
-			acvartwentysixtwo=0
-			acvartwentyseven=0
-			acvartwentyeight=0
-			acvartwentynine=0
-			acvarthirty=0
+			bonusWheelActive=0
+			bonusWheelFrame=0
+			bonusWheelTransitionY=0
+			bonusWheelState=0
+			savedWheelAngle=0
+			savedWheelSegment=0
 			
 			//Stop spin
-			acvarthirtyone=1
+			canStopSpin=1
 			
 			//spin label checker for sound
-			acvarthirtytwo=acvartwelve=abs(floor((acvarnine-360)/45)+1)
+			lastSegmentForSound=currentWheelSegment=abs(floor((wheelAngle-360)/45)+1)
 			
 			//Token
-			acvarthirtythree=0
-			
+			tokenDropAnimation=0
+
 			//Array
 			arcadeArray[0,0]=0
 			arcadeArray[0,1]=0
@@ -234,7 +268,7 @@ yps=camy-camytwo
 			arcadeArray[21,5]=0
 			arcadeArray[21,6]=0			
 			
-			acvardur=0
+			dispenseDuration=0
 			arcadeArray[0,0]=0
 			
 			arcadeprizeArray[0,0]=2
@@ -364,13 +398,13 @@ yps=camy-camytwo
 		
 
 	//Insert Token
-	if(acvarsix<=0){
-		if(acvarsign<49){
-			acvarsign+=1
+	if(playsRemaining<=0){
+		if(insertTokenSignY<49){
+			insertTokenSignY+=1
 		}
 	}else{
-		if(acvarsign>0){
-			acvarsign-=1
+		if(insertTokenSignY>0){
+			insertTokenSignY-=1
 		}	
 	}
 
@@ -478,41 +512,41 @@ yps=camy-camytwo
 
 		
 		//Crab anim Yawn
-		if(acvarsix==0&&acvarseven==0){
-			if(acvartwentyonetwo!=acvartwentyonestable+4&&acvartwentyonetwo!=acvartwentyonestable+6){
-				acvartwentyonetwo=acvartwentyonestable+4
-				acvartwentyonethree=30*4
-				acvartwentyone=0
-				acvartwentyonefour=0.5
-				image_index=acvartwentyonetwo
+		if(playsRemaining==0&&spinsAvailable==0){
+			if(crabAnimBase!=crabAnimDefault+4&&crabAnimBase!=crabAnimDefault+6){
+				crabAnimBase=crabAnimDefault+4
+				crabAnimDuration=30*4
+				crabAnimFrame=0
+				crabAnimSpeed=0.5
+				image_index=crabAnimBase
 				
-				acvartwentyonetwo=acvartwentyonestable+6
-				acvartwentyonethree=30*3
-				acvartwentyone=0	
-				acvartwentyonefour=0.3
-				image_index=acvartwentyonetwo				
+				crabAnimBase=crabAnimDefault+6
+				crabAnimDuration=30*3
+				crabAnimFrame=0	
+				crabAnimSpeed=0.3
+				image_index=crabAnimBase				
 			}
 		}else{
 			
-			if(acvartwentyonetwo!=acvartwentyonestable&&acvarseven==0){
+			if(crabAnimBase!=crabAnimDefault&&spinsAvailable==0){
 				//Return to default
-				acvartwentyone=0
-				acvartwentyonetwo=acvartwentyonestable
-				acvartwentyonethree=30*3
-				acvartwentyonefour=1	
-				image_index=acvartwentyonetwo
+				crabAnimFrame=0
+				crabAnimBase=crabAnimDefault
+				crabAnimDuration=30*3
+				crabAnimSpeed=1	
+				image_index=crabAnimBase
 			}
 			
-			if(acvartwentyonetwo!=acvartwentyonestable+9){
-				if(acvarseven>0){
-					if(acvartwentyonefive>=0){
+			if(crabAnimBase!=crabAnimDefault+9){
+				if(spinsAvailable>0){
+					if(crabCelebrateState>=0){
 						//Celebrate
-						acvartwentyone=0
-						acvartwentyonetwo=acvartwentyonestable+9
-						acvartwentyonethree=30*4
-						acvartwentyonefour=2
-						acvartwentyonefive=1
-						image_index=acvartwentyonetwo
+						crabAnimFrame=0
+						crabAnimBase=crabAnimDefault+9
+						crabAnimDuration=30*4
+						crabAnimSpeed=2
+						crabCelebrateState=1
+						image_index=crabAnimBase
 					}
 				}
 			}
@@ -527,31 +561,31 @@ yps=camy-camytwo
 			}
 
 		//Crab image_index
-		if(acvartwentyone+acvartwentyonefour<acvartwentyonethree){
-			acvartwentyone+=acvartwentyonefour
+		if(crabAnimFrame+crabAnimSpeed<crabAnimDuration){
+			crabAnimFrame+=crabAnimSpeed
 		}else{
-			acvartwentyone=0
+			crabAnimFrame=0
 			
 			//Yawn Loop
-			if(acvartwentyonetwo==acvartwentyonestable+6){
-				acvartwentyonetwo=acvartwentyonestable+6
-				acvartwentyonethree=30*3
-				acvartwentyone=0	
-				acvartwentyonefour=0.3
-				image_index=acvartwentyonetwo
+			if(crabAnimBase==crabAnimDefault+6){
+				crabAnimBase=crabAnimDefault+6
+				crabAnimDuration=30*3
+				crabAnimFrame=0	
+				crabAnimSpeed=0.3
+				image_index=crabAnimBase
 			}else{
 			
 				//Celebrate back
-				if(acvartwentyonetwo==acvartwentyonestable+9){
-					if(acvartwentyonefive==0){
-						acvartwentyone=0
-						acvartwentyonetwo=acvartwentyonestable
-						acvartwentyonethree=30*3
-						acvartwentyonefour=1
-						acvartwentyonefive=-1
-						image_index=acvartwentyonetwo
+				if(crabAnimBase==crabAnimDefault+9){
+					if(crabCelebrateState==0){
+						crabAnimFrame=0
+						crabAnimBase=crabAnimDefault
+						crabAnimDuration=30*3
+						crabAnimSpeed=1
+						crabCelebrateState=-1
+						image_index=crabAnimBase
 					}else{
-						acvartwentyonefive-=1
+						crabCelebrateState-=1
 					}
 				}else{
 			
@@ -563,19 +597,19 @@ yps=camy-camytwo
 		}
 
 //Inifinite wheel
-//acvarnine+=0.1
-//acvarseven+=0.1
+//wheelAngle+=0.1
+//spinsAvailable+=0.1
 
 with(Part){
-	
+
 	image_angle+=spin
-	
+
 	if(image_index+imgsped>img+imgcap){
 		image_index=img
 	}else{
 		image_index+=imgsped
 	}
-	
+
 	x+=hsp
 	y+=vsp
 
@@ -585,53 +619,85 @@ with(Part){
 		instance_destroy()
 	}
 
+	// Lightning bolt behavior
+	if(variable_instance_exists(id, "isLightning") && isLightning){
+		// On strike frames (image_index >= 2), play sound
+		if(image_index>=2 && hasStruck==0){
+			hasStruck=1
+			audio_play_sound_at(choose(snd_crab_squid_shock_1,snd_crab_squid_shock_2),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
+		}
+
+		// Collect marbles within range of lightning
+		if(image_index >= 2){
+			with(Arcade){
+				if(pin==1){
+					if(point_distance(x,y,other.x,other.y) < 10){
+						Control.pendingTickets += value
+						Control.arcadeArray[100,0] += 1
+						Control.arcadeArray[100+Control.arcadeArray[100,0],0] = 60
+						Control.arcadeArray[100+Control.arcadeArray[100,0],1] = value
+						Control.arcadeArray[100+Control.arcadeArray[100,0],2] = x
+						Control.arcadeArray[100+Control.arcadeArray[100,0],3] = 0
+						audio_play_sound_at(choose(snd_ac_cute_1,snd_ac_cute_2,snd_ac_cute_3,snd_ac_cute_4),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
+						instance_destroy()
+					}
+				}
+			}
+		}
+
+		// Delete main lightning after image_index 5
+		if(image_index > 5){
+			instance_destroy()
+		}
+	}
+
 }
 
-		if(acvartwentytwo==0){
-			if(acvartwentythree<4){
-				acvartwentythree+=0.01
+		if(bgWaveDirection==0){
+			if(bgWaveOffsetX<4){
+				bgWaveOffsetX+=0.01
 			}else{
-				acvartwentytwo=1
+				bgWaveDirection=1
 			}
 		}else{
-			if(acvartwentythree>-4){
-				acvartwentythree-=0.01
+			if(bgWaveOffsetX>-4){
+				bgWaveOffsetX-=0.01
 			}else{
-				acvartwentytwo=0
+				bgWaveDirection=0
 			}		
 		}
 		
-		if(acvartwentyfour==0){
-			if(acvartwentyfive<2){
-				acvartwentyfive+=0.01
+		if(bgBobDirection==0){
+			if(bgBobOffsetY<2){
+				bgBobOffsetY+=0.01
 			}else{
-				acvartwentyfour=1
+				bgBobDirection=1
 			}
 		}else{
-			if(acvartwentyfive>-2){
-				acvartwentyfive-=0.01
+			if(bgBobOffsetY>-2){
+				bgBobOffsetY-=0.01
 			}else{
-				acvartwentyfour=0
+				bgBobDirection=0
 			}		
 		}		
 		
-		acvartimer+=1
+		gameTimer+=1
 	
-		if(acvartimer mod 75==0){
-			if(acvarsigntwo==0){
-				acvarsigntwo=1
+		if(gameTimer mod 75==0){
+			if(insertTokenSignFrame==0){
+				insertTokenSignFrame=1
 			}else{
-				acvarsigntwo=0
+				insertTokenSignFrame=0
 			}
 		}
 	
 		//Ticket
-		if(acvartwenty>0){
+		if(pendingTickets>0){
 			if(arcadeArray[0,1]<4){
 				arcadeArray[0,1]+=1
 				arcadeArray[arcadeArray[0,1],0]=1
 				arcadeArray[arcadeArray[0,1],2]=1
-				acvartwenty-=1
+				pendingTickets-=1
 				//audio_play_sound_at(choose(snd_ac_tick_1,snd_ac_tick_2,snd_ac_tick_3),xps+30,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 			}
 		}
@@ -642,7 +708,7 @@ with(Part){
 			if(arcadeArray[i,1]<100){
 				
 				if(arcadeArray[i,2]==1){
-					acvarfour+=1
+					totalTickets+=1
 					arcadeArray[i,2]=0
 				}
 				if(i==1){
@@ -671,103 +737,108 @@ with(Part){
 		}
 
 		//Hoop Highlight
-		if(acvarnineteen>0){
-			acvarnineteen-=1
+		if(hoopHighlightTimer>0){
+			hoopHighlightTimer-=1
 		}
 		
 
 		
 		//Spin points till spin
-		if(acvareighteen>=3){
-			acvareighteen-=3
-			acvarseven+=1
+		if(spinPointsAccumulated>=3){
+			spinPointsAccumulated-=3
+			spinsAvailable+=1
 			
 		}
 
-	if(acvartwentyseven>0){
+	if(bonusWheelTransitionY>0){
 		
-		acvartwentyseven-=2
+		bonusWheelTransitionY-=2
 		
-		if(acvartwentyeight==3){
-			acvartwentyseven-=3
+		if(bonusWheelState==3){
+			bonusWheelTransitionY-=3
 		}
 		
-		if(acvartwentyseven==0){
-			if(acvartwentyeight==3){
-				acvartwentysix=0
-				acvartwentysixtwo=0
-				acvartwentyeight=0
-				acvarnine=acvartwentynine
-				acvartwelve=acvarthirty
+		if(bonusWheelTransitionY==0){
+			if(bonusWheelState==3){
+				bonusWheelActive=0
+				bonusWheelFrame=0
+				bonusWheelState=0
+				wheelAngle=savedWheelAngle
+				currentWheelSegment=savedWheelSegment
 			}
 		}
 	
 	}else{
 		
 		//SPIN
-		if(acvarseven>0){
-			if(acvareight>0||acvarten>0){
-				if(acvareight==300){
+		if(spinsAvailable>0){
+			if(wheelSpinTimer>0||wheelRotationSpeed>0){
+				if(wheelSpinTimer==300){
 				
 				/*
 				//Crab celebrate
-				acvartwentyone=0
-				acvartwentyonetwo=207
-				acvartwentyonethree=30*3
-				acvartwentyonefour=1	
+				crabAnimFrame=0
+				crabAnimBase=207
+				crabAnimDuration=30*3
+				crabAnimSpeed=1	
 				*/
 					
-					acvarten=random_range(4,7)
+					wheelRotationSpeed=random_range(4,7)
 					
-					if(acvartwentysix>0){
-						acvarten=random_range(4,4.5)
+					if(bonusWheelActive>0){
+						wheelRotationSpeed=random_range(4,4.5)
 					}
-					acvareleven=1
-					acvarthirtyone=1
-					acvareight=299
+					isSpinning=1
+					canStopSpin=1
+					wheelSpinTimer=299
 				}
 				
-				acvareight-=1
+				wheelSpinTimer-=1
 				
-				if(acvartwentysix>0){
+				if(bonusWheelActive>0){
 					
-						if(acvartwentysixtwo+0.4<22){
-							acvartwentysixtwo+=0.1
+						if(bonusWheelFrame+0.4<22){
+							bonusWheelFrame+=0.1
 						}else{
-							acvartwentysixtwo=0
+							bonusWheelFrame=0
 						}
 					
-						if(acvarthirtyone==1){
-							
-							if(global.con_p_q||global.con_p_e||global.conp_p_q||global.conp_p_e||global.conp_p_space||mouse_check_button(mb_left)||mouse_check_button(mb_right)){
-								if(acvarten>3){
-									acvarten=random_range(2.9,3.1)
-									acvarthirtyone=0
-									acvareight=50
-								}	
+						if(canStopSpin==1){
+							var _wheelMouseClick = _mouseLeftPressed || _mouseRightPressed
+							var _wheelKbClick = global.con_p_q||global.con_p_e||global.conp_p_q||global.conp_p_e||global.conp_p_space
+
+							if(_wheelKbClick || _wheelMouseClick){
+								if(wheelRotationSpeed>0.5){
+									wheelRotationSpeed=random_range(2.9,3.1)
+									canStopSpin=0
+									wheelSpinTimer=50
+									if(_wheelMouseClick) _mouseClickConsumed = true  // Mark click as consumed by wheel
+								}else{
+									if(_wheelMouseClick) _mouseClickConsumed = true  // Still consumed even if blocked
+								}
 							}
 						}else{
-							if(acvarten>0.009){
-								acvarten-=0.009
+							if(wheelRotationSpeed>0.009){
+								wheelRotationSpeed-=0.009
 							}else{
-								acvarten=0
+								wheelRotationSpeed=0
 							}
 						}
 				}
 				
 				
-				if(acvarnine+acvarten>=360){
-					acvarnine-=360
+				if(wheelAngle+wheelRotationSpeed>=360){
+					wheelAngle-=360
 				}
-					acvarnine+=acvarten
+					wheelAngle+=wheelRotationSpeed
 				
-				if(acvarthirteen==0){
+				if(spinDecelerating==0){
 
-					if(acvarten<0.1){
-						if(acvarthirteentwo==1){
-							acvarthirteentwo=0
+					if(wheelRotationSpeed<0.1){
+						if(spinSoundPlayed==1){
+							spinSoundPlayed=0
 
-							if(acvartwentysix>0){
+							if(bonusWheelActive>0){
 				
 								audio_play_sound_at(choose(snd_ac_win_1,snd_ac_win_2,snd_ac_win_3),xps+125,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 							}else{
@@ -779,26 +850,26 @@ with(Part){
 					}
 
 					
-					if(acvarten>0.06){
-						if(acvartwentysix>0){
+					if(wheelRotationSpeed>0.06){
+						if(bonusWheelActive>0){
 							
 						}else{
-							acvarten-=0.02
+							wheelRotationSpeed-=0.02
 						}
 					}else{
-						acvarten=0
-						acvareight=30
+						wheelRotationSpeed=0
+						wheelSpinTimer=30
 						
 						
-						acvarthirteen=1
-						acvarthirteentwo=1
+						spinDecelerating=1
+						spinSoundPlayed=1
 					}
 				}
-				acvartwelve=abs(floor((acvarnine-360)/45)+1)
-				if(acvarthirtytwo!=acvartwelve){
-					acvarthirtytwo=acvartwelve
+				currentWheelSegment=abs(floor((wheelAngle-360)/45)+1)
+				if(lastSegmentForSound!=currentWheelSegment){
+					lastSegmentForSound=currentWheelSegment
 					
-					if(acvartwentysix>0){
+					if(bonusWheelActive>0){
 				
 						audio_play_sound_at(choose(snd_ac_ticktwo_1,snd_ac_ticktwo_2,snd_ac_ticktwo_3),xps+125,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 					}else{
@@ -811,31 +882,31 @@ with(Part){
 			}else{
 				
 				//Celebrate reset
-				acvartwentyonefive=0
+				crabCelebrateState=0
 				
-				acvareleven=0
-				acvareight=300
-				acvarseven-=1
-				acvarthirteen=0
+				isSpinning=0
+				wheelSpinTimer=300
+				spinsAvailable-=1
+				spinDecelerating=0
 				
-				chance=acvartwelve
+				chance=currentWheelSegment
 				
 				
 				
 				/*
 				if(choose(0,1)==0){
-					other.acvarthree+=choose(2,2,3,3,5,5,10,10,50)
+					other.bonusFishToDispense+=choose(2,2,3,3,5,5,10,10,50)
 				}else{
-					other.acvarsix+=choose(2,2,2,3,3,3,5,5,5)
+					other.playsRemaining+=choose(2,2,2,3,3,3,5,5,5)
 				}
 				*/
 				chancetwo=0
-				if(acvartwentysix>0){
+				if(bonusWheelActive>0){
 					chance+=10
 					
-					if(acvartwentyeight==1){
-						acvartwentyeight=3
-						acvartwentyseven=150
+					if(bonusWheelState==1){
+						bonusWheelState=3
+						bonusWheelTransitionY=150
 					}					
 					
 				}
@@ -845,10 +916,10 @@ with(Part){
 				//arcadeprizeArray[chance,1]=6
 	
 				if(arcadeprizeArray[chance,1]==0){
-					acvarsix+=arcadeprizeArray[chance,0]
+					playsRemaining+=arcadeprizeArray[chance,0]
 				}else{
 					if(arcadeprizeArray[chance,1]==1){
-						acvarthree+=arcadeprizeArray[chance,0]
+						bonusFishToDispense+=arcadeprizeArray[chance,0]
 					}else{
 						if(arcadeprizeArray[chance,1]==2){
 							
@@ -894,12 +965,12 @@ with(Part){
 						
 							//Bonus Treasure wheel
 							if(arcadeprizeArray[chance,1]==3){
-								acvartwentysix=1
-								acvartwentyseven=150
-								acvartwentyeight=1
-								acvarseven+=1
-								acvartwentynine=acvarnine
-								acvarthirty=acvartwelve
+								bonusWheelActive=1
+								bonusWheelTransitionY=150
+								bonusWheelState=1
+								spinsAvailable+=1
+								savedWheelAngle=wheelAngle
+								savedWheelSegment=currentWheelSegment
 							}else{
 								
 								//Abil 1
@@ -1038,13 +1109,13 @@ with(Part){
 												
 												//SQUID BIG BONUS
 												if(crabtype==1){
-					
+
 													created=instance_create_depth(xps+random_range(50,205),yps-20,0,Arcade)
-				
+
 													with(created){
-						
+
 															pin=3
-					
+
 														depth=11
 														visible=false
 														image_speed=0
@@ -1052,12 +1123,12 @@ with(Part){
 														img=149
 														imgsave=img
 														imgcap=2
-						
+
 														image_index=img+irandom(imgcap)
 														imgsped=0.03
-					
+
 														spin=0
-					
+
 														dur=99999999
 														hsp=random_range(0.5,1)
 														vsp=0
@@ -1065,15 +1136,21 @@ with(Part){
 														//image_xscale=other.chance
 														beenhit=0
 														move=0
-														
+
 														hp=0
 														immune=1
 														hurt=0
 														audio_play_sound_at(choose(snd_crab_squid_throw_2,snd_crab_squid_throw_3),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
-							
-													}															
+
+													}
+
+													// Trigger squid lightning effect
+													arcadeArray[40,0]=200
+													arcadeArray[40,1]=0
+													arcadeArray[40,2]=irandom_range(69,185)
+													arcadeArray[40,3]=0
 												}else{
-												
+
 												}
 											}
 											
@@ -1083,7 +1160,7 @@ with(Part){
 										//Teasure Bonus
 										if(arcadeprizeArray[chance,1]==6){			
 											
-											acvarthree+=30
+											bonusFishToDispense+=30
 											
 												
 												created=instance_create_depth(xps+choose(72,100,127,154,182),yps-10,0,Arcade)
@@ -1128,12 +1205,12 @@ with(Part){
 						}
 					//	}
 							/*
-								acvartwentysix=1
-								if(acvartwentyeight!=3){
-									acvartwentyseven=100
+								bonusWheelActive=1
+								if(bonusWheelState!=3){
+									bonusWheelTransitionY=100
 								}
-								acvartwentyeight=1
-								acvarseven+=1		
+								bonusWheelState=1
+								spinsAvailable+=1		
 							*/
 						
 					}
@@ -1148,7 +1225,7 @@ with(Part){
 
 	
 
-if(acvartwentysix==0){
+if(bonusWheelActive==0){
 
 		//Crab Claw
 		if(crabtype==0){
@@ -1193,38 +1270,34 @@ if(acvartwentysix==0){
 			//Squid Lightning
 			if(arcadeArray[40,0]>0){
 				arcadeArray[40,0]-=1
-			
-			
-				if(arcadeArray[40,0]>150){
-					arcadeArray[40,1]+=1
-				}else{
-					if(arcadeArray[40,0]>105){
-						if(arcadeArray[40,3]<2){
-							if(arcadeArray[40,0] mod 15 == 0){
-								arcadeArray[40,3]+=1
-							}
-						
-						}
-					}else{
-						if(arcadeArray[40,0]>0){
-						
-							with(Arcade){
-								if(pin==1){
-									//if(point_distance(x,y,other.xps-0.5+other.arcadeArray[40,2],other.yps-0.5+142+-other.arcadeArray[40,1]*0.5)<8){
-									chance=other.xps-0.5+other.arcadeArray[40,2]
-									chancetwo=other.yps-0.5+142-other.arcadeArray[40,1]*0.5
-									if(x>=chance-8&&x<=chance+5&&y>=chancetwo-7&&y<=chancetwo+12){
-										y+=1
-									}
-								}
-							}
-						
-							arcadeArray[40,0]-=1
-							arcadeArray[40,1]-=1
-						}else{
-			
-						}				
-					}			
+
+				// Spawn new lightning bolt at start
+				if(arcadeArray[40,0]==199){
+					// Strike position: X between 50-200, Y between 110-120 (relative to xps/yps)
+					var _strikeX = xps + random_range(50, 200)
+					var _strikeY = yps + random_range(110, 120)
+					var _dir = choose(1,-1)
+					if(_dir == -1) _strikeX += 18
+
+					// Create lightning bolt using Part (visual effect, no physics)
+					created=instance_create_depth(_strikeX, _strikeY, 0, Part)
+					with(created){
+						sprite_index=arc_fish_lightning_spr
+						image_index=1
+						image_speed=0
+						image_angle=0
+						dir=_dir
+						visible=false
+						dur=240
+						hsp=0
+						vsp=0
+						spin=0
+						img=1
+						imgcap=6
+						imgsped=0.25
+						hasStruck=0
+						isLightning=true
+					}
 				}
 			}
 
@@ -1233,59 +1306,59 @@ if(acvartwentysix==0){
 
 		chance=16*2
 		//Hoop
-		if(acvarfifteen==0){
-			if(acvarfourteen<chance){
-				acvarfourteen+=0.5
+		if(hoopDirection==0){
+			if(hoopXOffset<chance){
+				hoopXOffset+=0.5
 			}else{
-				acvarfifteen=1
+				hoopDirection=1
 			}
 		}else{
-			if(acvarfourteen>(chance)*-1){
-				acvarfourteen-=0.5
+			if(hoopXOffset>(chance)*-1){
+				hoopXOffset-=0.5
 			}else{
-				acvarfifteen=0
+				hoopDirection=0
 			}		
 		}	
 	
 		/*
 		//Cannon Angle
 		if(global.con_h_w||global.conp_h_w){
-			if(acvarseventeen==0){
-				if(acvarsixteen<16){
-					acvarsixteen+=0.5
+			if(cannonDirection==0){
+				if(cannonAngle<16){
+					cannonAngle+=0.5
 				}else{
-					acvarseventeen=1
+					cannonDirection=1
 				}
 			}else{
-				if(acvarsixteen>-4){
-					acvarsixteen-=0.5
+				if(cannonAngle>-4){
+					cannonAngle-=0.5
 				}else{
-					acvarseventeen=0
+					cannonDirection=0
 				}			
 			}
 		}
 		*/
 		
 		if(global.con_h_up||global.conp_h_up){
-				if(acvarsixteen<18){
-					acvarsixteen+=0.5
+				if(cannonAngle<18){
+					cannonAngle+=0.5
 				}			
 		}
 		if(mouse_wheel_up()){
-				if(acvarsixteen<18){
-					acvarsixteen+=1
+				if(cannonAngle<18){
+					cannonAngle+=1
 				}			
 		}
 
 		if(global.con_h_down||global.conp_h_down){
-				if(acvarsixteen>-7){
-					acvarsixteen-=0.5
+				if(cannonAngle>-7){
+					cannonAngle-=0.5
 				}			
 		}
 
 		if(mouse_wheel_down()){
-				if(acvarsixteen>-7){
-					acvarsixteen-=1
+				if(cannonAngle>-7){
+					cannonAngle-=1
 				}				
 		}
 		
@@ -1293,58 +1366,93 @@ if(acvartwentysix==0){
 		chance=0
 		
 		//Token
-		if(tokens>0&&acvarthirtythree<=0){
+		if(tokens>0&&tokenDropAnimation<=0){
 			if(global.con_p_r||global.conp_p_w){
 				tokens-=1
 				tokenangle=random(360)
 				tokentype=choose(0,1,1,1)
 				tokentype=0
-				acvarthirtythree=45
+				tokenDropAnimation=45
 			}
 		}
 		
-		if(acvarthirtythree>0){
+		if(tokenDropAnimation>0){
 			
-			acvarthirtythree-=0.25
+			tokenDropAnimation-=0.25
 			
-			if(acvarthirtythree>18){
-				acvarthirtythree-=0.75
+			if(tokenDropAnimation>18){
+				tokenDropAnimation-=0.75
 
 			}else{
 			
-				if(acvarthirtythree<5){
-					acvarthirtythree=0
+				if(tokenDropAnimation<5){
+					tokenDropAnimation=0
 				}
 			
 			}
-				if(acvarthirtythree==0){
-					acvarsix+=5
+				if(tokenDropAnimation==0){
+					playsRemaining+=5
 				}			
 		}
 		
-		if(acvarsix>0){
+		if(playsRemaining>0){
 			if(global.con_p_q||global.conp_p_shl||global.conp_p_r||global.conp_p_l){
 				chance=1
 				chancex=32-8
 			}
-			if(global.con_p_e||global.conp_p_shr||global.conp_p_q||global.conp_p_e){
+			if(global.con_p_e||global.conp_p_shr||global.conp_p_e){
 				chance=2
 				chancex=222+8
 			}
-			
-			
-			if(mouse_check_button_pressed(mb_left)){
-				chance=1
-				chancex=32-8
+
+			// Mouse cannon firing - use captured state (only if not consumed by wheel)
+			if(!_mouseClickConsumed){
+				if(_mouseLeftPressed){
+					chance=1
+					chancex=32-8
+				}
+				if(_mouseRightPressed){
+					chance=2
+					chancex=222+8
+				}
 			}
-			if(mouse_check_button_pressed(mb_right)){
-				chance=2
-				chancex=222+8
-			}				
-			
 		}
 
-
+		// DEBUG: Test squid abilities with T and Y keys (only when squid selected)
+		if(crabtype==1){
+			// T = Test Lightning ability (base)
+			if(keyboard_check_pressed(ord("T"))){
+				arcadeArray[40,0]=200
+				arcadeArray[40,1]=0
+			}
+			// Y = Test Big Squid spawn (good ability)
+			if(keyboard_check_pressed(ord("Y"))){
+				created=instance_create_depth(xps+random_range(50,205),yps-20,0,Arcade)
+				with(created){
+					pin=3
+					depth=11
+					visible=false
+					image_speed=0
+					sprite_index=abil_crab_spr
+					img=149
+					imgsave=img
+					imgcap=2
+					image_index=img+irandom(imgcap)
+					imgsped=0.03
+					spin=0
+					dur=99999999
+					hsp=random_range(0.5,1)
+					vsp=0
+					dir=1
+					beenhit=0
+					move=0
+					hp=0
+					immune=1
+					hurt=0
+					audio_play_sound_at(choose(snd_crab_squid_throw_2,snd_crab_squid_throw_3),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
+				}
+			}
+		}
 
 			if(global.con_h_w&&mouse_check_button_pressed(mb_left)){
 				
@@ -1382,15 +1490,7 @@ if(acvartwentysix==0){
 			
 			event+=1
 			
-			//Squid life
-			with(Arcade){
-				if(pin==3){
-					
-					if(immune==0){
-						hp+=1
-					}
-				}
-			}
+			//Squid life - hp now tracked in beenhit handler
 			
 			if(chance==1){
 				arcadeArray[36,0]=7
@@ -1414,7 +1514,7 @@ if(acvartwentysix==0){
 			//Cannon
 			audio_play_sound_at(choose(snd_ac_cannon_1,snd_ac_cannon_2),xps+chancex,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)	
 			
-				acvarsix-=1
+				playsRemaining-=1
 				
 				
 				for(i=0;i<3;i+=1){
@@ -1473,9 +1573,9 @@ if(acvartwentysix==0){
 					
 					speed=3
 					if(other.chance==1){
-						direction=45+other.acvarsixteen+random_range(-1.5,1.5)
+						direction=45+other.cannonAngle+random_range(-1.5,1.5)
 					}else{
-						direction=135-other.acvarsixteen+random_range(-1.5,1.5)
+						direction=135-other.cannonAngle+random_range(-1.5,1.5)
 					}
 					
 					hsp=hspeed
@@ -1489,12 +1589,12 @@ if(acvartwentysix==0){
 		
 
 		
-		acvardur+=1
+		dispenseDuration+=1
 			
 			//Dispense bonus fish
-			if(acvardur mod 20==0){
-				if(acvarthree>0){
-					acvarthree-=1
+			if(dispenseDuration mod 20==0){
+				if(bonusFishToDispense>0){
+					bonusFishToDispense-=1
 					//for(i=0;i<chance;i+=1){
 				
 				if(irandom(19)!=1){
@@ -1570,8 +1670,8 @@ if(acvartwentysix==0){
 			}
 	//}
 			
-				if(acvarone>0){
-					acvarone-=1
+				if(fishBoardTickTimer>0){
+					fishBoardTickTimer-=1
 				}else{
 					
 					with(Arcade){
@@ -1585,7 +1685,7 @@ if(acvartwentysix==0){
 						}
 					}
 					
-					acvarone=acvartwo
+					fishBoardTickTimer=fishBoardTickInterval
 				}			
 			
 						//Small hoop light
@@ -1656,22 +1756,22 @@ if(img==212){
 
 					//Hoop
 					if(bonuscheck==1){
-						//xps-0.5+126+acvarfourteen,yps-0.5+55
+						//xps-0.5+126+hoopXOffset,yps-0.5+55
 						if(img==54){
-							if(x>=other.xps-0.5+126+other.acvarfourteen-12&&x<=other.xps-0.5+126+other.acvarfourteen+12){
+							if(x>=other.xps-0.5+126+other.hoopXOffset-12&&x<=other.xps-0.5+126+other.hoopXOffset+12){
 								if(y>=other.yps-0.5+55-8-3&&y<=other.yps-0.5+55-8+3){
 									bonuscheck=0
 									
 									audio_play_sound_at(choose(snd_ac_chime_1,snd_ac_chime_2,snd_ac_chime_3),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)								
 									
-									if(other.acvarseven<5){
-										//other.acvarseven+=1
+									if(other.spinsAvailable<5){
+										//other.spinsAvailable+=1
 									}
-									if(other.acvareighteen<3){
-										other.acvareighteen+=1
+									if(other.spinPointsAccumulated<3){
+										other.spinPointsAccumulated+=1
 									}									
 									//game_end()
-									other.acvarnineteen=15
+									other.hoopHighlightTimer=15
 									
 										for(i=0;i<3;i+=1){
 											created=instance_create_depth(x-3+random(6),y-3+random(6),0,Part)
@@ -1912,8 +2012,8 @@ if(img==212){
 											}
 										}
 
-								if(other.acvarseven<5){
-									other.acvareighteen+=1
+								if(other.spinsAvailable<5){
+									other.spinPointsAccumulated+=1
 								}
 								bonuschecktwo=0
 								audio_play_sound_at(choose(snd_ac_chimetwo_1,snd_ac_chimetwo_2,snd_ac_chimetwo_3),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)	
@@ -1996,7 +2096,7 @@ if(img==212){
 						}
 						if(y>other.yps+142){
 							
-							other.acvartwenty+=value
+							other.pendingTickets+=value
 							
 							//Ticket count for coins collected
 							other.arcadeArray[100,0]+=1
@@ -2144,26 +2244,30 @@ if(img==212){
 								if(beenhit>=1){
 									audio_play_sound_at(choose(snd_crab_squid_shock_1,snd_crab_squid_shock_2),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 									beenhit=0
-									
+									hp+=1
+
+									// Trigger lightning on every 2nd hit (hp 2 and 4)
+									if(hp==2 || hp==4){
+										other.arcadeArray[40,0]=200
+										other.arcadeArray[40,1]=0
+									}
+
 									if(hurt<=0){
 										img=imgsave+9
-										image_index+=9									
+										image_index+=9
 									}
 									hurt=30
 								}
 								
-								if(hurt>0){
-									hurt-=1
-								
-									if(hurt==0){
-										img=imgsave
-										image_index-=9
-									}
+								// Reset hurt animation (check separately since Arcade/Step_0 also decrements hurt)
+								if(hurt==0 && img!=imgsave){
+									img=imgsave
+									image_index-=9
 								}
-							
+
 							}
-						
-						}				
+
+						}
 				}
 			}
 
@@ -2271,26 +2375,26 @@ if(arcadeArray[100,0]>0){
 			arcselect=0
 					
 			
-			acvartimer=0
+			gameTimer=0
 			arcwave=0
 			arcwavetimer=0
 			arcwavetick=0
 			
-			acvarone=100
-			acvartwo=100
+			fishBoardTickTimer=100
+			fishBoardTickInterval=100
 			
 			//Bonus
-			acvarthree=0
+			bonusFishToDispense=0
 			
 			//Tickets
-			acvarfour=0
+			totalTickets=0
 			//Level
-			acvarfive=1
+			bonusRollActive=1
 			//Plays
-			acvarsix=15
+			playsRemaining=15
 			//Bonus Que
-			acvarseven=0
-			acvareight=300
+			spinsAvailable=0
+			wheelSpinTimer=300
 			
 			arcadegrid=16
 			arcadegridsize=50
@@ -2444,9 +2548,9 @@ if(arcadeArray[100,0]>0){
 			
 		//Level Up
 		chance=1
-		if(acvarfour>=chance*acvarfive){
-			acvarfour-=chance*acvarfive
-			acvarfive+=1
+		if(totalTickets>=chance*bonusRollActive){
+			totalTickets-=chance*bonusRollActive
+			bonusRollActive+=1
 			
 			arcpause=1
 
@@ -2486,11 +2590,11 @@ if(arcadeArray[100,0]>0){
 		
 		if(arcwave!=10){
 		//Enemy Spawn
-		if(acvartimer<200-floor(arcwave*4)){
-			acvartimer+=1
+		if(gameTimer<200-floor(arcwave*4)){
+			gameTimer+=1
 		}else{
 			
-				acvartimer=0
+				gameTimer=0
 			
 			
 				chance=xps+120-60+random(120)
@@ -2600,29 +2704,45 @@ if(arcadeArray[100,0]>0){
 
 				chance=statspeddraw
 
-				if(global.con_h_up||global.conp_h_up){
-					y-=chance
-					dir=3
+				// Analog stick movement (priority)
+				var _axisH = global.conp_axis_lh
+				var _axisV = global.conp_axis_lv
+
+				if(_axisH != 0 || _axisV != 0){
+					x += _axisH * chance
+					y += _axisV * chance
+
+					if(abs(_axisH) > abs(_axisV)){
+						dir = (_axisH > 0) ? 0 : 2
+					}else{
+						dir = (_axisV > 0) ? 1 : 3
+					}
 				}else{
-					if(global.con_h_down||global.conp_h_down){
-						y+=chance
-						dir=1
-					}		
-				}
-				if(global.con_h_left||global.conp_h_left){
-					x-=chance
-					dir=2
-				}else{
-					if(global.con_h_right||global.conp_h_right){
-						x+=chance
-						dir=0
-					}		
+					// Fallback to digital controls (D-pad/keyboard)
+					if(global.con_h_up||global.conp_h_up){
+						y-=chance
+						dir=3
+					}else{
+						if(global.con_h_down||global.conp_h_down){
+							y+=chance
+							dir=1
+						}
+					}
+					if(global.con_h_left||global.conp_h_left){
+						x-=chance
+						dir=2
+					}else{
+						if(global.con_h_right||global.conp_h_right){
+							x+=chance
+							dir=0
+						}
+					}
 				}	
 
 				//Pickup Pollen
 				hit=instance_place(x,y,Arcade_four)
 				if(hit!=noone){
-					Control.acvarfour+=1
+					Control.totalTickets+=1
 					with(hit){
 						instance_destroy()
 					}

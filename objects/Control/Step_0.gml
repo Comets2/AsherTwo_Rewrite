@@ -30,8 +30,8 @@ if(vibrate>0){
 	}
 }
 
-// Escape/Enter handling (skip for title menu, options, and arcade selection)
-if((global.con_p_escape||global.conp_p_enter) && pause != 20 && pause != 21 && pause != 22){
+// Escape/Enter handling (skip for title menu, options, arcade selection, and rogue menus)
+if((global.con_p_escape||global.conp_p_enter) && pause != 20 && pause != 21 && pause != 22 && pause != 23 && pause != 24){
 	if(pause==2){
 		pause=pauselast
 		pausetwo=0
@@ -85,12 +85,12 @@ if(pause == 20){
 	// Keyboard/Controller navigation
 	if(global.con_p_up || global.conp_p_up){
 		title_selection -= 1
-		if(title_selection < 0) title_selection = 2
+		if(title_selection < 0) title_selection = 3
 		cursor_mode = 1
 	}
 	if(global.con_p_down || global.conp_p_down){
 		title_selection += 1
-		if(title_selection > 2) title_selection = 0
+		if(title_selection > 3) title_selection = 0
 		cursor_mode = 1
 	}
 
@@ -107,7 +107,7 @@ if(pause == 20){
 
 	// Mouse selection
 	if(cursor_mode == 0){
-		for(var i = 0; i < 3; i++){
+		for(var i = 0; i < 4; i++){
 			var item_y = menu_start_y + (i * menu_spacing)
 			if(mouse_x >= xps + 80 && mouse_x <= xps + 175 &&
 			   mouse_y >= item_y - 5 && mouse_y <= item_y + 12){
@@ -123,7 +123,7 @@ if(pause == 20){
 		var valid_click = true
 		if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
 			valid_click = false
-			for(var i = 0; i < 3; i++){
+			for(var i = 0; i < 4; i++){
 				var item_y = menu_start_y + (i * menu_spacing)
 				if(mouse_x >= xps + 80 && mouse_x <= xps + 175 &&
 				   mouse_y >= item_y - 5 && mouse_y <= item_y + 12){
@@ -147,7 +147,12 @@ if(pause == 20){
 					arcade_selection = 0
 					menu_input_delay = 5  // Prevent immediate selection in submenu
 					break
-				case 2: // Options
+				case 2: // Rogue
+					pause = 23  // Rogue level selection screen
+					rogue_selection = 0
+					menu_input_delay = 5
+					break
+				case 3: // Options
 					pause = 21  // Options menu
 					options_tab = 0
 					options_selection = 0
@@ -271,13 +276,148 @@ if(pause == 22){
 		   mouse_check_button_pressed(mb_left)){
 			arcadetype = arcade_selection + 1
 			arcade = 1
-			pause = 10
+			// Fish Marble goes to character selection first
+			if(arcade_selection == 0){
+				pause = 25
+				fish_char_selection = 0
+				menu_input_delay = 5
+			}else{
+				pause = 10
+			}
 		}
 
 		// Back to title menu (ESC only)
 		if(global.con_p_escape){
 			pause = 20
 		}
+	}
+}
+#endregion
+
+#region Fish Marble Character Selection (pause == 25)
+if(pause == 25){
+	xps = camx - camxtwo
+	yps = camy - camytwo
+
+	// Decrement input delay
+	if(menu_input_delay > 0){
+		menu_input_delay -= 1
+	}else{
+		// Character hitbox positions (matching Draw_0.gml)
+		var crab_x = xps + 70
+		var squid_x = xps + 180
+		var char_y = yps + 75
+		var hitbox_size = 30
+
+		// Mouse hover selection
+		if(mouse_x >= crab_x - hitbox_size && mouse_x <= crab_x + hitbox_size &&
+		   mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size){
+			fish_char_selection = 0
+		}
+		if(mouse_x >= squid_x - hitbox_size && mouse_x <= squid_x + hitbox_size &&
+		   mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size){
+			fish_char_selection = 1
+		}
+
+		// Navigation - Left/Right to switch between Crab and Squid
+		if(global.con_p_left || global.conp_p_left){
+			fish_char_selection = 0
+		}
+		if(global.con_p_right || global.conp_p_right){
+			fish_char_selection = 1
+		}
+
+		// Confirm selection (keyboard/controller)
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter){
+			crabtype = fish_char_selection
+			pause = 10
+		}
+
+		// Mouse click to confirm (only if clicking on a character)
+		if(mouse_check_button_pressed(mb_left)){
+			if((mouse_x >= crab_x - hitbox_size && mouse_x <= crab_x + hitbox_size &&
+			    mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size) ||
+			   (mouse_x >= squid_x - hitbox_size && mouse_x <= squid_x + hitbox_size &&
+			    mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size)){
+				crabtype = fish_char_selection
+				pause = 10
+			}
+		}
+
+		// Back to arcade menu
+		if(global.con_p_escape){
+			pause = 22
+			menu_input_delay = 5
+		}
+	}
+}
+#endregion
+
+#region Rogue Level Selection (pause == 23)
+if(pause == 23){
+	xps = camx - camxtwo
+	yps = camy - camytwo
+
+	// Decrement input delay
+	if(menu_input_delay > 0){
+		menu_input_delay -= 1
+	}else{
+		// Navigation (only Forest for now, index 0)
+		if(global.con_p_up || global.conp_p_up){
+			rogue_selection -= 1
+			if(rogue_selection < 0) rogue_selection = 0
+		}
+		if(global.con_p_down || global.conp_p_down){
+			rogue_selection += 1
+			if(rogue_selection > 0) rogue_selection = 0  // Only 1 level for now
+		}
+
+		// Selection - Start Rogue mode
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		   mouse_check_button_pressed(mb_left)){
+			// Initialize rogue mode
+			rogue_mode = true
+			rogue_wave = 0
+			rogue_xp = 0
+			rogue_level = 1
+			rogue_xp_needed = 10
+			rogue_pause = 0
+			rogue_wave_timer = 180  // 3 second start delay
+			rogue_wave_active = false
+
+			// Initialize game if not already
+			if(!game_initialized){
+				game_start_scr()
+			}
+
+			// Generate the rogue arena
+			rogue_worldgen_scr()
+
+			pause = 0  // Start gameplay
+			pauselast = 0
+		}
+
+		// Back to title menu (ESC only)
+		if(global.con_p_escape){
+			pause = 20
+		}
+	}
+}
+#endregion
+
+#region Rogue Game Over (pause == 24)
+if(pause == 24){
+	// Handle input to return to title
+	if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+	   mouse_check_button_pressed(mb_left)){
+		// Return to title menu
+		rogue_mode = false
+		pause = 20
+
+		// Clean up
+		with(Enemy){ instance_destroy() }
+		with(Abil){ if(pin != 23) instance_destroy() }
+		with(Part){ instance_destroy() }
 	}
 }
 #endregion
