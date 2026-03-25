@@ -341,7 +341,7 @@ function class_scr() {
 						talentfivecdcount=0
 						talentfive=1
 						talentfivecd=irandom_range(1000,3000)
-						talentfivecdtotal=10000
+						talentfivecdtotal=7200
 						//talentfivecdtotal=1000
 						talentfivetwo=0
 						talentfivethree=0
@@ -367,229 +367,137 @@ function class_scr() {
 					visible=true
 				}
 			}
-			//Passive Sugar Rush
+			//Passive Sugar Rush - Ghost companion with cooldown
 			if(Control.talentmapArray[19,1]>0){
-				if(talentfivecd>0){
-					talentfivecd-=1
+				//Ghost is NOT active - count down cooldown
+				if(passivefourArray[0,3]<=0){
+					if(talentfivecd>0){
+						talentfivecd-=1
+					}
+					//Cooldown finished - activate ghost timer
+					if(talentfivecd<=0&&talentfivethree==0){
+						//Set ghost active duration (1800 frames = 30 seconds at 60fps)
+						passivefourArray[0,3]=1800
+					}
 				}
-					if(talentfivecd<=0){
-								talentfivecd=talentfivecdtotal
-							for(i=0;i<1;i+=1){
-								//Sugar Rush Passive
-								created=instance_create_depth(Control.midx+48,random_range(Control.mapyspot+48,Control.mapyspottotal-48),0,Abil)
-								with(created){
-									sndobjectone=instance_create_depth(x,y,0,Snd)
-									with(sndobjectone){
-										sndemitone=audio_emitter_create()				
-										audio_play_sound_on(sndemitone,choose(snd_pumpkin_throw_all_1,snd_pumpkin_throw_all_2),false,8)
-										audio_emitter_falloff(sndemitone, 48, Control.falloff_max, Control.falloff_factor)					
-									}	
-									//0=TRUE/False,1=Target,2=X,3=Y,4=Img,5=ImgCap,6=Amount,7=Delay,8=DelayAmount,9=Dur,10=hsp,11=vsp,12=DurExtra,13=XscaleYscale,14=XscaleMaxYscaleMax,15=ImgSped
-									part_gen_scr(1,0,5,5,34,2,1,1,2,16,0,0,8,0.6,1,0)
-									
-									sprite_index=mask_pump_other_spr
-									img=130+(choose(0,0,0,0,0,0,1,2,2,3)*3)
-									img=130
-									imgsped=0
-									imgcap=3
-									image_index=img
-									image_speed=0
-									imgangle=0
-									dur=9999999
-									en=0
-									phase=1
-									tick=0
-									
-									pin=17
-									sped=0.5
-									spedtwo=0.1
-									range=260
-									rangetwo=5
-									attcd=320
-									attcdtotal=attcd
-									attcd=irandom_range(attcd*0.25,attcd)
-									hsp=0
-									vsp=0
-									grav=0
-									hittrigger=0
-									hittriggertwo=0
-									depth=other.depth+1
-									
-									
-									dir=choose(1,-1)
-									dir=-1
-									if(dir==1){
-										x-=range
-									}else{
-										x+=range
-									}
 
-									startx=x
-									starty=y
-								}
-							}
-					}
-
-				hit=instance_place(x,y,Part)
-				if(hit!=noone){
-					if(hit.pin==2){
-				
-						if(talentfivetwo+passivefourArray[0,0]<10){
-								with(hit){
-									other.chance=image_index
-									instance_destroy()
-								}
-							audio_play_sound(choose(snd_crab_fish_pickup_1,snd_crab_fish_pickup_2,snd_crab_fish_pickup_3),8,false)
-							passivefourArray[0,0]+=1
-							passivefourArray[passivefourArray[0,0],0]=30
-							passivefourArray[passivefourArray[0,0],1]=1
-							passivefourArray[passivefourArray[0,0],2]=chance
-							
-						}
-					}
-				}
-			
-			if(passivefourArray[0,0]>0){
-				for(i=0;i<passivefourArray[0,0];i+=1){
-					if(passivefourArray[i+1,0]>0){
-						passivefourArray[i+1,0]-=1
-						if(passivefourArray[i+1,0]<3){
-							passivefourArray[0,1]=5
-						}
-					}else{
-						if(passivefourArray[i+1,1]==1){
-							talentfivetwo+=1
-							//Actual passive timer
-							passivefourArray[0,3]+=300
-						}
-						for(ii=i;ii<passivefourArray[0,0];ii+=1){
-							if(ii<passivefourArray[0,0]-1){
-								passivefourArray[ii+1,0]=passivefourArray[ii+2,0]
-								passivefourArray[ii+1,1]=passivefourArray[ii+2,1]
-							}else{
-								passivefourArray[ii+1,0]=0
-								passivefourArray[ii+1,1]=0
-							}
-						}
-						passivefourArray[0,0]-=1
-					}
-				}
-			}
-			if(passivefourArray[0,1]>0){
-				passivefourArray[0,1]-=1
-			}
-				//Sugar rush passive effect
+				//Ghost is active
 				if(passivefourArray[0,3]>0){
-					passivefourArray[0,3]-=1
-							
-							//Ghost
-								if(talentfivethree==0){
-									if(talentfivethree==0){
-										talentfivethree=1
-										
-											chancetwo=0
-											ghosttrigger=0
-											ghostpassive=instance_create_depth(x,y,9,Abil)
-											with(ghostpassive){
-												dir=Me.dir
-												if(dir==-1){
-													xscale=-1
-												}
-												
-												dmg=1
-												attcdtwo=0
-												attcd=0
-												attacktrigger=0
-												xtargetsave=0
-												ytargetsave=0
-												attack=0
-												range=16
-												xtarget=Me.x
-												ytarget=Me.y	
-												target=Me
-												yspot=y
-												tick=0
-												pin=18
-												en=0
-												cd=60 
-												vsp=0
-												type=1
-												creator=other.id
-												image_speed=0
-												dmg=2
-												chance=dmg
-												dmg+=dmg*(Control.invenArray[25,3]*0.01)
-												dmg+=chance*(Control.invenArray[20,3]*0.01)
-												sprite_index=mask_pump_other_spr
-													if(other.chancetwo<3){
-														img=208
-														enopt=0
-													}else{
-														img=208
-														enopt=1
-													}
-													img=214
-													img=208
-												image_index=img
-												imgcap=3
-												imgsave=208
-												imgsped=0.08
-												sped=0.5
-												dur=3000
-												durtotal=dur
-												phase=1
-												attacking=0
-											}
-									}
-								}
-							
-							//abilArray[0,1]
-							if(abilArray[1,1]>0){
-								abilArray[1,1]-=1
+					//Spawn ghost if not already spawned
+					if(talentfivethree==0){
+						talentfivethree=1
+						chancetwo=0
+						ghosttrigger=0
+						ghostpassive=instance_create_depth(x,y,9,Abil)
+						with(ghostpassive){
+							dir=Me.dir
+							if(dir==-1){
+								xscale=-1
 							}
-							if(abilArray[2,1]>0){
-								abilArray[2,1]-=1
-							}
-								//Particle
-								if(passivefourArray[0,3] mod 3==0){
-									for(i=0;i<1;i+=1){
-										if(instance_exists(ghostpassive)){
-											created=instance_create_depth(ghostpassive.x-6+random(12),ghostpassive.y-6+random(12),0,Part)
-											with(created){
-													type=1
-													pin=1
-												depth=choose(6,10,10,10)
-												spin=100
-												img=18
-												imgcap=2
-												imgsped=0
-												sprite_index=mask_pump_other_spr
-												image_speed=0
-												image_index=img+irandom(imgcap)
-												dur=15+irandom(10)
-												durtotal=dur
-												hsp=random(0.2)*choose(1,-1)
-												vsp=random(0.2)*choose(1,-1)
-									
-												grav=0.003
-												gravtwo=0
 
-												chance=random_range(0.7,0.85)
-												xscale=chance
-												yscale=chance
-												phase=1
-												speed=0
-												mask_index=dummy_spr
-												image_angle=random(360)
-												imgangle=image_angle
-											}	
-										}else{
-											talentfivethree=0
-										}
-									}
-								}
-					if(passivefourArray[0,3] mod 300== 0){
-						talentfivetwo-=1
+							dmg=1
+							attcdtwo=0
+							attcd=0
+							attacktrigger=0
+							xtargetsave=0
+							ytargetsave=0
+							attack=0
+							range=16
+							xtarget=Me.x
+							ytarget=Me.y
+							target=Me
+							yspot=y
+							tick=0
+							pin=18
+							en=0
+							cd=60
+							vsp=0
+							type=1
+							creator=other.id
+							image_speed=0
+							dmg=2
+							chance=dmg
+							dmg+=dmg*(Control.invenArray[25,3]*0.01)
+							dmg+=chance*(Control.invenArray[20,3]*0.01)
+							sprite_index=mask_pump_other_spr
+							if(other.chancetwo<3){
+								img=208
+								enopt=0
+							}else{
+								img=208
+								enopt=1
+							}
+							img=214
+							img=208
+							image_index=img
+							imgcap=3
+							imgsave=208
+							imgsped=0.08
+							sped=0.5
+							dur=99999
+							durtotal=dur
+							phase=1
+							attacking=0
+						}
+					}
+
+					//Ability cooldown reduction while ghost active
+					if(abilArray[1,1]>0){
+						abilArray[1,1]-=1
+					}
+					if(abilArray[2,1]>0){
+						abilArray[2,1]-=1
+					}
+
+					//Ghost particle effects
+					if(passivefourArray[0,3] mod 3==0){
+						if(instance_exists(ghostpassive)){
+							created=instance_create_depth(ghostpassive.x-6+random(12),ghostpassive.y-6+random(12),0,Part)
+							with(created){
+								type=1
+								pin=1
+								depth=choose(6,10,10,10)
+								spin=100
+								img=18
+								imgcap=2
+								imgsped=0
+								sprite_index=mask_pump_other_spr
+								image_speed=0
+								image_index=img+irandom(imgcap)
+								dur=15+irandom(10)
+								durtotal=dur
+								hsp=random(0.2)*choose(1,-1)
+								vsp=random(0.2)*choose(1,-1)
+
+								grav=0.003
+								gravtwo=0
+
+								chance=random_range(0.7,0.85)
+								xscale=chance
+								yscale=chance
+								phase=1
+								speed=0
+								mask_index=dummy_spr
+								image_angle=random(360)
+								imgangle=image_angle
+							}
+						}
+					}
+
+					//Count down ghost duration
+					passivefourArray[0,3]-=1
+
+					//Ghost duration expired - start cooldown and destroy ghost
+					if(passivefourArray[0,3]<=0){
+						talentfivecd=talentfivecdtotal
+						talentfivethree=0
+						//Destroy ghost
+						if(instance_exists(ghostpassive)){
+							with(ghostpassive){
+								instance_destroy()
+							}
+						}
+						ghostpassive=0
 					}
 				}
 			}
@@ -718,7 +626,6 @@ function class_scr() {
 						}
 						
 						passivefourArray[1000,0]=passivefourArray[1000,1]
-						passivefourArray[1000,0]=10
 							
 						if(passivetwo==0||!instance_exists(passivetwo)){
 							audio_play_sound_at(choose(snd_pumpkin_armor_1,snd_pumpkin_armor_2,snd_pumpkin_armor_3),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
@@ -1151,7 +1058,7 @@ if(Control.talentmapArray[23,1]>0){
 									sndemitone=audio_emitter_create()
 								}
 												//choose(snd_bee_swarm_2,snd_bee_swarm_3)
-								audio_play_sound_on(sndemitone,choose(snd_bee_swarm_3),false,8)
+								audio_play_sound_on(sndemitone,snd_bee_swarm_3,false,8)
 								audio_emitter_falloff(sndemitone, 48, Control.falloff_max, Control.falloff_factor)		
 							}
 						}
@@ -1260,7 +1167,7 @@ if(Control.talentmapArray[23,1]>0){
 									sndemitone=audio_emitter_create()
 								}
 												//choose(snd_bee_swarm_2,snd_bee_swarm_3)
-								audio_play_sound_on(sndemitone,choose(snd_bee_swarm_3),false,8)
+								audio_play_sound_on(sndemitone,snd_bee_swarm_3,false,8)
 								audio_emitter_falloff(sndemitone, 48, Control.falloff_max, Control.falloff_factor)		
 							}
 						}
@@ -1414,7 +1321,6 @@ if(Control.talentmapArray[23,1]>0){
 					}
 						
 						passivefourArray[1000,0]=passivefourArray[1000,1]
-						passivefourArray[1000,0]=10
 							
 						if(passivetwo==0||!instance_exists(passivetwo)){
 
@@ -2064,7 +1970,7 @@ if(Control.talentmapArray[23,1]>0){
 													spin=10
 													sprite_index=abil_crab_spr
 													depth=other.depth+1
-													img=53+choose(0)
+													img=53
 													imgcap=0
 													imgsped=0
 													image_speed=0
@@ -2428,6 +2334,7 @@ chance=2
 			
 								//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 								dmg+=chance*(Control.invenArray[25,3]*0.01)
+								if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 								creator=other.id
 			
@@ -3096,7 +3003,7 @@ chance=2
 						if(jumps==0&&justjump==0&&gumdrop==0){
 							vsp=-5
 							
-							created=instance_create_depth(x,y+8,Fakeblock)
+							created=instance_create_depth(x,y+8,0,Fakeblock)
 							with(created){
 								visible = true
 								sprite_index=abil_candy_spr

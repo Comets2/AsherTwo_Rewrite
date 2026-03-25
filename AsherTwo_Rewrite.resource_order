@@ -101,6 +101,7 @@
     {"name":"Tree","order":7,"path":"folders/Sprites/ME/Abil/Masks/Tree.yy",},
     {"name":"Char","order":3,"path":"folders/Sprites/ME/Char.yy",},
     {"name":"group0","order":1,"path":"folders/Sprites/ME/group0.yy",},
+    {"name":"Rogue","order":13,"path":"folders/Sprites/Rogue.yy",},
     {"name":"UI","order":5,"path":"folders/Sprites/UI.yy",},
     {"name":"Abilbar","order":3,"path":"folders/Sprites/UI/Abilbar.yy",},
     {"name":"Tile Sets","order":3,"path":"folders/Tile Sets.yy",},

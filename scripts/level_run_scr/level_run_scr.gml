@@ -1070,7 +1070,7 @@ if(exitdoor==1){
 	
 	exitdoor=2
 	
-	door=instance_create_depth(midx+48,midy+48,Dummy)
+	door=instance_create_depth(midx+48,midy+48,0,Dummy)
 	with(door){
 		sprite_index=abil_crab_spr
 		img=262

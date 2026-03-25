@@ -31,8 +31,14 @@ function me_control_scr() {
 		}
 
 
+			// Calculate movement speed with rogue bonus
+			var move_speed = sped
+			if(Control.rogue_mode){
+				move_speed += sped * (rogue_statsped * 0.05)  // +5% per point
+			}
+
 			if(con_h_right){
-				hsp=sped
+				hsp=move_speed
 				dir=1
 				moving=1
 				if(grounded==1){
@@ -41,7 +47,7 @@ function me_control_scr() {
 				}
 			}
 			if(con_h_left){
-				hsp=sped*-1
+				hsp=move_speed*-1
 				dir=-1
 				moving=1
 				if(grounded==1){

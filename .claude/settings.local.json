@@ -11,7 +11,13 @@
       "Bash(dir /s \"C:\\\\Users\\\\danie\\\\GameMakerProjects\\\\AsherTwo\\\\AsherTwo_Rewrite\")",
       "Bash(findstr:*)",
       "Bash(awk:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(move:*)",
+      "Bash(dir:*)",
+      "Bash(xargs ls:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)"
     ]
   }
 }

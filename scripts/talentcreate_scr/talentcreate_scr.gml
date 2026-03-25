@@ -23,10 +23,9 @@ if(Me.class==0){
 	classArray[6,0]="Super"
 	classArray[7,0]="Treeling"
 	classArray[8,0]="CakeQueen"
-	for(a=0;a<10;a+=1){	
+	for(a=0;a<10;a+=1){
 		//Level
 		classArray[a,1]=1
-		classArray[a,1]=30
 		//Experience Current
 		classArray[a,2]=0
 		//Experience Total

@@ -1478,472 +1478,74 @@ function worldgen_scr() {
 						}
 					}
 				}
-				if(c==1){
-					xpos=1+bordertwo
-					xpostwo=5
-					ypos=9+bordertwo
-					ypostwo=3
-				}else{
-					if(c==2){
-						xpos=6+bordertwo
-						xpostwo=2
-						ypos=10+bordertwo
-						ypostwo=1
-					}else{
-						if(c==3){
-							xpos=1+bordertwo
-							xpostwo=19
-							ypos=15+bordertwo
-							ypostwo=3
-						}else{
-							if(c==4){
-								xpos=7+bordertwo
-								xpostwo=4
-								ypos=14+bordertwo
-								ypostwo=2
-							}else{
-								if(c==5){
-									xpos=1+bordertwo
-									xpostwo=2
-									ypos=24+bordertwo
-									ypostwo=3
-								}else{
-									if(c==6){
-										xpos=6+bordertwo
-										xpostwo=2
-										ypos=22+bordertwo
-										ypostwo=1
-									}else{
-										if(c==7){
-											xpos=10+bordertwo
-											xpostwo=2
-											ypos=8+bordertwo
-											ypostwo=1
-										}else{
-											if(c==8){
-												xpos=12+bordertwo
-												xpostwo=32
-												ypos=7+bordertwo
-												ypostwo=2
-											}else{
-												if(c==9){
-													xpos=12+bordertwo
-													xpostwo=8
-													ypos=9+bordertwo
-													ypostwo=1
-												}else{
-													if(c==10){
-														xpos=13+bordertwo
-														xpostwo=3
-														ypos=10+bordertwo
-														ypostwo=1
-													}else{
-														if(c==11){
-															xpos=14+bordertwo
-															xpostwo=3
-															ypos=1+bordertwo
-															ypostwo=1
-														}else{
-															if(c==12){
-																xpos=14+bordertwo
-																xpostwo=3
-																ypos=4+bordertwo
-																ypostwo=4
-															}else{
-																if(c==13){
-																	xpos=13+bordertwo
-																	xpostwo=3
-																	ypos=13+bordertwo
-																	ypostwo=3
-																}else{
-																	if(c==14){
-																		xpos=29+bordertwo
-																		xpostwo=4
-																		ypos=28+bordertwo
-																		ypostwo=4
-																	}else{
-																		if(c==15){
-																			xpos=13+bordertwo
-																			xpostwo=3
-																			ypos=18+bordertwo
-																			ypostwo=2
-																		}else{
-																			if(c==16){
-																				xpos=13+bordertwo
-																				xpostwo=3
-																				ypos=22+bordertwo
-																				ypostwo=3
-																			}else{
-																				if(c==17){
-																					xpos=29+bordertwo
-																					xpostwo=4
-																					ypos=28+bordertwo
-																					ypostwo=4
-																				}else{
-																					if(c==18){
-																						xpos=11+bordertwo
-																						xpostwo=10
-																						ypos=24+bordertwo
-																						ypostwo=3
-																					}else{
-																						if(c==19){
-																							xpos=20+bordertwo
-																							xpostwo=12
-																							ypos=16+bordertwo
-																							ypostwo=2
-																						}else{
-																							if(c==20){
-																								xpos=20+bordertwo
-																								xpostwo=3
-																								ypos=5+bordertwo
-																								ypostwo=3
-																							}else{
-																									if(c==21){
-																										xpos=48+bordertwo
-																										xpostwo=6
-																										ypos=24+bordertwo
-																										ypostwo=1
-																								}else{
-																										if(c==22){
-																											xpos=24+bordertwo
-																											xpostwo=4
-																											ypos=12+bordertwo
-																											ypostwo=1																										
-																										}else{
-																											if(c==23){
-
-																											}else{
-																												if(c==24){
-																													xpos=32+bordertwo
-																													xpostwo=12
-																													ypos=7+bordertwo
-																													ypostwo=3
-																												}else{
-																													if(c==25){
-																														xpos=32+bordertwo
-																														xpostwo=9
-																														ypos=15+bordertwo
-																														ypostwo=3
-																													}else{
-																														if(c==26){
-																															xpos=31+bordertwo
-																															xpostwo=11
-																															ypos=24+bordertwo
-																															ypostwo=3
-																														}else{
-																															if(c==27){
-																																xpos=33+bordertwo
-																																xpostwo=3
-																																ypos=5+bordertwo
-																																ypostwo=3
-																															}else{
-																																if(c==28){
-																																	xpos=32+bordertwo
-																																	xpostwo=14
-																																	ypos=9+bordertwo
-																																	ypostwo=1
-																																}else{
-																																	if(c==29){
-																																		xpos=36+bordertwo
-																																		xpostwo=3
-																																		ypos=10+bordertwo
-																																		ypostwo=1
-																																	}else{
-																																		if(c==30){
-																																			xpos=36+bordertwo
-																																			xpostwo=3
-																																			ypos=13+bordertwo
-																																			ypostwo=7
-																																		}else{
-																																			if(c==31){
-																																				xpos=36+bordertwo
-																																				xpostwo=3
-																																				ypos=22+bordertwo
-																																				ypostwo=5
-																																			}else{
-																																				if(c==32){
-																																					xpos=39+bordertwo
-																																					xpostwo=3
-																																					ypos=1+bordertwo
-																																					ypostwo=1
-																																				}else{
-																																					if(c==33){
-																																						xpos=39+bordertwo
-																																						xpostwo=3
-																																						ypos=4+bordertwo
-																																						ypostwo=4
-																																					}else{
-																																						if(c==34){
-																																							xpos=41+bordertwo
-																																							xpostwo=2
-																																							ypos=17+bordertwo
-																																							ypostwo=1
-																																						}else{
-																																							if(c==35){
-																																								xpos=45+bordertwo
-																																								xpostwo=2
-																																								ypos=20+bordertwo
-																																								ypostwo=1
-																																							}else{
-																																								if(c==36){
-																																									xpos=46+bordertwo
-																																									xpostwo=10
-																																									ypos=25+bordertwo
-																																									ypostwo=1
-																																								}else{
-																																									if(c==37){
-																																										xpos=24+bordertwo
-																																										xpostwo=6
-																																										ypos=48+bordertwo
-																																										ypostwo=1
-																																									}else{
-																																										if(c==38){
-																																											xpos=48+bordertwo
-																																											xpostwo=6
-																																											ypos=15+bordertwo
-																																											ypostwo=2
-																																										}else{
-																																											if(c==39){
-																																												xpos=50+bordertwo
-																																												xpostwo=2
-																																												ypos=6+bordertwo
-																																												ypostwo=1
-																																											}else{
-																																												if(c==40){
-																																													xpos=50+bordertwo
-																																													xpostwo=2
-																																													ypos=12+bordertwo
-																																													ypostwo=1
-																																												}else{
-																																													if(c==41){
-																																														xpos=56+bordertwo
-																																														xpostwo=14
-																																														ypos=9+bordertwo
-																																														ypostwo=1
-																																													}else{
-																																														if(c==42){
-																																															xpos=58+bordertwo
-																																															xpostwo=32
-																																															ypos=7+bordertwo
-																																															ypostwo=2
-																																														}else{
-																																																if(c==43){
-																																																	xpos=60+bordertwo
-																																																	xpostwo=3
-																																																	ypos=1+bordertwo
-																																																	ypostwo=1
-																																																}else{
-																																																	if(c==44){
-																																																		xpos=60+bordertwo
-																																																		xpostwo=3
-																																																		ypos=4+bordertwo
-																																																		ypostwo=3
-																																																	}else{
-																																																		if(c==45){
-																																																			xpos=56+bordertwo
-																																																			xpostwo=2
-																																																			ypos=20+bordertwo
-																																																			ypostwo=1
-																																																		}else{
-																																																			if(c==46){
-																																																				xpos=59+bordertwo
-																																																				xpostwo=2
-																																																				ypos=17+bordertwo
-																																																				ypostwo=1
-																																																			}else{
-																																																				if(c==47){
-																																																					xpos=60+bordertwo
-																																																					xpostwo=7
-																																																					ypos=24+bordertwo
-																																																					ypostwo=2
-																																																				}else{
-																																																					if(c==48){
-																																																						xpos=61+bordertwo
-																																																						xpostwo=7
-																																																						ypos=15+bordertwo
-																																																						ypostwo=1
-																																																					}else{
-																																																					if(c==49){
-																																																						xpos=61+bordertwo
-																																																						xpostwo=40
-																																																						ypos=16+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==50){
-																																																						xpos=63+bordertwo
-																																																						xpostwo=3
-																																																						ypos=10+bordertwo
-																																																						ypostwo=1
-																																																					}else{
-																																																					if(c==51){
-																																																						xpos=63+bordertwo
-																																																						xpostwo=3
-																																																						ypos=13+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==52){
-																																																						xpos=71+bordertwo
-																																																						xpostwo=9
-																																																						ypos=14+bordertwo
-																																																						ypostwo=4
-																																																					}else{
-																																																					if(c==53){
-																																																						xpos=81+bordertwo
-																																																						xpostwo=9
-																																																						ypos=9+bordertwo
-																																																						ypostwo=1
-																																																					}else{
-																																																					if(c==54){
-																																																						xpos=83+bordertwo
-																																																						xpostwo=18
-																																																						ypos=15+bordertwo
-																																																						ypostwo=1
-																																																					}else{
-																																																					if(c==55){
-																																																						xpos=85+bordertwo
-																																																						xpostwo=3
-																																																						ypos=1+bordertwo
-																																																						ypostwo=1
-																																																					}else{
-																																																					if(c==56){
-																																																						xpos=85+bordertwo
-																																																						xpostwo=3
-																																																						ypos=4+bordertwo
-																																																						ypostwo=7
-																																																					}else{
-																																																					if(c==57){
-																																																						xpos=85+bordertwo
-																																																						xpostwo=3
-																																																						ypos=13+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==58){
-																																																						xpos=86+bordertwo
-																																																						xpostwo=3
-																																																						ypos=18+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==59){
-																																																						xpos=86+bordertwo
-																																																						xpostwo=3
-																																																						ypos=22+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==60){
-																																																						xpos=90+bordertwo
-																																																						xpostwo=1
-																																																						ypos=7+bordertwo
-																																																						ypostwo=1
-																																																					}else{
-																																																					if(c==61){
-																																																						xpos=93+bordertwo
-																																																						xpostwo=3
-																																																						ypos=12+bordertwo
-																																																						ypostwo=3
-																																																					}else{
-																																																					if(c==62){
-																																																						xpos=93+bordertwo
-																																																						xpostwo=3
-																																																						ypos=24+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==63){
-																																																						xpos=0+bordertwo
-																																																						xpostwo=0
-																																																						ypos=0+bordertwo
-																																																						ypostwo=0
-																																																					}else{
-																																																					if(c==64){
-																																																						xpos=98+bordertwo
-																																																						xpostwo=3
-																																																						ypos=7+bordertwo
-																																																						ypostwo=1
-																																																					}else{
-																																																					if(c==65){
-																																																						xpos=85+bordertwo
-																																																						xpostwo=5
-																																																						ypos=24+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==66){
-																																																						xpos=63+bordertwo
-																																																						xpostwo=3
-																																																						ypos=22+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-																																																					if(c==67){
-																																																						xpos=63+bordertwo
-																																																						xpostwo=3
-																																																						ypos=18+bordertwo
-																																																						ypostwo=2
-																																																					}else{
-			
-																																																					}				
-																																																					}				
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																					}			
-																																																				}			
-																																																			}			
-																																																		}			
-																																																	}			
-																																																}			
-																																															}			
-																																														}				
-																																													}				
-																																												}				
-																																											}				
-																																										}				
-																																									}				
-																																								}				
-																																							}				
-																																						}				
-																																					}				
-																																				}			
-																																			}			
-																																		}				
-																																	}				
-																																}				
-																															}				
-																														}			
-																													}			
-																												}			
-																											}			
-																										}			
-																									}			
-																								}		
-																							}			
-																						}			
-																					}			
-																				}			
-																			}			
-																		}			
-																	}				
-																}				
-															}			
-														}			
-													}			
-												}				
-											}			
-										}			
-									}			
-								}			
-							}			
-						}			
-					}			
+				switch(c){
+				case 1: xpos=1+bordertwo; xpostwo=5; ypos=9+bordertwo; ypostwo=3; break;
+				case 2: xpos=6+bordertwo; xpostwo=2; ypos=10+bordertwo; ypostwo=1; break;
+				case 3: xpos=1+bordertwo; xpostwo=19; ypos=15+bordertwo; ypostwo=3; break;
+				case 4: xpos=7+bordertwo; xpostwo=4; ypos=14+bordertwo; ypostwo=2; break;
+				case 5: xpos=1+bordertwo; xpostwo=2; ypos=24+bordertwo; ypostwo=3; break;
+				case 6: xpos=6+bordertwo; xpostwo=2; ypos=22+bordertwo; ypostwo=1; break;
+				case 7: xpos=10+bordertwo; xpostwo=2; ypos=8+bordertwo; ypostwo=1; break;
+				case 8: xpos=12+bordertwo; xpostwo=32; ypos=7+bordertwo; ypostwo=2; break;
+				case 9: xpos=12+bordertwo; xpostwo=8; ypos=9+bordertwo; ypostwo=1; break;
+				case 10: xpos=13+bordertwo; xpostwo=3; ypos=10+bordertwo; ypostwo=1; break;
+				case 11: xpos=14+bordertwo; xpostwo=3; ypos=1+bordertwo; ypostwo=1; break;
+				case 12: xpos=14+bordertwo; xpostwo=3; ypos=4+bordertwo; ypostwo=4; break;
+				case 13: xpos=13+bordertwo; xpostwo=3; ypos=13+bordertwo; ypostwo=3; break;
+				case 14: xpos=29+bordertwo; xpostwo=4; ypos=28+bordertwo; ypostwo=4; break;
+				case 15: xpos=13+bordertwo; xpostwo=3; ypos=18+bordertwo; ypostwo=2; break;
+				case 16: xpos=13+bordertwo; xpostwo=3; ypos=22+bordertwo; ypostwo=3; break;
+				case 17: xpos=29+bordertwo; xpostwo=4; ypos=28+bordertwo; ypostwo=4; break;
+				case 18: xpos=11+bordertwo; xpostwo=10; ypos=24+bordertwo; ypostwo=3; break;
+				case 19: xpos=20+bordertwo; xpostwo=12; ypos=16+bordertwo; ypostwo=2; break;
+				case 20: xpos=20+bordertwo; xpostwo=3; ypos=5+bordertwo; ypostwo=3; break;
+				case 21: xpos=48+bordertwo; xpostwo=6; ypos=24+bordertwo; ypostwo=1; break;
+				case 22: xpos=24+bordertwo; xpostwo=4; ypos=12+bordertwo; ypostwo=1; break;
+				case 23: break;
+				case 24: xpos=32+bordertwo; xpostwo=12; ypos=7+bordertwo; ypostwo=3; break;
+				case 25: xpos=32+bordertwo; xpostwo=9; ypos=15+bordertwo; ypostwo=3; break;
+				case 26: xpos=31+bordertwo; xpostwo=11; ypos=24+bordertwo; ypostwo=3; break;
+				case 27: xpos=33+bordertwo; xpostwo=3; ypos=5+bordertwo; ypostwo=3; break;
+				case 28: xpos=32+bordertwo; xpostwo=14; ypos=9+bordertwo; ypostwo=1; break;
+				case 29: xpos=36+bordertwo; xpostwo=3; ypos=10+bordertwo; ypostwo=1; break;
+				case 30: xpos=36+bordertwo; xpostwo=3; ypos=13+bordertwo; ypostwo=7; break;
+				case 31: xpos=36+bordertwo; xpostwo=3; ypos=22+bordertwo; ypostwo=5; break;
+				case 32: xpos=39+bordertwo; xpostwo=3; ypos=1+bordertwo; ypostwo=1; break;
+				case 33: xpos=39+bordertwo; xpostwo=3; ypos=4+bordertwo; ypostwo=4; break;
+				case 34: xpos=41+bordertwo; xpostwo=2; ypos=17+bordertwo; ypostwo=1; break;
+				case 35: xpos=45+bordertwo; xpostwo=2; ypos=20+bordertwo; ypostwo=1; break;
+				case 36: xpos=46+bordertwo; xpostwo=10; ypos=25+bordertwo; ypostwo=1; break;
+				case 37: xpos=24+bordertwo; xpostwo=6; ypos=48+bordertwo; ypostwo=1; break;
+				case 38: xpos=48+bordertwo; xpostwo=6; ypos=15+bordertwo; ypostwo=2; break;
+				case 39: xpos=50+bordertwo; xpostwo=2; ypos=6+bordertwo; ypostwo=1; break;
+				case 40: xpos=50+bordertwo; xpostwo=2; ypos=12+bordertwo; ypostwo=1; break;
+				case 41: xpos=56+bordertwo; xpostwo=14; ypos=9+bordertwo; ypostwo=1; break;
+				case 42: xpos=58+bordertwo; xpostwo=32; ypos=7+bordertwo; ypostwo=2; break;
+				case 43: xpos=60+bordertwo; xpostwo=3; ypos=1+bordertwo; ypostwo=1; break;
+				case 44: xpos=60+bordertwo; xpostwo=3; ypos=4+bordertwo; ypostwo=3; break;
+				case 45: xpos=56+bordertwo; xpostwo=2; ypos=20+bordertwo; ypostwo=1; break;
+				case 46: xpos=59+bordertwo; xpostwo=2; ypos=17+bordertwo; ypostwo=1; break;
+				case 47: xpos=60+bordertwo; xpostwo=7; ypos=24+bordertwo; ypostwo=2; break;
+				case 48: xpos=61+bordertwo; xpostwo=7; ypos=15+bordertwo; ypostwo=1; break;
+				case 49: xpos=61+bordertwo; xpostwo=40; ypos=16+bordertwo; ypostwo=2; break;
+				case 50: xpos=63+bordertwo; xpostwo=3; ypos=10+bordertwo; ypostwo=1; break;
+				case 51: xpos=63+bordertwo; xpostwo=3; ypos=13+bordertwo; ypostwo=2; break;
+				case 52: xpos=71+bordertwo; xpostwo=9; ypos=14+bordertwo; ypostwo=4; break;
+				case 53: xpos=81+bordertwo; xpostwo=9; ypos=9+bordertwo; ypostwo=1; break;
+				case 54: xpos=83+bordertwo; xpostwo=18; ypos=15+bordertwo; ypostwo=1; break;
+				case 55: xpos=85+bordertwo; xpostwo=3; ypos=1+bordertwo; ypostwo=1; break;
+				case 56: xpos=85+bordertwo; xpostwo=3; ypos=4+bordertwo; ypostwo=7; break;
+				case 57: xpos=85+bordertwo; xpostwo=3; ypos=13+bordertwo; ypostwo=2; break;
+				case 58: xpos=86+bordertwo; xpostwo=3; ypos=18+bordertwo; ypostwo=2; break;
+				case 59: xpos=86+bordertwo; xpostwo=3; ypos=22+bordertwo; ypostwo=2; break;
+				case 60: xpos=90+bordertwo; xpostwo=1; ypos=7+bordertwo; ypostwo=1; break;
+				case 61: xpos=93+bordertwo; xpostwo=3; ypos=12+bordertwo; ypostwo=3; break;
+				case 62: xpos=93+bordertwo; xpostwo=3; ypos=24+bordertwo; ypostwo=2; break;
+				case 63: xpos=0+bordertwo; xpostwo=0; ypos=0+bordertwo; ypostwo=0; break;
+				case 64: xpos=98+bordertwo; xpostwo=3; ypos=7+bordertwo; ypostwo=1; break;
+				case 65: xpos=85+bordertwo; xpostwo=5; ypos=24+bordertwo; ypostwo=2; break;
+				case 66: xpos=63+bordertwo; xpostwo=3; ypos=22+bordertwo; ypostwo=2; break;
+				case 67: xpos=63+bordertwo; xpostwo=3; ypos=18+bordertwo; ypostwo=2; break;
 				}
 			}
 		}else{

@@ -121,6 +121,7 @@
     {"$GMFolder":"","%Name":"Witch","folderPath":"folders/Sprites/ME/Abil/Masks/Witch.yy","name":"Witch","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Char","folderPath":"folders/Sprites/ME/Char.yy","name":"Char","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"group0","folderPath":"folders/Sprites/ME/group0.yy","name":"group0","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Rogue","folderPath":"folders/Sprites/Rogue.yy","name":"Rogue","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"UI","folderPath":"folders/Sprites/UI.yy","name":"UI","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Abilbar","folderPath":"folders/Sprites/UI/Abilbar.yy","name":"Abilbar","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Map","folderPath":"folders/Sprites/UI/Map.yy","name":"Map","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -132,7 +133,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.14.2.213",
+    "IDEVersion":"2024.14.3.217",
   },
   "name":"AsherTwo_Rewrite",
   "resources":[
@@ -157,6 +158,7 @@
     {"id":{"name":"Snd","path":"objects/Snd/Snd.yy",},},
     {"id":{"name":"Terrain","path":"objects/Terrain/Terrain.yy",},},
     {"id":{"name":"Xp","path":"objects/Xp/Xp.yy",},},
+    {"id":{"name":"room_rogue","path":"rooms/room_rogue/room_rogue.yy",},},
     {"id":{"name":"room0","path":"rooms/room0/room0.yy",},},
     {"id":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
     {"id":{"name":"abil_create_scr","path":"scripts/abil_create_scr/abil_create_scr.yy",},},
@@ -189,6 +191,7 @@
     {"id":{"name":"item_createstats_scr","path":"scripts/item_createstats_scr/item_createstats_scr.yy",},},
     {"id":{"name":"item_pickup_scr","path":"scripts/item_pickup_scr/item_pickup_scr.yy",},},
     {"id":{"name":"items_scr","path":"scripts/items_scr/items_scr.yy",},},
+    {"id":{"name":"leaderboard_scr","path":"scripts/leaderboard_scr/leaderboard_scr.yy",},},
     {"id":{"name":"lerpp","path":"scripts/lerpp/lerpp.yy",},},
     {"id":{"name":"level_run_scr","path":"scripts/level_run_scr/level_run_scr.yy",},},
     {"id":{"name":"loot_scr","path":"scripts/loot_scr/loot_scr.yy",},},
@@ -204,6 +207,7 @@
     {"id":{"name":"talentcreate_scr","path":"scripts/talentcreate_scr/talentcreate_scr.yy",},},
     {"id":{"name":"talentui_scr","path":"scripts/talentui_scr/talentui_scr.yy",},},
     {"id":{"name":"touch_helpers_scr","path":"scripts/touch_helpers_scr/touch_helpers_scr.yy",},},
+    {"id":{"name":"ui_draw_scr","path":"scripts/ui_draw_scr/ui_draw_scr.yy",},},
     {"id":{"name":"wep_scr","path":"scripts/wep_scr/wep_scr.yy",},},
     {"id":{"name":"worldgen_initialize_scr","path":"scripts/worldgen_initialize_scr/worldgen_initialize_scr.yy",},},
     {"id":{"name":"worldgen_scr","path":"scripts/worldgen_scr/worldgen_scr.yy",},},
@@ -510,6 +514,7 @@
     {"id":{"name":"pallet_spr","path":"sprites/pallet_spr/pallet_spr.yy",},},
     {"id":{"name":"part_spr","path":"sprites/part_spr/part_spr.yy",},},
     {"id":{"name":"sheet_spr","path":"sprites/sheet_spr/sheet_spr.yy",},},
+    {"id":{"name":"spr_rogue_ui","path":"sprites/spr_rogue_ui/spr_rogue_ui.yy",},},
     {"id":{"name":"sprite27","path":"sprites/sprite27/sprite27.yy",},},
     {"id":{"name":"sprite30","path":"sprites/sprite30/sprite30.yy",},},
     {"id":{"name":"Sprite60","path":"sprites/Sprite60/Sprite60.yy",},},
@@ -528,6 +533,7 @@
   "RoomOrderNodes":[
     {"roomId":{"name":"room0","path":"rooms/room0/room0.yy",},},
     {"roomId":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
+    {"roomId":{"name":"room_rogue","path":"rooms/room_rogue/room_rogue.yy",},},
   ],
   "templateType":null,
   "TextureGroups":[

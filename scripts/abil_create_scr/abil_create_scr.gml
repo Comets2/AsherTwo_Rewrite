@@ -45,6 +45,7 @@ function abil_create_scr(argument0) {
 			
 			//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			creator=other.id
 			
@@ -651,6 +652,7 @@ function abil_create_scr(argument0) {
 			
 			dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			move=0
 			grav=0.1
@@ -1245,6 +1247,7 @@ function abil_create_scr(argument0) {
 			
 				dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 				dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 				
 				Me.passiveArray[0,1]=0
 			}else{
@@ -1256,6 +1259,7 @@ function abil_create_scr(argument0) {
 			
 				dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 				dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			}
 
@@ -2324,6 +2328,7 @@ function abil_create_scr(argument0) {
 			
 								//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 								dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 								creator=other.id
 			
@@ -2414,6 +2419,7 @@ function abil_create_scr(argument0) {
 			
 				//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 				dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 				
 			
@@ -2611,6 +2617,7 @@ function abil_create_scr(argument0) {
 			
 					//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 					dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 					creator=other.id
 			
@@ -2666,6 +2673,7 @@ function abil_create_scr(argument0) {
 						dmg+=dmg*(Control.talentmapArray[14,1]*0.05)
 			
 						dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 						
 						dmgsave=dmg
 						
@@ -2829,6 +2837,7 @@ function abil_create_scr(argument0) {
 			
 				//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 				dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 				creator=other.id
 			
@@ -2892,6 +2901,7 @@ function abil_create_scr(argument0) {
 			
 				//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 				dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 				creator=other.id
 			
@@ -2947,6 +2957,7 @@ function abil_create_scr(argument0) {
 					dmg+=dmg*(Control.talentmapArray[9,1]*0.25)
 		
 					dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 					creator=other.id
 			
@@ -3112,6 +3123,7 @@ function abil_create_scr(argument0) {
 			
 							//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 							dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 							creator=other.id
 							count=0
@@ -3424,6 +3436,7 @@ chance=1
 			
 							//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 							dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 							creator=other.id
 							released=0
@@ -3478,6 +3491,7 @@ chance=1
 			
 								//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 								dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 								creator=other.id
 								count=0
@@ -3618,6 +3632,7 @@ chance=1
 			
 			dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			creator=other.id
 			
@@ -3840,6 +3855,7 @@ chance=1
 			
 			
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			creator=other.id
 			
@@ -3952,6 +3968,7 @@ chance=1
 			dmg+=chance*(Control.talentmapArray[6,1]*0.25)
 			
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			creator=other.id
 			
@@ -4093,6 +4110,7 @@ chance=1
 			
 			
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			creator=other.id
 			
@@ -4291,6 +4309,7 @@ chance=1
 			
 			dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			creator=other.id
 			
@@ -4423,6 +4442,7 @@ chance=1
 			
 			dmg+=chance*(Control.talentmapArray[3,1]*0.25)
 			dmg+=chance*(Control.invenArray[25,3]*0.01)
+			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
 			
 			creator=other.id
 			

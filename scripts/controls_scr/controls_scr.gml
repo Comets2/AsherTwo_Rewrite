@@ -1,53 +1,42 @@
 function controls_scr(){
-	// Capture mouse input FIRST - before anything else can consume it
-	var _rawLeftPressed = mouse_check_button_pressed(mb_left)
-	var _rawRightPressed = mouse_check_button_pressed(mb_right)
+	// Mouse detection: held-with-reset + pressed() + device_pressed() + released-without-press
 	global.mouse_left_held = mouse_check_button(mb_left)
 	global.mouse_right_held = mouse_check_button(mb_right)
+	var _rawLeftPressed = mouse_check_button_pressed(mb_left)
+	var _rawRightPressed = mouse_check_button_pressed(mb_right)
+	var _devLeftPressed = device_mouse_check_button_pressed(0, mb_left)
+	var _devRightPressed = device_mouse_check_button_pressed(0, mb_right)
+	var _leftReleased = mouse_check_button_released(mb_left)
+	var _rightReleased = mouse_check_button_released(mb_right)
 
-	// Click buffer system - if button is newly held (wasn't held last frame), treat as pressed
-	// This catches clicks that mouse_check_button_pressed() might miss
-	if(!variable_global_exists("_mouse_left_was_held")) global._mouse_left_was_held = false
-	if(!variable_global_exists("_mouse_right_was_held")) global._mouse_right_was_held = false
+	if(!variable_global_exists("_mouse_left_consumed")) global._mouse_left_consumed = false
+	if(!variable_global_exists("_mouse_right_consumed")) global._mouse_right_consumed = false
 
-	var _leftNewlyHeld = global.mouse_left_held && !global._mouse_left_was_held
-	var _rightNewlyHeld = global.mouse_right_held && !global._mouse_right_was_held
+	// Held and not yet consumed = pressed (held-with-reset)
+	var _leftHeldPress = global.mouse_left_held && !global._mouse_left_consumed
+	var _rightHeldPress = global.mouse_right_held && !global._mouse_right_consumed
 
-	// Use either raw pressed OR newly held (backup detection)
-	global.mouse_left_pressed = _rawLeftPressed || _leftNewlyHeld
-	global.mouse_right_pressed = _rawRightPressed || _rightNewlyHeld
+	// Released-without-press: button was pressed+released between frames, only release was seen
+	var _leftReleasedNoPress = _leftReleased && !global.mouse_left_held && !global._mouse_left_consumed
+	var _rightReleasedNoPress = _rightReleased && !global.mouse_right_held && !global._mouse_right_consumed
 
-	// Update "was held" for next frame
-	global._mouse_left_was_held = global.mouse_left_held
-	global._mouse_right_was_held = global.mouse_right_held
+	// Final pressed = any source
+	global.mouse_left_pressed = _leftHeldPress || _rawLeftPressed || _devLeftPressed || _leftReleasedNoPress
+	global.mouse_right_pressed = _rightHeldPress || _rawRightPressed || _devRightPressed || _rightReleasedNoPress
 
-	// Console logging for mouse input debugging
-	if(global.mouse_left_pressed){
-		var _src = _rawLeftPressed ? "pressed()" : "newly_held"
-		show_debug_message(">>> MOUSE LEFT PRESSED at t=" + string(current_time) + " focus=" + string(window_has_focus()) + " src=" + _src)
-	}
-	if(global.mouse_right_pressed){
-		var _src = _rawRightPressed ? "pressed()" : "newly_held"
-		show_debug_message(">>> MOUSE RIGHT PRESSED at t=" + string(current_time) + " focus=" + string(window_has_focus()) + " src=" + _src)
-	}
-	// Log held-but-not-pressed (indicates click on previous frame, still holding)
-	if(global.mouse_left_held && !global.mouse_left_pressed){
-		// Only log once per hold, not every frame - use a static flag
-		if(!variable_global_exists("_debug_left_hold_logged") || !global._debug_left_hold_logged){
-			show_debug_message("    LEFT HELD (not pressed) at t=" + string(current_time))
-			global._debug_left_hold_logged = true
-		}
+	// Mark as consumed so held-with-reset only fires once per click
+	if(global.mouse_left_held || _leftReleasedNoPress){
+		global._mouse_left_consumed = true
 	}else{
-		global._debug_left_hold_logged = false
+		global._mouse_left_consumed = false
 	}
-	if(global.mouse_right_held && !global.mouse_right_pressed){
-		if(!variable_global_exists("_debug_right_hold_logged") || !global._debug_right_hold_logged){
-			show_debug_message("    RIGHT HELD (not pressed) at t=" + string(current_time))
-			global._debug_right_hold_logged = true
-		}
+
+	if(global.mouse_right_held || _rightReleasedNoPress){
+		global._mouse_right_consumed = true
 	}else{
-		global._debug_right_hold_logged = false
+		global._mouse_right_consumed = false
 	}
+
 
 	global.con_h_up=keyboard_check(global.consave_up)
 
@@ -91,6 +80,7 @@ function controls_scr(){
 	global.con_p_q=keyboard_check_pressed(global.consave_q)
 	global.con_h_q=keyboard_check(global.consave_q)
 	global.con_r_q=keyboard_check_released(global.consave_q)
+
 	//M
 	global.con_p_m=keyboard_check_pressed(global.consave_m)
 	global.con_r_m=keyboard_check_released(global.consave_m)

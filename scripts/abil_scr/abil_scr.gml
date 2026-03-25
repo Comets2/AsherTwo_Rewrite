@@ -3,9 +3,15 @@ function abil_scr() {
 	//Abil CD
 	for(i=0;i<5;i+=1){
 		if(abilArray[i,1]>0){
-		abilArray[i,1]-=1
-			if(abilArray[i,1]==0){
-				abilArray[i,4]=0
+			// Base reduction + rogue cooldown bonus
+			var cd_reduction = 1
+			if(Control.rogue_mode){
+				cd_reduction += rogue_statcooldown * 0.03  // +3% faster per point
+			}
+			abilArray[i,1] -= cd_reduction
+			if(abilArray[i,1] <= 0){
+				abilArray[i,1] = 0
+				abilArray[i,4] = 0
 			}
 		}
 	}
@@ -72,13 +78,16 @@ function abil_scr() {
 					abil_create_scr(1)
 	
 				}else{
-				
+
 					anim=12
 					animsave=14
 					abilArray[0,4]=2
 					created=abilArray[0,3]
 					if(instance_exists(created)){
-						created.phase=2
+						// Only detonate if pumpkin is active (phase 1), not already exploding (phase 2) or finished (phase 0)
+						if(created.phase==1){
+							created.phase=2
+						}
 					}
 				}
 			}

@@ -85,12 +85,12 @@ if(image_index+imgsped<=img+imgcap){
 if(instance_place(x,y,Me)){
 	audio_play_sound_at(choose(snd_ac_cute_1,snd_ac_cute_2,snd_ac_cute_3,snd_ac_cute_4),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 
-				Control.xpamount+=1
-				Control.xptimer=60
-
-				// Add XP for rogue mode
+				// Add XP based on mode
 				if(Control.rogue_mode){
 					rogue_collect_xp_scr(1)
+				}else{
+					Control.xpamount+=1
+					Control.xptimer=60
 				}
 	
 	

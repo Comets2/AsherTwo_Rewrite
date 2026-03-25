@@ -85,39 +85,53 @@ yps=camy-camytwo
 			arcadepet=0
 			arcadepetrarity=0
 
-			for(i=0;i<100;i+=1){
-				created=instance_create_depth(xps+50+10+random(206-50-20),yps+105+random(15),0,Arcade)
-				with(created){
-					pin=1
-					hsp=0
-					vsp=0
-					grav=0
-					hitcheck=1
-					hitcd=0
-					visible=false
-					depth=10
-				
-					sprite_index=abil_crab_spr
-					img=53
-					image_index=img
-					imgsped=0
-					dur=10000
-					image_angle=random(360)
-					for(i=0;i<10;i+=1){
-						if(instance_place(x,y,Arcade)){
-							if(x>other.xps+60+1&&x<other.xps+136-1){
-								x+=choose(0,1)
-							}
-							if(y>other.yps+105+1&&y<other.yps+105+15-1){
-								y+=choose(0,1)
-							}							
-						}
+			// Grid-based spawn to reduce overlap
+			// Spawn area: x 47-207, y 107-120 (relative to xps/yps)
+			var _minX = xps + 47
+			var _maxX = xps + 207
+			var _minY = yps + 107
+			var _maxY = yps + 120
+			var _areaW = _maxX - _minX  // 160 pixels
+			var _areaH = _maxY - _minY  // 22 pixels
+
+			var _cols = 20          // 20 columns
+			var _rows = 5           // 5 rows (20*5 = 100)
+			var _gridSpacingX = _areaW / (_cols - 1)  // ~8.4 pixels
+			var _gridSpacingY = _areaH / (_rows - 1)  // ~5.5 pixels
+			var _count = 0
+
+			for(var _row = 0; _row < _rows; _row++){
+				for(var _col = 0; _col < _cols; _col++){
+					if(_count >= 100) break
+
+					var _spawnX = _minX + (_col * _gridSpacingX) + random_range(-3, 3)
+					var _spawnY = _minY + (_row * _gridSpacingY) + random_range(-2, 2)
+
+					created=instance_create_depth(_spawnX, _spawnY, 0, Arcade)
+					with(created){
+						pin=1
+						hsp=0
+						vsp=0
+						grav=0
+						hitcheck=1
+						hitcd=0
+						visible=false
+						depth=10
+
+						sprite_index=abil_crab_spr
+						img=53
+						image_index=img
+						imgsped=0
+						dur=10000
+						image_angle=random(360)
+
+						bonuscheck=1
+						bonuschecktwo=1
+						value=1
 					}
-					
-					bonuscheck=1
-					bonuschecktwo=1		
-					value=1
+					_count++
 				}
+				if(_count >= 100) break
 			}
 			for(i=0;i<5;i+=1){
 				created=instance_create_depth(xps+50+10+random(206-50-20),yps+105+random(15),0,Arcade)
@@ -242,11 +256,16 @@ yps=camy-camytwo
 			//Token
 			tokenDropAnimation=0
 
+			//Input buffers
+			cannonBufferLeft=0
+			cannonBufferRight=0
+			wheelStopBuffer=0
+
 			//Array
 			arcadeArray[0,0]=0
 			arcadeArray[0,1]=0
 			
-			for(a=0;a<10;a+=1){
+			for(var a=0;a<10;a+=1){
 				for(b=0;b<10;b+=1){
 					arcadeArray[a,b]=0
 				}			
@@ -389,7 +408,7 @@ yps=camy-camytwo
 				arcadeArray[31+chance,0]=choose(1,1,1,1,1,2,2,2,2,2,3,3,4)
 
 
-			for(a=0;a<10;a+=1){
+			for(var a=0;a<10;a+=1){
 				for(b=0;b<10;b+=1){
 					arcadeArray[100+a,b]=0
 				}
@@ -691,42 +710,55 @@ with(Part){
 			}
 		}
 	
-		//Ticket
-		if(pendingTickets>0){
-			if(arcadeArray[0,1]<4){
-				arcadeArray[0,1]+=1
-				arcadeArray[arcadeArray[0,1],0]=1
-				arcadeArray[arcadeArray[0,1],2]=1
-				pendingTickets-=1
-				//audio_play_sound_at(choose(snd_ac_tick_1,snd_ac_tick_2,snd_ac_tick_3),xps+30,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
+		//Ticket - speed scales with pending count
+		var _ticketsToDispense = 1
+		if(pendingTickets>50) _ticketsToDispense=4
+		else if(pendingTickets>20) _ticketsToDispense=3
+		else if(pendingTickets>8) _ticketsToDispense=2
+
+		repeat(_ticketsToDispense){
+			if(pendingTickets>0){
+				if(arcadeArray[0,1]<4){
+					arcadeArray[0,1]+=1
+					arcadeArray[arcadeArray[0,1],0]=1
+					arcadeArray[arcadeArray[0,1],2]=1
+					pendingTickets-=1
+					//audio_play_sound_at(choose(snd_ac_tick_1,snd_ac_tick_2,snd_ac_tick_3),xps+30,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
+				}
 			}
 		}
-		
+
+		var _tickSpeed = 1
+		if(pendingTickets>50) _tickSpeed=6
+		else if(pendingTickets>20) _tickSpeed=4
+		else if(pendingTickets>8) _tickSpeed=2
+
 		chance=arcadeArray[0,1]
 		for(i=1;i<arcadeArray[0,1]+1;i+=1){
-			
+
 			if(arcadeArray[i,1]<100){
-				
+
 				if(arcadeArray[i,2]==1){
 					totalTickets+=1
 					arcadeArray[i,2]=0
 				}
 				if(i==1){
 					if(arcadeArray[i,1]<chance*36){
-						arcadeArray[i,1]+=1
+						arcadeArray[i,1]+=_tickSpeed
+						if(arcadeArray[i,1]>chance*36) arcadeArray[i,1]=chance*36
 					}
 				}else{
 					chance=(arcadeArray[1,1]-(36*(i-1)))
-					
+
 					if(chance<0){
 						chance=0
 					}
-					
+
 					arcadeArray[i,1]=chance
 				}
-				
+
 			}else{
-				
+
 				for(i=1;i<arcadeArray[0,1]+1;i+=1){
 					arcadeArray[i,0]=arcadeArray[i+1,0]
 					arcadeArray[i,1]=arcadeArray[i+1,1]
@@ -765,6 +797,9 @@ with(Part){
 				bonusWheelState=0
 				wheelAngle=savedWheelAngle
 				currentWheelSegment=savedWheelSegment
+				cannonBufferLeft=0
+				cannonBufferRight=0
+				wheelStopBuffer=0
 			}
 		}
 	
@@ -803,27 +838,29 @@ with(Part){
 							bonusWheelFrame=0
 						}
 					
-						if(canStopSpin==1){
-							var _wheelMouseClick = _mouseLeftPressed || _mouseRightPressed
-							var _wheelKbClick = global.con_p_q||global.con_p_e||global.conp_p_q||global.conp_p_e||global.conp_p_space
+						// Wheel stop input buffering - detect presses unconditionally
+						var _wheelMouseClick = _mouseLeftPressed || _mouseRightPressed
+						var _wheelKbClick = global.con_p_q||global.con_p_e||global.conp_p_q||global.conp_p_e||global.conp_p_space
 
-							if(_wheelKbClick || _wheelMouseClick){
-								if(wheelRotationSpeed>0.5){
-									wheelRotationSpeed=random_range(2.9,3.1)
-									canStopSpin=0
-									wheelSpinTimer=50
-									if(_wheelMouseClick) _mouseClickConsumed = true  // Mark click as consumed by wheel
-								}else{
-									if(_wheelMouseClick) _mouseClickConsumed = true  // Still consumed even if blocked
-								}
-							}
-						}else{
+						if(_wheelKbClick || _wheelMouseClick){
+							wheelStopBuffer=4
+							if(_wheelMouseClick) _mouseClickConsumed = true
+						}
+
+						if(canStopSpin==1 && wheelStopBuffer>0 && wheelRotationSpeed>0.5){
+							wheelRotationSpeed=random_range(2.9,3.1)
+							canStopSpin=0
+							wheelSpinTimer=50
+							wheelStopBuffer=0
+						}else if(canStopSpin!=1){
 							if(wheelRotationSpeed>0.009){
 								wheelRotationSpeed-=0.009
 							}else{
 								wheelRotationSpeed=0
 							}
 						}
+
+						if(wheelStopBuffer>0) wheelStopBuffer-=1
 				}
 				
 				
@@ -971,6 +1008,9 @@ with(Part){
 								spinsAvailable+=1
 								savedWheelAngle=wheelAngle
 								savedWheelSegment=currentWheelSegment
+								cannonBufferLeft=0
+								cannonBufferRight=0
+								wheelStopBuffer=0
 							}else{
 								
 								//Abil 1
@@ -1013,42 +1053,36 @@ with(Part){
 											}
 										}
 									}else{
-										//Squid
+										//Squid - Single Lightning + Squid Card Drop
 										if(crabtype==1){
-											//Card Drop Squid
-												for(i=0;i<2;i+=1){
+											// Trigger lightning
+											arcadeArray[40,0]=200
+											arcadeArray[40,1]=0
+											arcadeArray[40,2]=irandom_range(69,185)
+											arcadeArray[40,3]=0
 
-													created=instance_create_depth(xps+choose(72,100,127,154,182),yps-10,0,Arcade)
-													with(created){
-									
-														audio_play_sound_at(choose(snd_ac_cutealt_4,snd_ac_cutealt_5),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
-									
-														pin=1
-														hsp=0
-														vsp=random_range(0.1,0.3)*-1
-														grav=0.1
-														hitcheck=0
-														hitcd=0
-														visible=false
-														depth=9			
-							
-														sprite_index=abil_crab_spr
-														chance=2
-														img=224
-														value=(chance*5)+5
-							
-														image_index=img
-														imgsped=0.015
-														imgcap=3
-														dur=10000
-														image_angle=0
-														bonuscheck=1
-														bonuschecktwo=1		
-														chance=100
-											
-							
-													}
-												}											
+											// Squid card drop (bounds: xps+69 to xps+185)
+											created=instance_create_depth(xps+69+random(185-69),yps-10,0,Arcade)
+											with(created){
+												audio_play_sound_at(choose(snd_ac_cutealt_4,snd_ac_cutealt_5),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
+												pin=1
+												hsp=0
+												vsp=random_range(0.1,0.3)*-1
+												grav=0.1
+												hitcheck=0
+												hitcd=0
+												visible=false
+												depth=9
+												sprite_index=abil_crab_spr
+												img=143
+												value=10
+												image_index=img
+												imgsped=0
+												dur=10000
+												image_angle=random(360)
+												bonuscheck=1
+												bonuschecktwo=1
+											}
 										}
 									}
 
@@ -1225,14 +1259,50 @@ with(Part){
 
 	
 
+// Squid Lightning - runs independently of bonusWheelActive
+if(crabtype==1){
+	if(arcadeArray[40,0]>0){
+		arcadeArray[40,0]-=1
+
+		// Spawn new lightning bolt at start
+		if(arcadeArray[40,0]==199){
+			// Strike position: X between 50-200, Y between 110-120 (relative to xps/yps)
+			var _strikeX = xps + random_range(50, 200)
+			var _strikeY = yps + random_range(110, 120)
+			var _dir = choose(1,-1)
+			if(_dir == -1) _strikeX += 18
+
+			// Create lightning bolt using Part (visual effect, no physics)
+			created=instance_create_depth(_strikeX, _strikeY, 0, Part)
+			with(created){
+				sprite_index=arc_fish_lightning_spr
+				image_index=1
+				image_speed=0
+				image_angle=0
+				dir=_dir
+				visible=false
+				dur=240
+				hsp=0
+				vsp=0
+				spin=0
+				img=1
+				imgcap=6
+				imgsped=0.25
+				hasStruck=0
+				isLightning=true
+			}
+		}
+	}
+}
+
 if(bonusWheelActive==0){
 
 		//Crab Claw
 		if(crabtype==0){
 			if(arcadeArray[40,0]>0){
 				arcadeArray[40,0]-=1
-			
-			
+
+
 				if(arcadeArray[40,0]>150){
 					arcadeArray[40,1]+=1
 				}else{
@@ -1241,11 +1311,11 @@ if(bonusWheelActive==0){
 							if(arcadeArray[40,0] mod 15 == 0){
 								arcadeArray[40,3]+=1
 							}
-						
+
 						}
 					}else{
 						if(arcadeArray[40,0]>0){
-						
+
 							with(Arcade){
 								if(pin==1){
 									//if(point_distance(x,y,other.xps-0.5+other.arcadeArray[40,2],other.yps-0.5+142+-other.arcadeArray[40,1]*0.5)<8){
@@ -1256,51 +1326,15 @@ if(bonusWheelActive==0){
 									}
 								}
 							}
-						
+
 							arcadeArray[40,0]-=1
 							arcadeArray[40,1]-=1
 						}else{
-			
-						}				
-					}			
-				}
-			}
-		}else{
 
-			//Squid Lightning
-			if(arcadeArray[40,0]>0){
-				arcadeArray[40,0]-=1
-
-				// Spawn new lightning bolt at start
-				if(arcadeArray[40,0]==199){
-					// Strike position: X between 50-200, Y between 110-120 (relative to xps/yps)
-					var _strikeX = xps + random_range(50, 200)
-					var _strikeY = yps + random_range(110, 120)
-					var _dir = choose(1,-1)
-					if(_dir == -1) _strikeX += 18
-
-					// Create lightning bolt using Part (visual effect, no physics)
-					created=instance_create_depth(_strikeX, _strikeY, 0, Part)
-					with(created){
-						sprite_index=arc_fish_lightning_spr
-						image_index=1
-						image_speed=0
-						image_angle=0
-						dir=_dir
-						visible=false
-						dur=240
-						hsp=0
-						vsp=0
-						spin=0
-						img=1
-						imgcap=6
-						imgsped=0.25
-						hasStruck=0
-						isLightning=true
+						}
 					}
 				}
 			}
-
 		}
 
 
@@ -1395,28 +1429,35 @@ if(bonusWheelActive==0){
 				}			
 		}
 		
+		// Cannon input buffering - detect presses regardless of playsRemaining
+		var _cannonKbLeft = global.con_p_q||global.conp_p_shl||global.conp_p_r||global.conp_p_l
+		var _cannonKbRight = global.con_p_e||global.conp_p_shr||global.conp_p_e
+
+		if(_cannonKbLeft || (!_mouseClickConsumed && _mouseLeftPressed)){
+			cannonBufferLeft=4
+		}
+		if(_cannonKbRight || (!_mouseClickConsumed && _mouseRightPressed)){
+			cannonBufferRight=4
+		}
+
+		// Consume buffer when plays available
 		if(playsRemaining>0){
-			if(global.con_p_q||global.conp_p_shl||global.conp_p_r||global.conp_p_l){
+			if(cannonBufferLeft>0){
 				chance=1
 				chancex=32-8
+				cannonBufferLeft=0
+				cannonBufferRight=0
 			}
-			if(global.con_p_e||global.conp_p_shr||global.conp_p_e){
+			if(cannonBufferRight>0){
 				chance=2
 				chancex=222+8
-			}
-
-			// Mouse cannon firing - use captured state (only if not consumed by wheel)
-			if(!_mouseClickConsumed){
-				if(_mouseLeftPressed){
-					chance=1
-					chancex=32-8
-				}
-				if(_mouseRightPressed){
-					chance=2
-					chancex=222+8
-				}
+				cannonBufferRight=0
+				cannonBufferLeft=0
 			}
 		}
+
+		if(cannonBufferLeft>0) cannonBufferLeft-=1
+		if(cannonBufferRight>0) cannonBufferRight-=1
 
 		// DEBUG: Test squid abilities with T and Y keys (only when squid selected)
 		if(crabtype==1){
@@ -1800,25 +1841,25 @@ if(img==212){
 					}
 
 					if(hitcheck>0||hitcheck==-1){
-						
-						
+
+
 						if(hitcheck>0){
 							if(hitcd==0){
 								if(y>other.yps+95){
 								if(vsp!=0||hsp!=0){
 									hit=instance_place(x+hsp,y+vsp,Arcade)
 									if(hit!=noone){
-										
+
 										with(Arcade){
 											if(pin==1){
 												if(instance_place(x,y,other)){
 													vsp=other.vsp*0.9
-												
+
 													vsp=other.vsp*0.8
 													hitcd=10
-								
+
 													other.vsp=other.vsp*0.5
-												
+
 													other.vsp=other.vsp*0.4
 													other.hitcd=15
 												}
@@ -1827,28 +1868,45 @@ if(img==212){
 									}
 								}
 							}else{
-							
-									hit=instance_place(x,y,Arcade)
-									if(hit!=noone){
-										chance=choose(-1,0,1)
-										chancetwo=choose(-1,0,1)
-										
-										if(y+chancetwo<=other.yps+63||hit.y+(chancetwo*-1)<=other.yps+63){
-											chancetwo=choose(0)
+									// Rectangle-based push-apart when overlapping
+									var _halfW = 3  // Half of 6px (6x6 square)
+									var _halfH = 3
+
+									with(Arcade){
+										if(id != other.id && pin == 1){
+											// Check rectangle overlap
+											var _dx = other.x - x
+											var _dy = other.y - y
+											var _overlapX = (_halfW + _halfW) - abs(_dx)
+											var _overlapY = (_halfH + _halfH) - abs(_dy)
+
+											// If overlapping on both axes
+											if(_overlapX > 0 && _overlapY > 0){
+												// Push apart on the axis with smallest overlap
+												if(_overlapX < _overlapY){
+													// Push apart horizontally
+													var _pushX = (_overlapX / 2 + 0.5) * sign(_dx)
+													other.x += _pushX
+													x -= _pushX
+												}else{
+													// Push apart vertically
+													var _pushY = (_overlapY / 2 + 0.5) * sign(_dy)
+													// Respect upper boundary
+													if(other.y + _pushY > Control.yps+63){
+														other.y += _pushY
+													}
+													if(y - _pushY > Control.yps+63){
+														y -= _pushY
+													}
+												}
+											}
 										}
-										
-										x+=chance
-										hit.x+=chance*-1
-										
-										y+=chancetwo
-										hit.y+=chancetwo*-1										
-										
 									}
 							}
 							}else{
 								hitcd-=1
 							}
-								
+
 									if(vsp!=0){
 										if(y>other.yps+95){
 											hit=instance_place(x+hsp,y+vsp,Arcade)
@@ -1858,12 +1916,12 @@ if(img==212){
 										}
 									}
 						}
-						
-						
-					
-						
+
+
+
+
 						chance=0.02
-						
+
 						if(hitcheck>0){
 							if(abs(vsp)>0){
 								if(vsp-chance>=0){
@@ -1887,8 +1945,8 @@ if(img==212){
 									hsp=0
 								}
 							}
-						}						
-					
+						}
+
 					}
 					
 					//Seagull/SQUID
@@ -2300,12 +2358,12 @@ if(arcadeArray[100,0]>0){
             a += 1;
         }else{
             if(a<arcadeArray[100,0]){
-                for(var b=0;b<3;b+=1){
+                for(b=0;b<3;b+=1){
                     arcadeArray[100+a,b]=arcadeArray[100+a+1,b];
                     arcadeArray[100+a+1,b]=0;
                 }
             }else{
-                for(var b=0;b<3;b+=1){
+                for(b=0;b<3;b+=1){
                     arcadeArray[100+a,b]=0;
                 }                       
             }
@@ -2405,7 +2463,7 @@ if(arcadeArray[100,0]>0){
 			arcmenutickamount=0
 			
 			
-			for(a=0;a<arcadegridsize;a+=1){
+			for(var a=0;a<arcadegridsize;a+=1){
 				for(b=0;b<arcadegridsize;b+=1){
 					arcadeterrArray[a,b]=1
 				}
@@ -2439,15 +2497,15 @@ if(arcadeArray[100,0]>0){
 		
 			//Level up select
 			if(arcpause==1){
-				
-				if(global.con_p_right||global.conp_p_right){
+
+				if(global.con_p_right||global.conp_p_right||keyboard_check_pressed(ord("D"))){
 					if(arcselect<levelupselecttotal-1){
 						arcselect+=1
 					}else{
 						arcselect=0
 					}
 				}
-				if(global.con_p_left||global.conp_p_left){
+				if(global.con_p_left||global.conp_p_left||keyboard_check_pressed(ord("A"))){
 					if(arcselect>0){
 						arcselect-=1
 					}else{
@@ -2456,7 +2514,21 @@ if(arcadeArray[100,0]>0){
 				}				
 				
 
-				if(global.con_p_e||global.conp_p_e||global.con_p_space||global.conp_p_space){
+				//Mouse/touch card selection
+				var _mx=mouse_x
+				var _my=mouse_y
+				var _clicked=global.mouse_left_pressed||global.touch_pressed
+				if(_clicked){
+					for(var _ci=0;_ci<levelupselecttotal;_ci+=1){
+						var _cx=xps+74.5+_ci*28.5
+						var _cy=yps+74.5
+						if(point_distance(_mx,_my,_cx,_cy)<14){
+							arcselect=_ci
+						}
+					}
+				}
+
+				if(global.con_p_e||global.conp_p_e||global.con_p_space||global.conp_p_space||_clicked){
 					//Attack
 					if(arcadeArray[1,arcselect+1]==0){
 						playerbee.statatt+=1
@@ -2718,21 +2790,21 @@ if(arcadeArray[100,0]>0){
 						dir = (_axisV > 0) ? 1 : 3
 					}
 				}else{
-					// Fallback to digital controls (D-pad/keyboard)
-					if(global.con_h_up||global.conp_h_up){
+					// Fallback to digital controls (D-pad/keyboard/WASD)
+					if(global.con_h_up||global.conp_h_up||keyboard_check(ord("W"))){
 						y-=chance
 						dir=3
 					}else{
-						if(global.con_h_down||global.conp_h_down){
+						if(global.con_h_down||global.conp_h_down||keyboard_check(ord("S"))){
 							y+=chance
 							dir=1
 						}
 					}
-					if(global.con_h_left||global.conp_h_left){
+					if(global.con_h_left||global.conp_h_left||keyboard_check(ord("A"))){
 						x-=chance
 						dir=2
 					}else{
-						if(global.con_h_right||global.conp_h_right){
+						if(global.con_h_right||global.conp_h_right||keyboard_check(ord("D"))){
 							x+=chance
 							dir=0
 						}

@@ -1,3 +1,4 @@
+persistent = true
 instance_create_depth(0,0,40,Terrain)
 randomize()
 depth=1
@@ -79,12 +80,24 @@ falloff_factor=2000
 	title_anim = 0
 	game_initialized = false
 	menu_input_delay = 0  // Prevents input from carrying over between menus
+	quit_confirm = false  // Quit confirmation overlay
+	quit_selection = 0    // 0=No, 1=Yes
 
 	// Options Menu variables
-	options_tab = 0      // 0=Sound, 1=Controls
+	options_tab = 0      // 0=Sound, 1=Controls, 2=Graphics
 	options_selection = 0
 	remap_active = false
 	remap_target = -1
+	remap_type = 0       // 0=keyboard, 1=gamepad
+
+	// Color Viewer variables
+	color_scroll = 0
+
+	// Leaderboard variables
+	lb_selection = 0
+	lb_scroll = 0
+	lb_visible_rows = 7
+	leaderboard_load()
 
 	// Arcade Selection variables
 	arcade_selection = 0
@@ -95,19 +108,34 @@ falloff_factor=2000
 	rogue_mode = false       // Flag for rogue mode active
 	rogue_wave = 0           // Current wave number
 	rogue_xp = 0             // XP collected for level ups
+	rogue_xp_display = 0     // Visual XP for smooth bar fill (float)
 	rogue_level = 1          // Current player level
-	rogue_xp_needed = 10     // XP needed for next level
+	rogue_xp_needed = 3      // XP needed for next level (reduced for testing)
 	rogue_pause = 0          // 0=gameplay, 1=card selection
 	rogue_card_select = 0    // Currently selected card
+	rogue_card_hold = 0      // Hold timer for confirming card selection
+	rogue_card_hold_needed = 30  // Frames needed to confirm (0.5 sec at 60fps)
 	levelupselecttotal_rogue = 3  // Number of cards to show
 	rogue_wave_timer = 0     // Timer until next wave
 	rogue_wave_active = false // Is a wave currently in progress
 	rogue_enemies_remaining = 0  // Enemies left in current wave
+	rogue_xpamount = 0       // Pending XP to animate into bar
+	rogue_xptimer = 0        // Delay timer before XP fills
+
+	// Rogue Character Selection
+	rogue_char_selection = 0    // Selected character index (0-8)
+	rogue_char_grid_x = 0       // Grid cursor X (0-2)
+	rogue_char_grid_y = 0       // Grid cursor Y (0-2)
+	rogue_selected_class = 2    // Default to Pumpkin
 
 	// Sound Settings
 	global.master_volume = 1.0
 	global.music_volume = 1.0
 	global.sfx_volume = 1.0
+
+	// Graphics Settings
+	global.vsync_enabled = true
+	display_reset(0, true)  // Enable V-Sync by default
 
 lvlArray[1000,0]=0
 
@@ -115,8 +143,10 @@ lvlArray[1000,0]=0
 
 hurtcolor = $5959BB
 poisoncolor = $A86984
-pathcolor =	$2C1E37
 pathcolor = $332F55
+ui_border = $2C1E37
+ui_btn_outline = $6384A9
+ui_btn_outline_sel = $433058
 pathcolortwo = $4E6089
 colorgold = $78A5D1
 colorgoldmed = $5E7EC4
@@ -382,6 +412,35 @@ for(var i = 0; i < 10; i++){
 for(var i = 0; i < 10; i++){
 	rogueSpawnArray[i,0] = 0  // X position
 	rogueSpawnArray[i,1] = 0  // Y position
+}
+
+// Initialize rogue card pool array
+// rogueCardPool[card_id, property]
+// 0: Name (string)
+// 1: Type (0=stat, 1=ability_unlock, 2=ability_buff, 3=passive_unlock, 4=passive_buff)
+// 2: Talent index (-1 for stats, 1-21 for talents)
+// 3: Prerequisite talent (0=none)
+// 4: Blocks talent (0=none)
+// 5: Repeatable (1=yes, 0=no)
+// 6: Description
+// 7: Stat type for stat cards (0=att, 1=cooldown, 2=speed, 3=health, -1 for talent cards)
+// 8: Sprite index in talent_spr (-1 for stat cards)
+for(var i = 0; i < 30; i++){
+	for(var j = 0; j < 10; j++){
+		rogueCardPool[i,j] = 0
+	}
+	rogueCardPool[i,0] = ""
+	rogueCardPool[i,6] = ""
+}
+
+// Track which talent branches are blocked (e.g., picking Gourds blocks Sprout)
+for(var i = 0; i < 24; i++){
+	rogue_blocked_talents[i] = false
+}
+
+// Track which talents have been acquired this run
+for(var i = 0; i < 24; i++){
+	rogue_acquired_talents[i] = false
 }
 
 // Initialize invenArray with default values (for arcade mode before game starts)

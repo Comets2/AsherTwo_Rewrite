@@ -30,8 +30,8 @@ if(vibrate>0){
 	}
 }
 
-// Escape/Enter handling (skip for title menu, options, arcade selection, and rogue menus)
-if((global.con_p_escape||global.conp_p_enter) && pause != 20 && pause != 21 && pause != 22 && pause != 23 && pause != 24){
+// Escape/Enter handling (skip for title menu, options, arcade selection, arcade mode, and rogue menus)
+if((global.con_p_escape||global.conp_p_enter) && pause != 10 && pause != 20 && pause != 21 && pause != 22 && pause != 23 && pause != 24 && pause != 27 && pause != 29){
 	if(pause==2){
 		pause=pauselast
 		pausetwo=0
@@ -57,13 +57,16 @@ if((global.con_p_escape||global.conp_p_enter) && pause != 20 && pause != 21 && p
 	}
 }
 
-if(keyboard_check_pressed(ord("L"))||(global.conp_p_w&&pause!=0)){
+// L key toggles arcade mode on/off (gamepad Y only enters, not exits - Y is used for tokens in fish game)
+if(keyboard_check_pressed(ord("L"))){
 	if(pause!=10){
+		pauselast=pause  // Remember where to return when exiting arcade
+		if(pauselast == 0 || pauselast == 1) pauselast = 20  // Default to title menu if coming from gameplay/overworld
 		pause=10
 		arcade=1
 		arcadetype=2
-
 	}else{
+		leaderboard_add(totalTickets)
 		with(Arcade){
 			instance_destroy()
 		}
@@ -75,30 +78,126 @@ if(pause==10){
 
 	arcade_scr()
 
+	// Exit arcade mode with Escape/Back button
+	if(global.con_p_escape || global.conp_p_escape){
+		leaderboard_add(totalTickets)
+		with(Arcade){
+			instance_destroy()
+		}
+		pause=pauselast
+	}
+
 }
 
+#region Quit Confirmation
+if(quit_confirm){
+	// Decrement input delay
+	if(menu_input_delay > 0){
+		menu_input_delay -= 1
+	}else{
+		// Detect mouse movement
+		if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
+			cursor_mode = 0
+		}
+
+		// Left/Right navigation
+		if(global.con_p_left || global.conp_p_left){
+			quit_selection = 0
+			cursor_mode = 1
+		}
+		if(global.con_p_right || global.conp_p_right){
+			quit_selection = 1
+			cursor_mode = 1
+		}
+
+		// Mouse hover on buttons
+		xps = camx - camxtwo
+		yps = camy - camytwo
+		var qpop_x = xps + 127 - 50
+		var qpop_y = yps + 50
+		var qpop_w = 100
+		var qbtn_w = 40
+		var qbtn_gap = 8
+		var qbtn_y = qpop_y + 26
+		var qbtn_h = 14
+		var qbtn_x1 = qpop_x + qpop_w/2 - qbtn_w - qbtn_gap/2
+		var qbtn_x2 = qpop_x + qpop_w/2 + qbtn_gap/2
+
+		if(cursor_mode == 0){
+			if(mouse_x >= qbtn_x1 && mouse_x <= qbtn_x1 + qbtn_w &&
+			   mouse_y >= qbtn_y && mouse_y <= qbtn_y + qbtn_h){
+				quit_selection = 0
+			}
+			if(mouse_x >= qbtn_x2 && mouse_x <= qbtn_x2 + qbtn_w &&
+			   mouse_y >= qbtn_y && mouse_y <= qbtn_y + qbtn_h){
+				quit_selection = 1
+			}
+		}
+
+		// Confirm
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		   mouse_check_button_pressed(mb_left)){
+			var valid_click = true
+			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
+				valid_click = false
+				if((mouse_x >= qbtn_x1 && mouse_x <= qbtn_x1 + qbtn_w &&
+				    mouse_y >= qbtn_y && mouse_y <= qbtn_y + qbtn_h) ||
+				   (mouse_x >= qbtn_x2 && mouse_x <= qbtn_x2 + qbtn_w &&
+				    mouse_y >= qbtn_y && mouse_y <= qbtn_y + qbtn_h)){
+					valid_click = true
+				}
+			}
+			if(valid_click){
+				if(quit_selection == 1){
+					game_end()
+				}else{
+					quit_confirm = false
+					menu_input_delay = 5
+				}
+			}
+		}
+
+		// Escape cancels
+		if(global.con_p_escape || global.conp_p_escape){
+			quit_confirm = false
+			menu_input_delay = 5
+		}
+	}
+}
+#endregion
+
 #region Title Menu (pause == 20)
-if(pause == 20){
+if(pause == 20 && !quit_confirm){
 	// Update animation timer
 	title_anim = (title_anim + 1) mod 120
+
+	// Decrement input delay
+	if(menu_input_delay > 0){
+		menu_input_delay -= 1
+	}else{
 
 	// Keyboard/Controller navigation
 	if(global.con_p_up || global.conp_p_up){
 		title_selection -= 1
-		if(title_selection < 0) title_selection = 3
+		if(title_selection < 0) title_selection = 4
 		cursor_mode = 1
 	}
 	if(global.con_p_down || global.conp_p_down){
 		title_selection += 1
-		if(title_selection > 3) title_selection = 0
+		if(title_selection > 4) title_selection = 0
 		cursor_mode = 1
 	}
 
 	// Mouse hover detection
 	xps = camx - camxtwo
 	yps = camy - camytwo
-	var menu_start_y = yps + 55
-	var menu_spacing = 20
+	var panel_x = xps + 127 - 50
+	var panel_y = yps + 12
+	var panel_w = 100
+	var item_pad = 6
+	var menu_start_y = panel_y + 28
+	var menu_spacing = 17
+	var item_h = 14
 
 	// Detect mouse movement to switch to mouse mode
 	if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
@@ -107,10 +206,10 @@ if(pause == 20){
 
 	// Mouse selection
 	if(cursor_mode == 0){
-		for(var i = 0; i < 4; i++){
+		for(var i = 0; i < 5; i++){
 			var item_y = menu_start_y + (i * menu_spacing)
-			if(mouse_x >= xps + 80 && mouse_x <= xps + 175 &&
-			   mouse_y >= item_y - 5 && mouse_y <= item_y + 12){
+			if(mouse_x >= panel_x + item_pad && mouse_x <= panel_x + panel_w - item_pad &&
+			   mouse_y >= item_y && mouse_y <= item_y + item_h){
 				title_selection = i
 			}
 		}
@@ -123,10 +222,10 @@ if(pause == 20){
 		var valid_click = true
 		if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
 			valid_click = false
-			for(var i = 0; i < 4; i++){
+			for(var i = 0; i < 5; i++){
 				var item_y = menu_start_y + (i * menu_spacing)
-				if(mouse_x >= xps + 80 && mouse_x <= xps + 175 &&
-				   mouse_y >= item_y - 5 && mouse_y <= item_y + 12){
+				if(mouse_x >= panel_x + item_pad && mouse_x <= panel_x + panel_w - item_pad &&
+				   mouse_y >= item_y && mouse_y <= item_y + item_h){
 					valid_click = true
 					break
 				}
@@ -157,10 +256,28 @@ if(pause == 20){
 					options_tab = 0
 					options_selection = 0
 					break
+				case 4: // Exit
+					quit_confirm = true
+					quit_selection = 0
+					menu_input_delay = 5
+					break
 			}
 		}
 	}
+
+	} // end menu_input_delay else
+
+	// Escape opens quit confirmation (always active, outside delay)
+	if(menu_input_delay <= 0 && (global.con_p_escape || global.conp_p_escape)){
+		if(!quit_confirm){
+			quit_confirm = true
+			quit_selection = 0
+			menu_input_delay = 5
+		}
+	}
 }
+#endregion
+
 #endregion
 
 #region Options Menu (pause == 21)
@@ -168,67 +285,157 @@ if(pause == 21){
 	xps = camx - camxtwo
 	yps = camy - camytwo
 
-	// Tab switching with Tab key or shoulder buttons
-	if(keyboard_check_pressed(vk_tab) || global.conp_p_shl || global.conp_p_shr){
-		options_tab = 1 - options_tab
-		options_selection = 0
+	// Detect mouse movement
+	if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
+		cursor_mode = 0
 	}
 
-	// Navigation within tab
+	// Tab switching with Tab key or shoulder buttons
+	if(keyboard_check_pressed(vk_tab) || global.conp_p_shl || global.conp_p_shr){
+		options_tab = (options_tab + 1) mod 4
+		options_selection = 0
+		cursor_mode = 1
+	}
+
+	// Keyboard/controller navigation within tab
 	if(global.con_p_up || global.conp_p_up){
 		options_selection -= 1
-		if(options_tab == 0){ // Sound tab
+		if(options_tab == 0){
 			if(options_selection < 0) options_selection = 2
-		}else{ // Controls tab
+		}else if(options_tab == 1){
 			if(options_selection < 0) options_selection = 6
+		}else{
+			if(options_selection < 0) options_selection = 0
 		}
+		cursor_mode = 1
 	}
 	if(global.con_p_down || global.conp_p_down){
 		options_selection += 1
-		if(options_tab == 0){ // Sound tab
+		if(options_tab == 0){
 			if(options_selection > 2) options_selection = 0
-		}else{ // Controls tab
+		}else if(options_tab == 1){
 			if(options_selection > 6) options_selection = 0
+		}else{
+			if(options_selection > 0) options_selection = 0
+		}
+		cursor_mode = 1
+	}
+
+	// Mouse click on tabs
+	var tab_btn_y = yps + 4 + 21
+	var tab_btn_h = 12
+	var tab_gap = 2
+	var tab_total_w = 235 - 12
+	var tab_btn_w = (tab_total_w - tab_gap * 3) / 4
+	if(mouse_check_button_pressed(mb_left)){
+		for(var t = 0; t < 4; t++){
+			var tx1 = xps + 10 + 6 + t * (tab_btn_w + tab_gap)
+			if(mouse_x >= tx1 && mouse_x <= tx1 + tab_btn_w &&
+			   mouse_y >= tab_btn_y && mouse_y <= tab_btn_y + tab_btn_h){
+				options_tab = t
+				options_selection = 0
+			}
 		}
 	}
 
-	// Sound tab: volume adjustment with left/right
+	// Mouse hover on content rows
+	var content_y = tab_btn_y + tab_btn_h + 4
+	var content_x = xps + 10 + 6
+	var content_w = 235 - 12
+	if(cursor_mode == 0){
+		if(options_tab == 0){
+			for(var s = 0; s < 3; s++){
+				var ry = content_y + 6 + (s * 22)
+				if(mouse_x >= content_x + 8 && mouse_x <= content_x + content_w - 4 &&
+				   mouse_y >= ry && mouse_y <= ry + 18){
+					options_selection = s
+				}
+			}
+		}else if(options_tab == 1){
+			for(var c = 0; c < 7; c++){
+				var ry = content_y + 4 + (c * 12)
+				if(mouse_x >= content_x + 8 && mouse_x <= content_x + content_w - 4 &&
+				   mouse_y >= ry && mouse_y <= ry + 10){
+					options_selection = c
+				}
+			}
+		}else{
+			var ry = content_y + 10
+			if(mouse_x >= content_x + 8 && mouse_x <= content_x + content_w - 4 &&
+			   mouse_y >= ry && mouse_y <= ry + 18){
+				options_selection = 0
+			}
+		}
+	}
+
+	// Sound tab: volume adjustment with left/right (pressed only) and mouse click
 	if(options_tab == 0){
 		var volume_step = 0.1
-		if(global.con_p_left || global.conp_p_left || global.con_h_left || global.conp_h_left){
+		if(global.con_p_left || global.conp_p_left){
 			switch(options_selection){
 				case 0: global.master_volume = max(0, global.master_volume - volume_step); break
 				case 1: global.music_volume = max(0, global.music_volume - volume_step); break
 				case 2: global.sfx_volume = max(0, global.sfx_volume - volume_step); break
 			}
 		}
-		if(global.con_p_right || global.conp_p_right || global.con_h_right || global.conp_h_right){
+		if(global.con_p_right || global.conp_p_right){
 			switch(options_selection){
 				case 0: global.master_volume = min(1, global.master_volume + volume_step); break
 				case 1: global.music_volume = min(1, global.music_volume + volume_step); break
 				case 2: global.sfx_volume = min(1, global.sfx_volume + volume_step); break
 			}
 		}
+
+		// Mouse click on volume bar to set value directly
+		if(mouse_check_button_pressed(mb_left) || mouse_check_button(mb_left)){
+			var snd_content_x = xps + 10 + 6
+			var snd_content_y = tab_btn_y + tab_btn_h + 4
+			for(var s = 0; s < 3; s++){
+				var ry = snd_content_y + 6 + (s * 22)
+				var bar_x = snd_content_x + 8 + 95
+				var bar_w = 50
+				if(mouse_x >= bar_x && mouse_x <= bar_x + bar_w &&
+				   mouse_y >= ry && mouse_y <= ry + 18){
+					var new_vol = clamp((mouse_x - bar_x) / bar_w, 0, 1)
+					new_vol = round(new_vol * 10) / 10
+					switch(s){
+						case 0: global.master_volume = new_vol; break
+						case 1: global.music_volume = new_vol; break
+						case 2: global.sfx_volume = new_vol; break
+					}
+					options_selection = s
+				}
+			}
+		}
 	}
 
-	// Controls tab: key remapping
+	// Controls tab: key remapping with popup
 	if(options_tab == 1){
 		if(remap_active){
-			// Listen for any key press
-			var new_key = keyboard_lastkey
-			if(new_key != vk_nokey && new_key != vk_escape){
-				switch(remap_target){
-					case 0: global.consave_up = new_key; break
-					case 1: global.consave_down = new_key; break
-					case 2: global.consave_left = new_key; break
-					case 3: global.consave_right = new_key; break
-					case 4: global.consave_space = new_key; break
-					case 5: global.consave_escape = new_key; break
-					case 6: global.consave_enter = new_key; break
+			if(remap_type == 0){
+				// Keyboard remap - listen for key press
+				var new_key = keyboard_lastkey
+				if(new_key != vk_nokey && new_key != vk_escape){
+					switch(remap_target){
+						case 0: global.consave_up = new_key; break
+						case 1: global.consave_down = new_key; break
+						case 2: global.consave_left = new_key; break
+						case 3: global.consave_right = new_key; break
+						case 4: global.consave_space = new_key; break
+						case 5: global.consave_escape = new_key; break
+						case 6: global.consave_enter = new_key; break
+					}
+					remap_active = false
+					remap_target = -1
+					keyboard_lastkey = vk_nokey
 				}
-				remap_active = false
-				remap_target = -1
-				keyboard_lastkey = vk_nokey
+			}else{
+				// Gamepad remap - listen for button press (placeholder, gamepad buttons are hardcoded)
+				// For now just close on any gamepad press
+				if(global.conp_p_space || global.conp_p_enter){
+					remap_active = false
+					remap_target = -1
+				}
 			}
 			// Cancel remapping with escape
 			if(keyboard_check_pressed(vk_escape)){
@@ -236,17 +443,65 @@ if(pause == 21){
 				remap_target = -1
 			}
 		}else{
-			// Start remapping on space/enter
+			// Mouse hover on control rows
+			var ctrl_content_y = yps + 4 + 21 + 12 + 4
+			var ctrl_content_x = xps + 10 + 6
+			var ctrl_content_w = 235 - 12
+			var ctrl_header_h = 8
+			var ctrl_rows_y = ctrl_content_y + ctrl_header_h + 3
+			var ctrl_row_h = 10
+			var ctrl_row_gap = 1
+			if(cursor_mode == 0){
+				for(var c = 0; c < 7; c++){
+					var ry = ctrl_rows_y + c * (ctrl_row_h + ctrl_row_gap)
+					if(mouse_x >= ctrl_content_x + 3 && mouse_x <= ctrl_content_x + ctrl_content_w - 3 &&
+					   mouse_y >= ry && mouse_y <= ry + ctrl_row_h){
+						options_selection = c
+					}
+				}
+			}
+
+			// Click keyboard column to remap keyboard
+			if(mouse_check_button_pressed(mb_left)){
+				var col2_x = ctrl_content_x + 65
+				var col3_x = ctrl_content_x + 145
+				for(var c = 0; c < 7; c++){
+					var ry = ctrl_rows_y + c * (ctrl_row_h + ctrl_row_gap)
+					if(mouse_x >= col2_x - 2 && mouse_x < col3_x - 2 &&
+					   mouse_y >= ry && mouse_y <= ry + ctrl_row_h){
+						options_selection = c
+						remap_active = true
+						remap_target = c
+						remap_type = 0
+						keyboard_lastkey = vk_nokey
+					}
+				}
+			}
+
+			// Keyboard/controller confirm to remap keyboard binding
 			if(global.con_p_space || global.conp_p_space || global.con_p_enter){
 				remap_active = true
 				remap_target = options_selection
+				remap_type = 0
 				keyboard_lastkey = vk_nokey
 			}
 		}
 	}
 
-	// Back to title menu with escape (only if not remapping)
-	if(!remap_active && global.con_p_escape){
+	// Graphics tab: V-Sync toggle
+	if(options_tab == 2){
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		   global.con_p_left || global.conp_p_left || global.con_p_right || global.conp_p_right ||
+		   mouse_check_button_pressed(mb_left)){
+			if(options_selection == 0){
+				global.vsync_enabled = !global.vsync_enabled
+				display_reset(0, global.vsync_enabled)
+			}
+		}
+	}
+
+	// Back to title menu (only if not remapping)
+	if(!remap_active && (global.con_p_escape || global.conp_p_escape)){
 		pause = 20
 	}
 }
@@ -257,37 +512,84 @@ if(pause == 22){
 	xps = camx - camxtwo
 	yps = camy - camytwo
 
+	// Detect mouse movement
+	if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
+		cursor_mode = 0
+	}
+
 	// Decrement input delay
 	if(menu_input_delay > 0){
 		menu_input_delay -= 1
 	}else{
-		// Navigation
+		// Keyboard/controller navigation
 		if(global.con_p_up || global.conp_p_up){
 			arcade_selection -= 1
-			if(arcade_selection < 0) arcade_selection = 4  // 5 arcade games (0-4)
+			if(arcade_selection < 0) arcade_selection = 5
+			cursor_mode = 1
 		}
 		if(global.con_p_down || global.conp_p_down){
 			arcade_selection += 1
-			if(arcade_selection > 4) arcade_selection = 0
+			if(arcade_selection > 5) arcade_selection = 0
+			cursor_mode = 1
 		}
 
-		// Selection
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
-		   mouse_check_button_pressed(mb_left)){
-			arcadetype = arcade_selection + 1
-			arcade = 1
-			// Fish Marble goes to character selection first
-			if(arcade_selection == 0){
-				pause = 25
-				fish_char_selection = 0
-				menu_input_delay = 5
-			}else{
-				pause = 10
+		// Mouse hover on items
+		var panel_x = xps + 127 - 50
+		var panel_y = yps + 12
+		var panel_w = 100
+		var item_pad = 6
+		var item_start_y = panel_y + 28
+		var item_spacing = 15
+		var item_h = 14
+		if(cursor_mode == 0){
+			for(var a = 0; a < 6; a++){
+				var item_y = item_start_y + (a * item_spacing)
+				if(mouse_x >= panel_x + item_pad && mouse_x <= panel_x + panel_w - item_pad &&
+				   mouse_y >= item_y && mouse_y <= item_y + item_h){
+					arcade_selection = a
+				}
 			}
 		}
 
-		// Back to title menu (ESC only)
-		if(global.con_p_escape){
+		// Selection confirmation
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		   mouse_check_button_pressed(mb_left)){
+			var valid_click = true
+			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
+				valid_click = false
+				for(var a = 0; a < 6; a++){
+					var item_y = item_start_y + (a * item_spacing)
+					if(mouse_x >= panel_x + item_pad && mouse_x <= panel_x + panel_w - item_pad &&
+					   mouse_y >= item_y && mouse_y <= item_y + item_h){
+						valid_click = true
+						break
+					}
+				}
+			}
+			if(valid_click){
+				if(arcade_selection == 5){
+					// Scores
+					pause = 29
+					lb_selection = 0
+					lb_scroll = 0
+					menu_input_delay = 5
+				}else{
+					arcadetype = arcade_selection + 1
+					arcade = 1
+					pauselast = 22
+					if(arcade_selection == 0){
+						pause = 25
+						fish_char_selection = 0
+						menu_input_delay = 5
+					}else{
+						pause = 10
+					}
+				}
+			}
+		}
+
+		// Back to title menu (ESC or gamepad Back)
+		if(global.con_p_escape || global.conp_p_escape){
 			pause = 20
 		}
 	}
@@ -299,53 +601,71 @@ if(pause == 25){
 	xps = camx - camxtwo
 	yps = camy - camytwo
 
+	// Detect mouse movement
+	if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
+		cursor_mode = 0
+	}
+
 	// Decrement input delay
 	if(menu_input_delay > 0){
 		menu_input_delay -= 1
 	}else{
-		// Character hitbox positions (matching Draw_0.gml)
-		var crab_x = xps + 70
-		var squid_x = xps + 180
-		var char_y = yps + 75
-		var hitbox_size = 30
+		// Card positions matching Draw_0.gml
+		var panel_x = xps + 127 - 70
+		var panel_y = yps + 12
+		var panel_w = 140
+		var card_pad = 8
+		var card_gap = 4
+		var card_w = (panel_w - card_pad * 2 - card_gap) / 2
+		var card_h = 60
+		var card_y = panel_y + 28
 
-		// Mouse hover selection
-		if(mouse_x >= crab_x - hitbox_size && mouse_x <= crab_x + hitbox_size &&
-		   mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size){
-			fish_char_selection = 0
-		}
-		if(mouse_x >= squid_x - hitbox_size && mouse_x <= squid_x + hitbox_size &&
-		   mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size){
-			fish_char_selection = 1
-		}
-
-		// Navigation - Left/Right to switch between Crab and Squid
+		// Keyboard/controller navigation
 		if(global.con_p_left || global.conp_p_left){
 			fish_char_selection = 0
+			cursor_mode = 1
 		}
 		if(global.con_p_right || global.conp_p_right){
 			fish_char_selection = 1
+			cursor_mode = 1
 		}
 
-		// Confirm selection (keyboard/controller)
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter){
-			crabtype = fish_char_selection
-			pause = 10
+		// Mouse hover selection
+		if(cursor_mode == 0){
+			for(var c = 0; c < 2; c++){
+				var cx1 = panel_x + card_pad + c * (card_w + card_gap)
+				var cy1 = card_y
+				if(mouse_x >= cx1 && mouse_x <= cx1 + card_w &&
+				   mouse_y >= cy1 && mouse_y <= cy1 + card_h){
+					fish_char_selection = c
+				}
+			}
 		}
 
-		// Mouse click to confirm (only if clicking on a character)
-		if(mouse_check_button_pressed(mb_left)){
-			if((mouse_x >= crab_x - hitbox_size && mouse_x <= crab_x + hitbox_size &&
-			    mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size) ||
-			   (mouse_x >= squid_x - hitbox_size && mouse_x <= squid_x + hitbox_size &&
-			    mouse_y >= char_y - hitbox_size && mouse_y <= char_y + hitbox_size)){
+		// Selection confirmation
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		   mouse_check_button_pressed(mb_left)){
+			var valid_click = true
+			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
+				valid_click = false
+				for(var c = 0; c < 2; c++){
+					var cx1 = panel_x + card_pad + c * (card_w + card_gap)
+					var cy1 = card_y
+					if(mouse_x >= cx1 && mouse_x <= cx1 + card_w &&
+					   mouse_y >= cy1 && mouse_y <= cy1 + card_h){
+						valid_click = true
+						break
+					}
+				}
+			}
+			if(valid_click){
 				crabtype = fish_char_selection
 				pause = 10
 			}
 		}
 
-		// Back to arcade menu
-		if(global.con_p_escape){
+		// Back to arcade menu (ESC or gamepad Back)
+		if(global.con_p_escape || global.conp_p_escape){
 			pause = 22
 			menu_input_delay = 5
 		}
@@ -358,48 +678,200 @@ if(pause == 23){
 	xps = camx - camxtwo
 	yps = camy - camytwo
 
+	// Detect mouse movement
+	if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
+		cursor_mode = 0
+	}
+
 	// Decrement input delay
 	if(menu_input_delay > 0){
 		menu_input_delay -= 1
 	}else{
-		// Navigation (only Forest for now, index 0)
+		// Keyboard/controller navigation
 		if(global.con_p_up || global.conp_p_up){
 			rogue_selection -= 1
 			if(rogue_selection < 0) rogue_selection = 0
+			cursor_mode = 1
 		}
 		if(global.con_p_down || global.conp_p_down){
 			rogue_selection += 1
-			if(rogue_selection > 0) rogue_selection = 0  // Only 1 level for now
+			if(rogue_selection > 0) rogue_selection = 0
+			cursor_mode = 1
 		}
 
-		// Selection - Start Rogue mode
+		// Mouse hover on items
+		var panel_x = xps + 127 - 50
+		var panel_y = yps + 12
+		var panel_w = 100
+		var item_pad = 6
+		var item_start_y = panel_y + 28
+		var item_spacing = 17
+		var item_h = 14
+		if(cursor_mode == 0){
+			for(var r = 0; r < 1; r++){
+				var item_y = item_start_y + (r * item_spacing)
+				if(mouse_x >= panel_x + item_pad && mouse_x <= panel_x + panel_w - item_pad &&
+				   mouse_y >= item_y && mouse_y <= item_y + item_h){
+					rogue_selection = r
+				}
+			}
+		}
+
+		// Selection confirmation
 		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
 		   mouse_check_button_pressed(mb_left)){
-			// Initialize rogue mode
-			rogue_mode = true
-			rogue_wave = 0
-			rogue_xp = 0
-			rogue_level = 1
-			rogue_xp_needed = 10
-			rogue_pause = 0
-			rogue_wave_timer = 180  // 3 second start delay
-			rogue_wave_active = false
-
-			// Initialize game if not already
-			if(!game_initialized){
-				game_start_scr()
+			var valid_click = true
+			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
+				valid_click = false
+				for(var r = 0; r < 1; r++){
+					var item_y = item_start_y + (r * item_spacing)
+					if(mouse_x >= panel_x + item_pad && mouse_x <= panel_x + panel_w - item_pad &&
+					   mouse_y >= item_y && mouse_y <= item_y + item_h){
+						valid_click = true
+						break
+					}
+				}
 			}
-
-			// Generate the rogue arena
-			rogue_worldgen_scr()
-
-			pause = 0  // Start gameplay
-			pauselast = 0
+			if(valid_click){
+				pause = 27
+				rogue_char_selection = 0
+				rogue_char_grid_x = 0
+				rogue_char_grid_y = 0
+				rogue_selected_class = 1
+				menu_input_delay = 5
+			}
 		}
 
-		// Back to title menu (ESC only)
-		if(global.con_p_escape){
+		// Back to title menu (ESC or gamepad Back)
+		if(global.con_p_escape || global.conp_p_escape){
 			pause = 20
+		}
+	}
+}
+#endregion
+
+#region Rogue Character Selection (pause == 27)
+if(pause == 27){
+	xps = camx - camxtwo
+	yps = camy - camytwo
+
+	// Detect mouse movement
+	if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
+		cursor_mode = 0
+	}
+
+	// Decrement input delay
+	if(menu_input_delay > 0){
+		menu_input_delay -= 1
+	}else{
+		// Grid navigation with wrapping
+		if(global.con_p_up || global.conp_p_up){
+			rogue_char_grid_y -= 1
+			if(rogue_char_grid_y < 0) rogue_char_grid_y = 2
+			cursor_mode = 1
+		}
+		if(global.con_p_down || global.conp_p_down){
+			rogue_char_grid_y += 1
+			if(rogue_char_grid_y > 2) rogue_char_grid_y = 0
+			cursor_mode = 1
+		}
+		if(global.con_p_left || global.conp_p_left){
+			rogue_char_grid_x -= 1
+			if(rogue_char_grid_x < 0) rogue_char_grid_x = 2
+			cursor_mode = 1
+		}
+		if(global.con_p_right || global.conp_p_right){
+			rogue_char_grid_x += 1
+			if(rogue_char_grid_x > 2) rogue_char_grid_x = 0
+			cursor_mode = 1
+		}
+
+		// Update selection from grid position
+		var char_classes = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+		rogue_char_selection = rogue_char_grid_y * 3 + rogue_char_grid_x
+		rogue_selected_class = char_classes[rogue_char_selection]
+
+		// Mouse hover detection on grid cells
+		var panel_x = xps + 10
+		var panel_y = yps + 4
+		var grid_pad = 6
+		var grid_start_x = panel_x + grid_pad
+		var grid_start_y = panel_y + 22
+		var cell_w = 73
+		var cell_h = 33
+		var cell_gap = 2
+
+		if(cursor_mode == 0){
+			for(var row = 0; row < 3; row++){
+				for(var col = 0; col < 3; col++){
+					var cell_x = grid_start_x + col * (cell_w + cell_gap)
+					var cell_y = grid_start_y + row * (cell_h + cell_gap)
+
+					if(mouse_x >= cell_x && mouse_x < cell_x + cell_w &&
+					   mouse_y >= cell_y && mouse_y < cell_y + cell_h){
+						rogue_char_grid_x = col
+						rogue_char_grid_y = row
+						rogue_char_selection = row * 3 + col
+						rogue_selected_class = char_classes[rogue_char_selection]
+					}
+				}
+			}
+		}
+
+		// Confirm selection - Start Rogue mode
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		   mouse_check_button_pressed(mb_left)){
+			// Check if click was inside the grid
+			var valid_click = true
+			if(mouse_check_button_pressed(mb_left)){
+				valid_click = false
+				for(var row = 0; row < 3; row++){
+					for(var col = 0; col < 3; col++){
+						var cell_x = grid_start_x + col * (cell_w + cell_gap)
+						var cell_y = grid_start_y + row * (cell_h + cell_gap)
+						if(mouse_x >= cell_x && mouse_x < cell_x + cell_w &&
+						   mouse_y >= cell_y && mouse_y < cell_y + cell_h){
+							valid_click = true
+							break
+						}
+					}
+					if(valid_click) break
+				}
+			}
+
+			if(valid_click){
+				// Initialize rogue mode
+				rogue_mode = true
+				rogue_wave = 0
+				rogue_xp = 0
+				rogue_xp_display = 0
+				rogue_level = 1
+				rogue_xp_needed = 3
+				rogue_pause = 0
+				rogue_wave_timer = 180
+				rogue_wave_active = false
+
+				// Initialize game if not already
+				if(!game_initialized){
+					game_start_scr()
+				}
+
+				// Set the selected class on Me before transitioning
+				Me.class = rogue_selected_class
+				Me.classcheck = 1
+
+				// Transition to rogue room
+				room_goto(room_rogue)
+
+				pause = 0
+				pauselast = 0
+			}
+		}
+
+		// Back to level selection (ESC or gamepad Back)
+		if(global.con_p_escape || global.conp_p_escape){
+			pause = 23
+			menu_input_delay = 5
 		}
 	}
 }
@@ -413,11 +885,66 @@ if(pause == 24){
 		// Return to title menu
 		rogue_mode = false
 		pause = 20
+		room_goto(room0)
 
 		// Clean up
 		with(Enemy){ instance_destroy() }
 		with(Abil){ if(pin != 23) instance_destroy() }
 		with(Part){ instance_destroy() }
+	}
+}
+#endregion
+
+#region Leaderboard (pause == 29)
+if(pause == 29){
+	// Detect mouse movement
+	if(mouse_x != mouse_x_previous || mouse_y != mouse_y_previous){
+		cursor_mode = 0
+	}
+
+	if(menu_input_delay > 0){
+		menu_input_delay -= 1
+	}else{
+		// Up/Down navigation
+		if(global.con_p_up || global.conp_p_up){
+			lb_selection -= 1
+			if(lb_selection < 0){
+				lb_selection = 0
+				if(lb_scroll > 0) lb_scroll -= 1
+			}
+			cursor_mode = 1
+		}
+		if(global.con_p_down || global.conp_p_down){
+			lb_selection += 1
+			var vis_count = min(global.lb_count, lb_visible_rows)
+			if(lb_selection >= vis_count){
+				lb_selection = max(0, vis_count - 1)
+				if(lb_scroll + lb_visible_rows < global.lb_count) lb_scroll += 1
+			}
+			cursor_mode = 1
+		}
+
+		// Mouse hover on rows
+		xps = camx - camxtwo
+		yps = camy - camytwo
+		var row_start_y = yps + 4 + 21 + 10 + 12
+		var row_h = 11
+		var vis_count = min(global.lb_count, lb_visible_rows)
+		if(cursor_mode == 0){
+			for(var i = 0; i < vis_count; i++){
+				var ry = row_start_y + i * row_h
+				if(mouse_x >= xps + 15 && mouse_x <= xps + 239 &&
+				   mouse_y >= ry && mouse_y <= ry + row_h){
+					lb_selection = i
+				}
+			}
+		}
+
+		// Back to arcade selection
+		if(global.con_p_escape || global.conp_p_escape){
+			pause = 22
+			menu_input_delay = 5
+		}
 	}
 }
 #endregion
@@ -445,7 +972,7 @@ if(game_initialized){
 	}
 }
 #endregion
-if(pause!=0){
+if(pause!=0 && pause!=26){
 //pause=0
 	if(pause==1){
 		// Debug: Teleport to dungeon entrance (T key)
@@ -866,7 +1393,7 @@ if(pauseopt!=2){
 																	}else{
 																		if(itemArray[invenArray[invenArray[30,0],0],2]==0){		
 																			selected=0
-																			for(i=0;i<3;i+=1){
+																			for(var i=0;i<3;i+=1){
 																				if(invenArray[24+i,0]==0){
 																					selected=24+i
 																					i=5
@@ -1040,12 +1567,12 @@ for(i=0;i<2;i+=1){
 */
 
 //invenArray[24+i,3]
-ii=0
+var ii=0
 invenArray[24,3]=0
 invenArray[25,3]=0
 invenArray[26,3]=0
 invenArray[24,4]=0
-for(i=0;i<3;i+=1){
+for(var i=0;i<3;i+=1){
 	if(invenArray[24+i,0]!=0){
 		if(itemstatsArray[invenArray[24+i,0],1]!=0){
 		invenArray[24,3]+=itemstatsArray[invenArray[24+i,0],1]+invenArray[24+i,2]
@@ -1192,7 +1719,7 @@ for(i=0;i<3;i+=1){
 						
 					}
 					if(chance==4||chance==7||chance==10||chance==13||chance==16||chance==19){
-						for(i=talentmapArray[chance+1,1];i>0;i-=1){
+						for(var i=talentmapArray[chance+1,1];i>0;i-=1){
 							if(talentmapArray[chance+1,1]>=talentmapArray[chance+1,3]){
 								talentmapArray[chance+1,1]-=talentmapArray[chance+1,3]
 								classArray[Me.class,4]-=talentmapArray[chance,3]
@@ -1234,14 +1761,16 @@ for(i=0;i<3;i+=1){
 }else{
 #endregion
 
-if(pause==0){
+if(pause==0 || pause==26){
 #region Passive Item CDS
-for(i=0;i<3;i+=1){
-	if(invenArray[24+i,8]>0){
-		invenArray[24+i,8]-=1
-	}
-	if(invenArray[24+i,9]>0){
-		invenArray[24+i,9]-=1
+if(pause==0){
+	for(var i=0;i<3;i+=1){
+		if(invenArray[24+i,8]>0){
+			invenArray[24+i,8]-=1
+		}
+		if(invenArray[24+i,9]>0){
+			invenArray[24+i,9]-=1
+		}
 	}
 }
 #endregion
@@ -1296,20 +1825,20 @@ if(global.con_p_i){
 		}		
 }
 //Difficulty
+/*
 if(global.con_p_d){
 		created=instance_create_depth(Me.x,Me.y-32,10,Enemy)
 		with(created){
 			pin=1
 			enopt=2
-		}	
-	/*
+		}
 	if(dif==0){
 	dif=1
 	}else{
 	dif=0
 	}
-	*/
 }
+*/
 
 
 if(global.con_p_i){
@@ -1343,24 +1872,34 @@ if(game_initialized){
 	camera_scr()
 
 	//Leveling Experience
-	//Experience Total
-	classArray[Me.class,3]=(classArray[Me.class,1]*10)+10
-	//Experience Total
-	classArray[Me.class,5]=classArray[Me.class,1]-1
-	if(keyboard_check(ord("P"))){
-		xpamount+=1
-		xptimer=60
-	}
+	if(!rogue_mode){
+		// Adventure mode leveling
+		//Experience Total
+		classArray[Me.class,3]=(classArray[Me.class,1]*10)+10
+		//Experience Total
+		classArray[Me.class,5]=classArray[Me.class,1]-1
+		if(keyboard_check(ord("P"))){
+			xpamount+=1
+			xptimer=60
+		}
 
-	if(xptimer>0){
-		xptimer-=1
-	}else{
-		if(levelup==0){
-			levelupimg=0
-			if(xpamount>0&&timertime mod 5==0){
-				xpamount-=1
-				classArray[Me.class,2]+=1
+		if(xptimer>0){
+			xptimer-=1
+		}else{
+			if(levelup==0){
+				levelupimg=0
+				if(xpamount>0&&timertime mod 5==0){
+					xpamount-=1
+					classArray[Me.class,2]+=1
+				}
 			}
+		}
+
+		//Level up
+		if(classArray[Me.class,2]>=classArray[Me.class,3]){
+			classArray[Me.class,1]+=1
+			levelup=leveluptotal
+			audio_play_sound_at(choose(snd_ac_chime_1,snd_ac_chime_2,snd_ac_chime_3),Me.x,Me.y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
 		}
 	}
 
@@ -1370,12 +1909,42 @@ if(game_initialized){
 		timertime=0
 	}
 
-	//Level up
-	if(classArray[Me.class,2]>=classArray[Me.class,3]){
-		classArray[Me.class,1]+=1
-		levelup=leveluptotal
-		audio_play_sound_at(choose(snd_ac_chime_1,snd_ac_chime_2,snd_ac_chime_3),Me.x,Me.y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+	// Rogue XP fill (moved outside if/else to ensure it runs)
+	if(rogue_mode){
+		// Countdown delay timer
+		if(rogue_xptimer>0){
+			rogue_xptimer-=1
+		}
 
+		// After delay, transfer all pending XP to actual XP instantly
+		if(rogue_xptimer<=0 && rogue_xpamount>0 && levelup==0){
+			rogue_xp+=rogue_xpamount
+			rogue_xpamount=0
+		}
+
+		// Smooth visual XP fill - lerp toward actual XP
+		var target_xp = rogue_xp
+		if(rogue_xp_display < target_xp){
+			// Fill speed: percentage of the bar per frame (adjust 0.02 for speed)
+			rogue_xp_display += (rogue_xp_needed * 0.02)
+			if(rogue_xp_display > target_xp){
+				rogue_xp_display = target_xp
+			}
+		}else if(rogue_xp_display > target_xp){
+			// Reset display if actual XP dropped (level up spent XP)
+			rogue_xp_display = target_xp
+		}
+
+		// Rogue level up check (wait for visual XP bar to finish filling)
+		if(rogue_xp>=rogue_xp_needed && rogue_xp_display>=rogue_xp_needed){
+			rogue_xp-=rogue_xp_needed
+			rogue_xp_display=rogue_xp  // Reset display to match new XP
+			rogue_level+=1
+			rogue_xp_needed=3+(rogue_level*2)
+			levelup=leveluptotal
+			audio_play_sound_at(choose(snd_ac_chime_1,snd_ac_chime_2,snd_ac_chime_3),Me.x,Me.y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+			rogue_trigger_levelup_scr()
+		}
 	}
 
 	if(levelup>0){
