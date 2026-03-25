@@ -3071,7 +3071,7 @@ if(pause==10){
 			draw_sprite_ext(arc_fish_spin_spr,64+crabtype,xps-0.5+204+chancetwo,yps-0.5+30-chance,1,1,wheelAngle,c_white,1)	
 		}
 		
-		draw_sprite_ext(arc_fish_spin_spr,2,xps-0.5+204+chancetwo+4,yps-0.5+30-0.5-chance,1,1,0,c_white,1)	
+		draw_sprite_ext(arc_fish_flipper_spr,0,xps-0.5+204+chancetwo+36,yps-0.5+30-chance,1,1,180+flipperAngle,c_white,1)	
 		
 		
 	}else{
@@ -3147,7 +3147,7 @@ if(pause==10){
 		
 		draw_sprite_ext(arc_fish_spin_spr,1,xps-0.5+204+5,yps-0.5+30-6,1,1,savedWheelAngle,c_white,1)	
 		draw_sprite_ext(arc_fish_spin_spr,14+savedWheelSegment,xps-0.5+204+5,yps-0.5+30-6,1,1,savedWheelAngle,c_white,1)	
-		draw_sprite_ext(arc_fish_spin_spr,2,xps-0.5+204+9,yps-0.5+30-6.5,1,1,0,c_white,1)	
+		draw_sprite_ext(arc_fish_flipper_spr,0,xps-0.5+204+5+36,yps-0.5+30-6,1,1,180,c_white,1)	
 		
 		draw_sprite_ext(arc_fish_spin_spr,64+crabtype,xps-0.5+204+5,yps-0.5+30-6,1,1,savedWheelAngle,c_white,1)	
 		
@@ -3159,14 +3159,14 @@ if(pause==10){
 			
 			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
 			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
-			draw_sprite_ext(arc_fish_big_spin_spr,2,xps-0.5+126,yps-0.5+71-bonusWheelTransitionY,1,1,0,c_white,1)	
+			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+50,yps-0.5+71-bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)	
 				
 		}else{
 			draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+71-150+bonusWheelTransitionY,1,1,0,c_white,1)	
 			
 			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
 			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
-			draw_sprite_ext(arc_fish_big_spin_spr,2,xps-0.5+126,yps-0.5+71-150+bonusWheelTransitionY,1,1,0,c_white,1)		
+			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+50,yps-0.5+71-150+bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)		
 			
 		}
 	}	

@@ -907,15 +907,29 @@ with(Part){
 					lastSegmentForSound=currentWheelSegment
 					
 					if(bonusWheelActive>0){
-				
+						bonusFlipperVelocity-=6.0
 						audio_play_sound_at(choose(snd_ac_ticktwo_1,snd_ac_ticktwo_2,snd_ac_ticktwo_3),xps+125,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 					}else{
-					
+						flipperVelocity-=8.0
 						audio_play_sound_at(choose(snd_ac_ticktwo_1,snd_ac_ticktwo_2,snd_ac_ticktwo_3),xps+200,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 					}
 				}
-				
-				
+
+				//Flipper spring physics (regular wheel)
+				flipperVelocity+=(-0.3*flipperAngle)
+				flipperVelocity*=0.75
+				flipperAngle+=flipperVelocity
+				flipperAngle=clamp(flipperAngle,-15,15)
+				if(abs(flipperAngle)<0.1&&abs(flipperVelocity)<0.1){flipperAngle=0;flipperVelocity=0}
+
+				//Flipper spring physics (bonus wheel)
+				bonusFlipperVelocity+=(-0.3*bonusFlipperAngle)
+				bonusFlipperVelocity*=0.75
+				bonusFlipperAngle+=bonusFlipperVelocity
+				bonusFlipperAngle=clamp(bonusFlipperAngle,-15,15)
+				if(abs(bonusFlipperAngle)<0.1&&abs(bonusFlipperVelocity)<0.1){bonusFlipperAngle=0;bonusFlipperVelocity=0}
+
+
 			}else{
 				
 				//Celebrate reset
@@ -925,6 +939,10 @@ with(Part){
 				wheelSpinTimer=300
 				spinsAvailable-=1
 				spinDecelerating=0
+				flipperAngle=0
+				flipperVelocity=0
+				bonusFlipperAngle=0
+				bonusFlipperVelocity=0
 				
 				chance=currentWheelSegment
 				
