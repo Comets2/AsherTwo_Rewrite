@@ -355,6 +355,9 @@ cannonCooldown = 0
 spinPointsAccumulated = 0
 hoopHighlightTimer = 0
 pendingTickets = 0
+ticketDropOffset = 0
+ticketDropSpeed = 0
+ticketDropping = false
 crabAnimFrame = 0
 crabAnimBase = 0
 crabAnimDuration = 0
@@ -387,8 +390,29 @@ flipperAngle = 0
 flipperVelocity = 0
 bonusFlipperAngle = 0
 bonusFlipperVelocity = 0
+
+// Pin-resistance / detent system
+detentStrength = 0.04
+detentSpeedThreshold = 2.0
+detentFullStrengthSpeed = 0.4
+detentPinZone = 5.0
+bonusDetentStrength = 0.025
+bonusDetentSpeedThreshold = 1.0
+bonusDetentFullStrengthSpeed = 0.2
+bonusDetentPinZone = 5.0
+bonusDetentOffset = -9.0   // Phase offset (degrees) to align pin feel with big wheel sprite
+
 arcwave = 0
 arcwavetimer = 0
+
+// Board water wave visuals
+boardWavePhase = 0
+for(var _i=0;_i<2;_i++){
+	boardPushWaveY[_i] = -1
+	boardPushWaveTimer[_i] = 0
+}
+boardPushWaveSpacing = 20
+
 tokens = 0
 arcpause = 0
 

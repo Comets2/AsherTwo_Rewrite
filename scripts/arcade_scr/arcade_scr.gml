@@ -176,7 +176,7 @@ yps=camy-camytwo
 			gameTimer=0
 			
 			fishBoardTickTimer=100
-			fishBoardTickInterval=100
+			fishBoardTickInterval=200
 			
 			//Bonus
 			bonusFishToDispense=0
@@ -698,8 +698,10 @@ with(Part){
 			}else{
 				bgBobDirection=0
 			}		
-		}		
-		
+		}
+
+		boardWavePhase+=0.02
+
 		gameTimer+=1
 	
 		if(gameTimer mod 75==0){
@@ -804,7 +806,18 @@ with(Part){
 		}
 	
 	}else{
-		
+
+		// DEBUG: Press B to trigger bonus wheel
+		if(keyboard_check_pressed(ord("B"))){
+			bonusWheelActive=1
+			bonusWheelTransitionY=150
+			bonusWheelState=1
+			spinsAvailable+=1
+			savedWheelAngle=wheelAngle
+			savedWheelSegment=currentWheelSegment
+			wheelSpinTimer=300
+		}
+
 		//SPIN
 		if(spinsAvailable>0){
 			if(wheelSpinTimer>0||wheelRotationSpeed>0){
@@ -852,11 +865,35 @@ with(Part){
 							canStopSpin=0
 							wheelSpinTimer=50
 							wheelStopBuffer=0
-						}else if(canStopSpin!=1){
-							if(wheelRotationSpeed>0.009){
-								wheelRotationSpeed-=0.009
+						}else if(canStopSpin!=1 && wheelRotationSpeed>0){
+							// Pin-resistance detent for bonus wheel (offset to align with sprite)
+							var _segPos=((wheelAngle+bonusDetentOffset)%45+45)%45
+							var _distToPin=_segPos
+							if(_distToPin>22.5) _distToPin=45.0-_distToPin
+
+							var _detentMix=0
+							if(wheelRotationSpeed<bonusDetentSpeedThreshold){
+								_detentMix=clamp((bonusDetentSpeedThreshold-wheelRotationSpeed)/(bonusDetentSpeedThreshold-bonusDetentFullStrengthSpeed),0,1)
+							}
+
+							var _resistForce=bonusDetentStrength*cos((_segPos/22.5)*(pi/2))*_detentMix
+
+							// Proportional damping at low speed for gentle coast
+							if(wheelRotationSpeed>0.3){
+								var _totalDecel=0.009+_resistForce
+								_totalDecel=max(_totalDecel,0.002)
+								wheelRotationSpeed-=min(_totalDecel,wheelRotationSpeed)
 							}else{
+								wheelRotationSpeed*=0.97-(_resistForce*2)
+								wheelRotationSpeed=max(wheelRotationSpeed,0)
+							}
+
+							// Stop only when truly crawling
+							if(wheelRotationSpeed<0.008){
 								wheelRotationSpeed=0
+								wheelSpinTimer=30
+								spinDecelerating=1
+								spinSoundPlayed=1
 							}
 						}
 
@@ -887,47 +924,87 @@ with(Part){
 					}
 
 					
-					if(wheelRotationSpeed>0.06){
-						if(bonusWheelActive>0){
-							
-						}else{
-							wheelRotationSpeed-=0.02
+					if(bonusWheelActive<=0 && wheelRotationSpeed>0){
+						// Pin-resistance detent for regular wheel
+						var _segPos=(wheelAngle%45+45)%45
+						var _distToPin=_segPos
+						if(_distToPin>22.5) _distToPin=45.0-_distToPin
+
+						var _detentMix=0
+						if(wheelRotationSpeed<detentSpeedThreshold){
+							_detentMix=clamp((detentSpeedThreshold-wheelRotationSpeed)/(detentSpeedThreshold-detentFullStrengthSpeed),0,1)
 						}
-					}else{
-						wheelRotationSpeed=0
-						wheelSpinTimer=30
-						
-						
-						spinDecelerating=1
-						spinSoundPlayed=1
+
+						var _resistForce=detentStrength*cos((_segPos/22.5)*(pi/2))*_detentMix
+
+						// Use proportional damping at low speed for a gentle coast
+						if(wheelRotationSpeed>0.5){
+							// Higher speeds: flat friction + detent
+							var _totalDecel=0.02+_resistForce
+							_totalDecel=max(_totalDecel,0.005)
+							wheelRotationSpeed-=min(_totalDecel,wheelRotationSpeed)
+						}else{
+							// Low speed: multiplicative drag for smooth coast-to-stop
+							wheelRotationSpeed*=0.97-(_resistForce*2)
+							wheelRotationSpeed=max(wheelRotationSpeed,0)
+						}
+
+						// Stop only when truly crawling
+						if(wheelRotationSpeed<0.01){
+							wheelRotationSpeed=0
+							wheelSpinTimer=30
+							spinDecelerating=1
+							spinSoundPlayed=1
+						}
 					}
 				}
 				currentWheelSegment=abs(floor((wheelAngle-360)/45)+1)
 				if(lastSegmentForSound!=currentWheelSegment){
 					lastSegmentForSound=currentWheelSegment
-					
+
 					if(bonusWheelActive>0){
-						bonusFlipperVelocity-=6.0
+						var _kickStrength=clamp(wheelRotationSpeed/2.0,0.3,1.0)
+						bonusFlipperVelocity-=6.0*_kickStrength
 						audio_play_sound_at(choose(snd_ac_ticktwo_1,snd_ac_ticktwo_2,snd_ac_ticktwo_3),xps+125,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 					}else{
-						flipperVelocity-=8.0
+						var _kickStrength=clamp(wheelRotationSpeed/3.0,0.3,1.0)
+						flipperVelocity-=8.0*_kickStrength
 						audio_play_sound_at(choose(snd_ac_ticktwo_1,snd_ac_ticktwo_2,snd_ac_ticktwo_3),xps+200,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 					}
 				}
 
-				//Flipper spring physics (regular wheel)
-				flipperVelocity+=(-0.3*flipperAngle)
+				// Pin contact: shift flipper rest position when a peg is pressing
+				var _flipperRest=0
+				var _bonusFlipperRest=0
+				if(wheelRotationSpeed>0&&wheelRotationSpeed<1.5){
+					var _offset=(bonusWheelActive>0)?bonusDetentOffset:0
+					var _segPos=((wheelAngle+_offset)%45+45)%45
+					var _distToNextPin=45.0-_segPos
+					if(_distToNextPin<15.0){
+						var _contact=1.0-(_distToNextPin/15.0)
+						var _speedFactor=1.0-clamp(wheelRotationSpeed/1.5,0,1)
+						var _bendAngle=-12.0*_contact*_speedFactor
+						if(bonusWheelActive>0){
+							_bonusFlipperRest=_bendAngle
+						}else{
+							_flipperRest=_bendAngle
+						}
+					}
+				}
+
+				//Flipper spring physics (regular wheel) — rests at _flipperRest (0 normally, bent when pin pressing)
+				flipperVelocity+=(-0.3*(flipperAngle-_flipperRest))
 				flipperVelocity*=0.75
 				flipperAngle+=flipperVelocity
 				flipperAngle=clamp(flipperAngle,-15,15)
-				if(abs(flipperAngle)<0.1&&abs(flipperVelocity)<0.1){flipperAngle=0;flipperVelocity=0}
+				if(abs(flipperAngle-_flipperRest)<0.1&&abs(flipperVelocity)<0.1){flipperAngle=_flipperRest;flipperVelocity=0}
 
-				//Flipper spring physics (bonus wheel)
-				bonusFlipperVelocity+=(-0.3*bonusFlipperAngle)
+				//Flipper spring physics (bonus wheel) — rests at _bonusFlipperRest
+				bonusFlipperVelocity+=(-0.3*(bonusFlipperAngle-_bonusFlipperRest))
 				bonusFlipperVelocity*=0.75
 				bonusFlipperAngle+=bonusFlipperVelocity
 				bonusFlipperAngle=clamp(bonusFlipperAngle,-15,15)
-				if(abs(bonusFlipperAngle)<0.1&&abs(bonusFlipperVelocity)<0.1){bonusFlipperAngle=0;bonusFlipperVelocity=0}
+				if(abs(bonusFlipperAngle-_bonusFlipperRest)<0.1&&abs(bonusFlipperVelocity)<0.1){bonusFlipperAngle=_bonusFlipperRest;bonusFlipperVelocity=0}
 
 
 			}else{
@@ -1447,6 +1524,33 @@ if(bonusWheelActive==0){
 				}			
 		}
 		
+		// Ticket slot click - clicking the ticket area tugs the ticket strip out
+		if(!_mouseClickConsumed && (_mouseLeftPressed || _mouseRightPressed)){
+			var _ticketCx=xps+28
+			var _ticketCy=yps+116
+			if(abs(mouse_x-_ticketCx)<12 && abs(mouse_y-_ticketCy)<14){
+				_mouseClickConsumed=true
+				if(arcadeArray[0,1]>0 && !ticketDropping){
+					ticketDropping=true
+					ticketDropSpeed=0.3
+					ticketDropOffset=0
+					audio_play_sound_at(choose(snd_ac_tick_1,snd_ac_tick_2,snd_ac_tick_3),xps+30,yps+81, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
+				}
+			}
+		}
+
+		// Animate ticket strip falling
+		if(ticketDropping){
+			ticketDropSpeed+=0.15
+			ticketDropOffset+=ticketDropSpeed
+			if(ticketDropOffset>60){
+				ticketDropping=false
+				ticketDropOffset=0
+				ticketDropSpeed=0
+				arcadeArray[0,1]=0
+			}
+		}
+
 		// Cannon input buffering - detect presses regardless of playsRemaining
 		var _cannonKbLeft = global.con_p_q||global.conp_p_shl||global.conp_p_r||global.conp_p_l
 		var _cannonKbRight = global.con_p_e||global.conp_p_shr||global.conp_p_e
@@ -1732,20 +1836,34 @@ if(bonusWheelActive==0){
 				if(fishBoardTickTimer>0){
 					fishBoardTickTimer-=1
 				}else{
-					
-					with(Arcade){
-						if(pin==1){
-							chance=other.yps
-							if(hitcheck!=-1){
-								if(y>=chance+60&&y<=chance+70||y>=chance+95&&y<=chance+104){
-									vsp=0.8
+					fishBoardTickTimer=fishBoardTickInterval
+					for(var _wi=0;_wi<2;_wi++){
+						boardPushWaveY[_wi]=yps+60-(_wi*boardPushWaveSpacing)
+						boardPushWaveTimer[_wi]=0
+					}
+				}
+
+				for(var _wi=0;_wi<2;_wi++){
+					if(boardPushWaveY[_wi]>=yps+60-1||boardPushWaveY[_wi]<yps+60){
+						boardPushWaveY[_wi]+=0.54
+					}
+					if(boardPushWaveY[_wi]>=yps+60){
+						boardPushWaveTimer[_wi]+=1
+
+						// Push fish as wave passes over them
+						var _wy=boardPushWaveY[_wi]
+						with(Arcade){
+							if(pin==1&&hitcheck!=-1){
+								if(abs(y-_wy)<4){
+									vsp=0.45
 								}
 							}
 						}
 					}
-					
-					fishBoardTickTimer=fishBoardTickInterval
-				}			
+					if(boardPushWaveY[_wi]>yps+102){
+						boardPushWaveY[_wi]=-1
+					}
+				}
 			
 						//Small hoop light
 						for(i=0;i<5;i+=1){
@@ -1887,8 +2005,8 @@ if(img==212){
 								}
 							}else{
 									// Rectangle-based push-apart when overlapping
-									var _halfW = 3  // Half of 6px (6x6 square)
-									var _halfH = 3
+									var _halfW = 5  // Half of 10px (10x10 square)
+									var _halfH = 5
 
 									with(Arcade){
 										if(id != other.id && pin == 1){
@@ -2457,7 +2575,7 @@ if(arcadeArray[100,0]>0){
 			arcwavetick=0
 			
 			fishBoardTickTimer=100
-			fishBoardTickInterval=100
+			fishBoardTickInterval=200
 			
 			//Bonus
 			bonusFishToDispense=0
@@ -2617,18 +2735,18 @@ if(arcadeArray[100,0]>0){
 					imgsped=0.04
 							
 					sped=0
-					image_xscale=0.5
-					image_yscale=0.5	
-				
+					image_xscale=1
+					image_yscale=1
+
 					attcd=20
-					
+
 					attcdtwo=600
 					attcdtwototal=attcdtwo
 					attcdtwo=200
 					attack=choose(1,2,3)
 					phase=0
 					hplow=0
-				
+
 					xp=choose(15,15,16,17)
 				
 				}						

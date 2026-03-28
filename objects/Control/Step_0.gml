@@ -31,7 +31,7 @@ if(vibrate>0){
 }
 
 // Escape/Enter handling (skip for title menu, options, arcade selection, arcade mode, and rogue menus)
-if((global.con_p_escape||global.conp_p_enter) && pause != 10 && pause != 20 && pause != 21 && pause != 22 && pause != 23 && pause != 24 && pause != 27 && pause != 29){
+if((global.con_p_escape||global.conp_p_enter || (pause == 2 && global.con_p_w)) && pause != 10 && pause != 20 && pause != 21 && pause != 22 && pause != 23 && pause != 24 && pause != 27 && pause != 29){
 	if(pause==2){
 		pause=pauselast
 		pausetwo=0
@@ -79,7 +79,7 @@ if(pause==10){
 	arcade_scr()
 
 	// Exit arcade mode with Escape/Back button
-	if(global.con_p_escape || global.conp_p_escape){
+	if(global.con_p_escape || global.conp_p_escape || global.con_p_w){
 		leaderboard_add(totalTickets)
 		with(Arcade){
 			instance_destroy()
@@ -135,7 +135,7 @@ if(quit_confirm){
 		}
 
 		// Confirm
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 		   mouse_check_button_pressed(mb_left)){
 			var valid_click = true
 			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
@@ -158,7 +158,7 @@ if(quit_confirm){
 		}
 
 		// Escape cancels
-		if(global.con_p_escape || global.conp_p_escape){
+		if(global.con_p_escape || global.conp_p_escape || global.con_p_w){
 			quit_confirm = false
 			menu_input_delay = 5
 		}
@@ -216,7 +216,7 @@ if(pause == 20 && !quit_confirm){
 	}
 
 	// Selection confirmation
-	if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+	if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 	   mouse_check_button_pressed(mb_left)){
 		// Check if mouse is over a menu item (for mouse clicks)
 		var valid_click = true
@@ -254,7 +254,7 @@ if(pause == 20 && !quit_confirm){
 				case 3: // Options
 					pause = 21  // Options menu
 					options_tab = 0
-					options_selection = 0
+					options_selection = -1
 					break
 				case 4: // Exit
 					quit_confirm = true
@@ -268,7 +268,7 @@ if(pause == 20 && !quit_confirm){
 	} // end menu_input_delay else
 
 	// Escape opens quit confirmation (always active, outside delay)
-	if(menu_input_delay <= 0 && (global.con_p_escape || global.conp_p_escape)){
+	if(menu_input_delay <= 0 && (global.con_p_escape || global.conp_p_escape || global.con_p_w)){
 		if(!quit_confirm){
 			quit_confirm = true
 			quit_selection = 0
@@ -293,32 +293,39 @@ if(pause == 21){
 	// Tab switching with Tab key or shoulder buttons
 	if(keyboard_check_pressed(vk_tab) || global.conp_p_shl || global.conp_p_shr){
 		options_tab = (options_tab + 1) mod 4
-		options_selection = 0
+		options_selection = -1
 		cursor_mode = 1
 	}
 
 	// Keyboard/controller navigation within tab
+	// options_selection == -1 means tabs are focused; left/right switches tabs
 	if(global.con_p_up || global.conp_p_up){
 		options_selection -= 1
-		if(options_tab == 0){
-			if(options_selection < 0) options_selection = 2
-		}else if(options_tab == 1){
-			if(options_selection < 0) options_selection = 6
-		}else{
-			if(options_selection < 0) options_selection = 0
-		}
+		if(options_selection < -1) options_selection = -1
 		cursor_mode = 1
 	}
 	if(global.con_p_down || global.conp_p_down){
 		options_selection += 1
 		if(options_tab == 0){
-			if(options_selection > 2) options_selection = 0
+			if(options_selection > 2) options_selection = -1
 		}else if(options_tab == 1){
-			if(options_selection > 6) options_selection = 0
+			if(options_selection > 6) options_selection = -1
 		}else{
-			if(options_selection > 0) options_selection = 0
+			if(options_selection > 0) options_selection = -1
 		}
 		cursor_mode = 1
+	}
+	// Left/Right to switch tabs when tabs are focused
+	if(options_selection == -1){
+		if(global.con_p_left || global.conp_p_left){
+			options_tab -= 1
+			if(options_tab < 0) options_tab = 3
+			cursor_mode = 1
+		}
+		if(global.con_p_right || global.conp_p_right){
+			options_tab = (options_tab + 1) mod 4
+			cursor_mode = 1
+		}
 	}
 
 	// Mouse click on tabs
@@ -479,7 +486,7 @@ if(pause == 21){
 			}
 
 			// Keyboard/controller confirm to remap keyboard binding
-			if(global.con_p_space || global.conp_p_space || global.con_p_enter){
+			if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e){
 				remap_active = true
 				remap_target = options_selection
 				remap_type = 0
@@ -490,7 +497,7 @@ if(pause == 21){
 
 	// Graphics tab: V-Sync toggle
 	if(options_tab == 2){
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 		   global.con_p_left || global.conp_p_left || global.con_p_right || global.conp_p_right ||
 		   mouse_check_button_pressed(mb_left)){
 			if(options_selection == 0){
@@ -501,7 +508,7 @@ if(pause == 21){
 	}
 
 	// Back to title menu (only if not remapping)
-	if(!remap_active && (global.con_p_escape || global.conp_p_escape)){
+	if(!remap_active && (global.con_p_escape || global.conp_p_escape || global.con_p_w)){
 		pause = 20
 	}
 }
@@ -552,7 +559,7 @@ if(pause == 22){
 		}
 
 		// Selection confirmation
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 		   mouse_check_button_pressed(mb_left)){
 			var valid_click = true
 			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
@@ -589,7 +596,7 @@ if(pause == 22){
 		}
 
 		// Back to title menu (ESC or gamepad Back)
-		if(global.con_p_escape || global.conp_p_escape){
+		if(global.con_p_escape || global.conp_p_escape || global.con_p_w){
 			pause = 20
 		}
 	}
@@ -643,7 +650,7 @@ if(pause == 25){
 		}
 
 		// Selection confirmation
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 		   mouse_check_button_pressed(mb_left)){
 			var valid_click = true
 			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
@@ -665,7 +672,7 @@ if(pause == 25){
 		}
 
 		// Back to arcade menu (ESC or gamepad Back)
-		if(global.con_p_escape || global.conp_p_escape){
+		if(global.con_p_escape || global.conp_p_escape || global.con_p_w){
 			pause = 22
 			menu_input_delay = 5
 		}
@@ -718,7 +725,7 @@ if(pause == 23){
 		}
 
 		// Selection confirmation
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 		   mouse_check_button_pressed(mb_left)){
 			var valid_click = true
 			if(mouse_check_button_pressed(mb_left) && cursor_mode == 0){
@@ -743,7 +750,7 @@ if(pause == 23){
 		}
 
 		// Back to title menu (ESC or gamepad Back)
-		if(global.con_p_escape || global.conp_p_escape){
+		if(global.con_p_escape || global.conp_p_escape || global.con_p_w){
 			pause = 20
 		}
 	}
@@ -819,7 +826,7 @@ if(pause == 27){
 		}
 
 		// Confirm selection - Start Rogue mode
-		if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+		if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 		   mouse_check_button_pressed(mb_left)){
 			// Check if click was inside the grid
 			var valid_click = true
@@ -869,7 +876,7 @@ if(pause == 27){
 		}
 
 		// Back to level selection (ESC or gamepad Back)
-		if(global.con_p_escape || global.conp_p_escape){
+		if(global.con_p_escape || global.conp_p_escape || global.con_p_w){
 			pause = 23
 			menu_input_delay = 5
 		}
@@ -880,7 +887,7 @@ if(pause == 27){
 #region Rogue Game Over (pause == 24)
 if(pause == 24){
 	// Handle input to return to title
-	if(global.con_p_space || global.conp_p_space || global.con_p_enter ||
+	if(global.con_p_space || global.conp_p_space || global.con_p_enter || global.con_p_e ||
 	   mouse_check_button_pressed(mb_left)){
 		// Return to title menu
 		rogue_mode = false
@@ -941,7 +948,7 @@ if(pause == 29){
 		}
 
 		// Back to arcade selection
-		if(global.con_p_escape || global.conp_p_escape){
+		if(global.con_p_escape || global.conp_p_escape || global.con_p_w){
 			pause = 22
 			menu_input_delay = 5
 		}

@@ -3990,9 +3990,9 @@ function enemy_scr() {
 				
 										sped=0.7
 										sped=random_range(0.6,1.2)
-										image_xscale=0.5
-										image_yscale=0.5	
-								
+										image_xscale=1
+										image_yscale=1
+
 										dur=900
 										durtotal=dur
 										move=1
@@ -4107,9 +4107,9 @@ function enemy_scr() {
 															sped=0.7
 															sped=random_range(0.6,0.9)
 															sped=random_range(0.3,0.4)
-															image_xscale=0.5
-															image_yscale=0.5	
-								
+															image_xscale=1
+															image_yscale=1
+
 															dur=800
 															durtotal=dur
 															move=1
@@ -4227,9 +4227,9 @@ function enemy_scr() {
 												sped=0.7
 												sped=random_range(0.6,0.9)
 												sped=random_range(0.3,0.4)
-												image_xscale=0.5
-												image_yscale=0.5	
-								
+												image_xscale=1
+												image_yscale=1
+
 												dur=1600
 												durtotal=dur
 								
@@ -4270,9 +4270,9 @@ function enemy_scr() {
 													diddmg=0
 				
 													sped=0.3
-													image_xscale=0.5
-													image_yscale=0.5	
-								
+													image_xscale=1
+													image_yscale=1
+
 													dur=250+irandom(100)
 													durtotal=dur
 								

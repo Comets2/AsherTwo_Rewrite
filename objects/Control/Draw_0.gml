@@ -312,7 +312,13 @@ if(pause == 21){
 	for(var t = 0; t < 4; t++){
 		var tx1 = panel_x + 6 + t * (tab_w + tab_gap)
 		var tx2 = tx1 + tab_w
+		var tab_focused = (t == options_tab && options_selection == -1 && cursor_mode == 1)
 		ui_button(tx1, tab_y, tx2, tab_y + tab_h, t == options_tab)
+		// Draw selection border when tab row is keyboard-focused
+		if(tab_focused){
+			draw_rectangle_color(tx1 - 1, tab_y - 1, tx2 + 1, tab_y + tab_h + 1,
+				colorbluelight, colorbluelight, colorbluelight, colorbluelight, true)
+		}
 
 		var tab_text_color = (t == options_tab) ? colorbluelight : colorgold
 		var tab_text_alpha = (t == options_tab) ? 1 : 0.7
@@ -3116,6 +3122,74 @@ if(pause==10){
 
 	}
 
+	// --- Board water waves (no alpha, dithered ambient) ---
+	var _bLeft=xps+49
+	var _bRight=xps+205
+	var _bTop=yps+66
+	var _waveColors
+	_waveColors[0]=$756446
+	_waveColors[1]=$A8945E
+	_waveColors[2]=$A8945E
+
+	// Ambient waves: 3 rows of peaks, clustered toward center
+	var _bMidX=(_bLeft+_bRight)*0.5
+	var _bMidY=_bTop+6
+	for(var _wl=0;_wl<3;_wl++){
+		var _ly=_bMidY+(_wl-1)*12
+		var _col=_waveColors[_wl]
+		var _inset=0
+		if(_wl==0) _inset=18
+		if(_wl==1) _inset=8
+		if(_wl==2) _inset=-2
+		for(var _pk=0;_pk<6;_pk++){
+			// Per-peak unique Y and X offsets using different hash seeds
+			var _pkYOffset=round(sin(_pk*173.9+_wl*67.3)*5)
+			var _pkXOffset=round(sin(_pk*83.7+_wl*197.3)*5)
+			var _peakLy=_ly+_pkYOffset
+			var _cx=_bMidX+((_pk-2.5)*22)+_pkXOffset
+			var _pkSeed=sin(_pk*127.1+_wl*311.7)*0.5+0.5
+			var _heightMul=1.5+_pkSeed*1.5
+			var _speedMul=0.7+_pkSeed*0.6
+			var _vis=sin(boardWavePhase*0.6*_speedMul+_pk*2.1+_wl*2.3)
+			if(abs(_vis)<0.08) continue
+			var _peakWidth=round(3+abs(_vis)*4)
+			var _prevOy=0
+			for(var _wx=max(_bLeft+_inset,_cx-_peakWidth);_wx<=min(_bRight-_inset,_cx+_peakWidth);_wx+=1){
+				var _dist=abs(_wx-_cx)
+				var _t=1-(_dist/_peakWidth)
+				var _curve=_t*_t
+				var _oy=round(abs(_vis)*_heightMul*_curve)
+				if(_oy<1){ _prevOy=0; continue; }
+				draw_rectangle_colour(_wx,_peakLy-_oy,_wx,_peakLy-_oy,_col,_col,_col,_col,false)
+				if(_prevOy>0){
+					var _lo=min(_oy,_prevOy)
+					var _hi=max(_oy,_prevOy)
+					for(var _fy=_lo+1;_fy<_hi;_fy++){
+						draw_rectangle_colour(_wx,_peakLy-_fy,_wx,_peakLy-_fy,_col,_col,_col,_col,false)
+					}
+				}
+				_prevOy=_oy
+			}
+		}
+	}
+
+	// Push wave fronts (3 independent waves) — drawn below fish
+	var _waveTop=yps+60
+	var _waveBot=yps+102
+	for(var _band=0;_band<2;_band++){
+		if(boardPushWaveY[_band]<_waveTop) continue
+		var _bandY=boardPushWaveY[_band]
+		var _progress=clamp((_bandY-_waveTop)/(_waveBot-_waveTop),0,1)
+		var _waveInset=round(lerp(18,-2,power(_progress,0.35)))
+		for(var _wx=_bLeft+_waveInset;_wx<_bRight-_waveInset;_wx+=1){
+			var _oy=round(sin((_wx*0.15)+boardWavePhase)*2)
+			var _py=_bandY+_oy
+			draw_rectangle_colour(_wx,_py-1,_wx,_py-1,$A8945E,$A8945E,$A8945E,$A8945E,false)
+			draw_rectangle_colour(_wx,_py,_wx,_py,$D8DEBC,$D8DEBC,$D8DEBC,$D8DEBC,false)
+			draw_rectangle_colour(_wx,_py+1,_wx,_py+1,$A8945E,$A8945E,$A8945E,$A8945E,false)
+		}
+	}
+
 	with(Arcade){
 		if(depth==11){
 			draw_sprite_ext(sprite_index,image_index,x,y,dir,1,image_angle,c_white,1)
@@ -3131,9 +3205,9 @@ if(pause==10){
 		if(depth==9){
 			draw_sprite_ext(sprite_index,image_index,x,y,1,1,image_angle,c_white,1)
 		}
-	}	
-	
-	draw_sprite_ext(arc_fish_spin_spr,25+chance,xps-0.5+126+hoopXOffset,yps-0.5+55,1,1,0,c_white,1)	
+	}
+
+	draw_sprite_ext(arc_fish_spin_spr,25+chance,xps-0.5+126+hoopXOffset,yps-0.5+55,1,1,0,c_white,1)
 
 	//Particles
 	with(Part){
@@ -3159,14 +3233,14 @@ if(pause==10){
 			
 			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
 			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
-			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+50,yps-0.5+71-bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)	
-				
+			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+61,yps-0.5+71-bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)
+
 		}else{
-			draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+71-150+bonusWheelTransitionY,1,1,0,c_white,1)	
-			
-			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
-			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
-			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+50,yps-0.5+71-150+bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)		
+			draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+71-150+bonusWheelTransitionY,1,1,0,c_white,1)
+
+			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)
+			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)
+			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+61,yps-0.5+71-150+bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)		
 			
 		}
 	}	
@@ -3237,7 +3311,7 @@ if(pause==10){
 	draw_sprite_ext(arc_fish_spin_spr,35,xps+28.5,yps+120.5,1,1,0,c_white,1)	
 	
 	for(var i=1;i<arcadeArray[0,1]+1;i+=1){
-		draw_sprite_ext(arc_fish_spin_spr,32,xps+26.5,yps+112+.5+(arcadeArray[i,1]*0.5),1,1,0,c_white,1)
+		draw_sprite_ext(arc_fish_spin_spr,32,xps+26.5,yps+112+.5+(arcadeArray[i,1]*0.5)+ticketDropOffset,1,1,0,c_white,1)
 	}
 
 	if(arcadeArray[36,0]>0){
