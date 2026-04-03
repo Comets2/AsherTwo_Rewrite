@@ -219,7 +219,11 @@ function abil_create_scr(argument0) {
 								pin=4
 								diddmg=0
 								dmg=3
-								times=3
+								if(Control.talentmapArray[9,1]>0){
+									times=3
+								}else{
+									times=1
+								}
 								dmg+=dmg*(Control.invenArray[25,3]*0.01)
 								creator=other.id
 								sprite_index=abil_witch_spr
@@ -416,15 +420,13 @@ function abil_create_scr(argument0) {
 								}
 
 
-									if(global.con_h_down||global.conp_h_down){
-										if(passive.times>1){
-											passive.times-=1
-											abilArray[1,1]=240-(Control.talentmapArray[8,1]*4)-(Control.talentmapArray[9,1]*40)
-											abilArray[1,1]=5
-										}else{
-											abilArray[1,1]=abilArray[1,2]
-										}
+									if((global.con_h_down||global.conp_h_down)&&passive.times>0){
+										passive.times-=1
+										abilArray[1,1]=5
 									}else{
+										scarecrow_deathx=passive.x
+										scarecrow_deathy=passive.y
+										scarecrow_deathtimer=40
 										with(passive){
 											instance_destroy()
 										}
@@ -1530,8 +1532,9 @@ function abil_create_scr(argument0) {
 			if(Me.dir==-1){
 					Me.hsp=-chance
 			}else{
-					Me.hsp=chance 			
+					Me.hsp=chance
 			}
+			Me.remhsp=Me.hsp
 			Me.vsp=-2
 			temp=1
 			if(global.con_h_up||global.conp_h_up){
@@ -2304,92 +2307,30 @@ function abil_create_scr(argument0) {
 			
 		
 
-	if(passivefourArray[1,2]==passivefourArray[1,3]){
-		passivefourArray[1,2]=0
-					//Super Bacon Punch 
-					for(i=0;i<5;i+=1){
-							created=instance_create_depth(x-3+random(6),y-6+random(6),0,Abil)
-							with(created){
-			
-								startx=x
-								starty=y
-								extrax=0
-								extray=0
-			
-								type=2
-								pin=53
-								phase=0
-								move=0
-								diddmg=0
-								dmg=1
-				
-								chance=dmg
-			
-			
-								//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
-								dmg+=chance*(Control.invenArray[25,3]*0.01)
-			if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
-			
-								creator=other.id
-			
-								depth=other.depth-2
-								spin=1
-								extra=0
-								
-								imgrem=0
-								
-									sprite_index=abil_super_two_spr
-									if(other.i<3){
-										img=342+irandom(2)
-										image_index=img
-									}else{
-										if(other.i==3){
-											img=345
-											imgrem=3
-											image_index=img
-											depth-=1
-											
-										}else{
-											img=346
-											imgrem=4
-											image_index=img
-											depth-=1
-										}
-									}
-									imgcap=1
-			
-								image_speed=0
-								
-								dur=140+irandom(40)
-								count=0
-								durtotal=dur
-								phase=0
-							
-								direction=random_range(30,60)
-								speed=random_range(1.8,2.2)
-								sped=speed
-								hsp=hspeed
-								vsp=vspeed
-								grav=0.1
-								gravtwo=0.04
-				
-								hsp=hsp*Me.dir
-								speed=0
-								tick=0
-								starty=y
-								tickamount=0
-								imgangle=random(360)
-								
-								sped=0.3
-								hsp=sped*Me.dir
-								
-								tick=choose(0,1)
-								ticktwo=choose(0,1)
-								extrax=irandom_range(-10,10)
-								extray=irandom_range(-10,10)
-				
-							}						
-						}
+	//Launch orbiting breakfast items on punch
+	if(Control.talentmapArray[18,1]>0){
+		var _launched=false
+		for(i=0;i<5;i+=1){
+			if(passivefourArray[1,30+i]!=0&&instance_exists(passivefourArray[1,30+i])){
+				with(passivefourArray[1,30+i]){
+					phase=0
+					startx=x
+					starty=y
+					extrax=0
+					extray=0
+					dur=140+irandom(40)
+					durtotal=dur
+					sped=0.3
+					hsp=sped*Me.dir
+					tick=choose(0,1)
+					ticktwo=choose(0,1)
+					extrax=irandom_range(-10,10)
+					extray=irandom_range(-10,10)
+				}
+				passivefourArray[1,30+i]=0
+				_launched=true
+			}
+		}
 	}
 			
 			created=instance_create_depth(xpos,ypos,0,Abil)
@@ -2816,9 +2757,7 @@ function abil_create_scr(argument0) {
 #region Fly Super Abil 3
 		if(argument0==3){
 
-		if(Control.talentmapArray[19,1]>0){
-			passivefourArray[1,14]=1
-		}	
+		//Toaster Pastry (handled on hit)
 
 			if(Control.talentmapArray[4,1]>0){
 			
@@ -4757,14 +4696,146 @@ chance=1
 							}
 					}		
 				
-				}else{
-#endregion		
+				}
+				}
+				}
+				}
+				}
 
+			}else{
+#endregion
+
+	//____________________________________________________________________________---------------------(Goblin)---------------------____________________________________________________________________________
+	if(class==10){
+#region Goblin Abil 1 Whack
+		if(argument0==1){
+
+			created=instance_create_depth(xpos,ypos,0,Abil)
+			with(created){
+
+				pin=90
+				diddmg=0
+				hurtnum=0
+				hurtArray[0]=0
+
+				dmg=4
+				chance=dmg
+				dmg+=dmg*(Control.talentmapArray[1,1]*0.05)
+				dmg+=chance*(Control.invenArray[25,3]*0.01)
+				if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
+
+				creator=other.id
+				depth=other.depth-1
+
+				sprite_index=abil_goblin_effect_spr
+				img=1
+				imgcap=3
+				imgsped=0.3
+				image_speed=0
+				image_index=img
+
+				dur=20
+				durtotal=dur
+				phase=1
+				move=0
+				hsp=0
+				vsp=0
+				speed=0
+
+				dir=Me.dir
+
+				//Direction: up, down, or neutral
+				if(global.con_h_up||global.conp_h_up){
+					opt=3
+					Me.vsp=-2
+				}else{
+					if(global.con_h_down||global.conp_h_down){
+						opt=2
+					}else{
+						opt=1
+					}
 				}
+
+				//Position based on direction
+				if(opt==1){
+					//Neutral - swing in front
+					if(dir==1){
+						x=Me.x+18
+					}else{
+						x=Me.x-18
+					}
+					y=Me.y+2
+				}else{
+					if(opt==2){
+						//Down - swing below
+						x=Me.x
+						y=Me.y+18
+					}else{
+						//Up - swing above
+						x=Me.x
+						y=Me.y-18
+					}
 				}
+
+				//Flip sprite based on direction
+				if(opt==1){
+					imgangle=0
+				}else{
+					dir=1
+					if(opt==2){
+						imgangle=270
+					}else{
+						imgangle=90
+					}
 				}
-				}
+
 			}
+
+		}else{
+#endregion
+#region Goblin Abil 2 Selector
+		if(argument0==2){
+
+			created=instance_create_depth(x,y-23,0,Abil)
+			with(created){
+				type=0
+				pin=91
+				move=0
+				diddmg=0
+
+				creator=other.id
+				depth=other.depth-1
+
+				sprite_index=abil_goblin_effect_spr
+				img=11
+				imgcap=5
+				imgsped=0
+				image_speed=0
+				image_index=img
+
+				hsp=0
+				vsp=0
+				grav=0
+				speed=0
+				dur=10
+				phase=0
+				chance=0
+				dir=1
+				imgangle=0
+			}
+
+		}else{
+#endregion
+#region Goblin Abil 3
+		if(argument0==3){
+			//Goblin Abil 3 creation
+		}else{
+#endregion
+
+		}
+		}
+		}
+	}
 	}
 #endregion
 

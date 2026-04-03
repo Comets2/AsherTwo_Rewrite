@@ -162,8 +162,11 @@ function enemy_scr() {
 							dir=-1
 							yrebound=0.9
 							part=1
-						
+
 							en=1
+							blockable=1
+							returnable=1
+							durtotal=dur
 							type=1
 							move=1
 							diddmg=0
@@ -248,8 +251,9 @@ function enemy_scr() {
 									imgsped=0
 									img=7
 									image_index=img
-									imgcap=1	
+									imgcap=1
 									en=1
+									blockable=1
 									sped=0.8
 									move_towards_point(Me.x,Me.y,sped)
 									imgangle=direction
@@ -721,8 +725,11 @@ function enemy_scr() {
 								dir=-1
 								yrebound=0.4
 								part=0
-						
+
 								en=1
+								blockable=1
+								returnable=1
+								durtotal=dur
 								type=1
 								move=1
 								diddmg=0
@@ -1071,8 +1078,11 @@ function enemy_scr() {
 							dir=-1
 							yrebound=0.4
 							part=0
-						
+
 							en=1
+							blockable=1
+							returnable=1
+							durtotal=dur
 							type=1
 							move=1
 							diddmg=0
@@ -1304,8 +1314,9 @@ function enemy_scr() {
 																img=22+irandom(3)+4
 															}
 												image_index=img
-												imgcap=1	
+												imgcap=1
 												en=1
+												blockable=1
 												sped=0.2
 												dmg=1
 												startx=x
@@ -1364,8 +1375,11 @@ function enemy_scr() {
 							dir=-1
 							yrebound=0.9
 							part=1
-						
+
 							en=1
+							blockable=1
+							returnable=1
+							durtotal=dur
 							type=1
 							move=1
 							diddmg=0
@@ -2546,13 +2560,14 @@ function enemy_scr() {
 							hsp=hspeed
 							vsp=vspeed
 							speed=0
-						
+
 							imgangle=180
 							dir=-1
 							yrebound=0.9
 							part=1
-						
+
 							en=1
+							blockable=1
 							type=1
 							move=1
 							diddmg=0
@@ -2732,9 +2747,10 @@ function enemy_scr() {
 												img=choose(14,22)
 												imgcap=2	
 											image_index=img+irandom(imgcap)
-										
+
 											en=1
-										
+											blockable=1
+
 											direction=other.i*2.5
 											hsp=hspeed
 											vsp=vspeed
@@ -3046,8 +3062,11 @@ function enemy_scr() {
 								dir=-1
 								yrebound=0.4
 								part=0
-						
+
 								en=1
+								blockable=1
+								returnable=1
+								durtotal=dur
 								type=1
 								move=1
 								diddmg=0
@@ -3080,8 +3099,11 @@ function enemy_scr() {
 								dir=-1
 								yrebound=0.4
 								part=0
-						
+
 								en=1
+								blockable=1
+								returnable=1
+								durtotal=dur
 								type=1
 								move=1
 								diddmg=0
@@ -3195,8 +3217,9 @@ function enemy_scr() {
 							imgsped=0
 							img=78+irandom(4)
 							image_index=img
-							imgcap=1	
+							imgcap=1
 							en=1
+							blockable=1
 							sped=random_range(0.4,1.2)
 							if(Me.x<x){
 								chance=choose(x+100,x-100,x-100)
@@ -3543,6 +3566,7 @@ function enemy_scr() {
 										with(created){
 											sprite_index=enemy_abil_spr
 											pin=32
+											blockable=1
 											image_speed=0
 											imgsped=0
 											speed=random_range(0.8,1.2)
@@ -3576,6 +3600,7 @@ function enemy_scr() {
 											with(created){
 												sprite_index=enemy_abil_spr
 												pin=32
+												blockable=1
 												image_speed=0
 												imgsped=0
 												speed=random_range(0.8,1.2)
@@ -3607,6 +3632,7 @@ function enemy_scr() {
 													sprite_index=enemy_abil_spr
 													pin=32
 													image_speed=0
+													blockable=1
 													imgsped=0
 													speed=random_range(0.8,1.2)
 														dur=450
@@ -4998,6 +5024,7 @@ function enemy_scr() {
 										with(created){
 											sprite_index=enemy_abil_spr
 											pin=32
+											blockable=1
 											image_speed=0
 											imgsped=0
 											speed=random_range(0.8,1.2)
@@ -5032,6 +5059,7 @@ function enemy_scr() {
 												sprite_index=enemy_abil_spr
 												pin=32
 												image_speed=0
+												blockable=1
 												imgsped=0
 												speed=random_range(0.8,1.2)
 													dur=450
@@ -5062,6 +5090,7 @@ function enemy_scr() {
 													sprite_index=enemy_abil_spr
 													pin=32
 													image_speed=0
+													blockable=1
 													imgsped=0
 													speed=random_range(0.8,1.2)
 														dur=450

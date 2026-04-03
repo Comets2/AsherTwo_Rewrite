@@ -242,43 +242,65 @@ function abil_scr() {
 				}
 			}
 		}else{
-			
-		}}}}}}}
+	//____________________________________________________________________________---------------------(Goblin Whack)---------------------____________________________________________________________________________
+		if(class==10){
+			//Goblin Abil 1
+			if(con_p_e){
+				if(abilArray[0,1]==0){
+					anim=12
+					animsave=14
+						abilArray[0,1]=abilArray[0,2]
+							if(abilArray[1,1]<globalcdtotal){
+								abilArray[1,1]=globalcdtotal
+								abilArray[1,4]=1
+							}
+							if(abilArray[2,1]<globalcdtotal){
+								abilArray[2,1]=globalcdtotal
+								abilArray[2,4]=1
+							}
+					xpos=x
+					ypos=y+2
+					abil_create_scr(1)
+				}
+			}
+		}else{
+
+		}}}}}}}}
 		}
-	
+
 	}
 
 
 	}else{
 
 	if(con_p_q){
-	//____________________________________________________________________________---------------------(Witch Broom)---------------------____________________________________________________________________________	
+	//____________________________________________________________________________---------------------(Witch Broom)---------------------____________________________________________________________________________
 			if(class==1){
 				//Abil 2
 				if(abilArray[1,1]==0){
 					anim=12
 					animsave=14
-					
+
 					//Do not show cooldown text or background abilArray[1,4]=2
 					abilArray[1,4]=2
 					if(Control.talentmapArray[4,1]>0){
 						abilArray[1,1]=abilArray[1,2]
 					}else{
 						if(passive!=noone){
-							
+
 							abilArray[1,4]=0
 							if(Control.talentmapArray[9,1]>0){
-								
+
 							}
 							abilArray[1,1]=abilArray[1,2]
-							
+
 						}
 					}
 	//				abilArray[2,1]=globalcdtotal
 					xpos=x
 					ypos=y+2
 					abil_create_scr(2)
-	
+
 				}else{
 
 				}
@@ -463,11 +485,31 @@ function abil_scr() {
 	
 				}
 			}else{
-				
-			}				
+	//____________________________________________________________________________---------------------(Goblin Selector)---------------------____________________________________________________________________________
+			if(class==10){
+				//Goblin Abil 2 - Selector
+				if(abilArray[1,1]==0){
+					anim=12
+					animsave=14
+						if(abilArray[0,1]<globalcdtotal){
+							abilArray[0,1]=globalcdtotal
+							abilArray[0,4]=1
+						}
+						if(abilArray[2,1]<globalcdtotal){
+							abilArray[2,1]=globalcdtotal
+							abilArray[2,4]=1
+						}
+					xpos=x
+					ypos=y
+					abil_create_scr(2)
+				}
+			}else{
+
 			}
-			}		
-		}			
+			}
+			}
+			}
+		}
 			}
 					}
 					}
@@ -676,12 +718,17 @@ function abil_scr() {
 
 				}
 			}else{
-				
-			}}}}}}}
+	//____________________________________________________________________________---------------------(Goblin)---------------------____________________________________________________________________________
+			if(class==10){
+				//Goblin Abil 3
+			}else{
+
+			}}}}}}}}
 			}
 	}
 	}
 	}
+
 #endregion
 
 #region Items

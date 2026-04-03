@@ -20,6 +20,7 @@ if(pause == 0 && instance_exists(Me)){
 	if(global.con_p_8) { Me.class = 7; Me.classcheck = 1; }
 	if(global.con_p_9) { Me.class = 8; Me.classcheck = 1; }
 	if(global.con_p_0) { Me.class = 9; Me.classcheck = 1; }
+	if(global.con_p_minus) { Me.class = 10; Me.classcheck = 1; }
 }
 
 if(vibrate>0){

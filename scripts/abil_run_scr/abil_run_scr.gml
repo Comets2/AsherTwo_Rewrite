@@ -783,6 +783,9 @@ function _abil_run_witch() {
 						if(Control.talentmapArray[9,1]>20){
 							Me.abilArray[1,1]=Me.abilArray[1,2]
 						}
+					Me.scarecrow_deathx=x
+					Me.scarecrow_deathy=y
+					Me.scarecrow_deathtimer=40
 					instance_destroy()
 				}
 
@@ -793,6 +796,9 @@ function _abil_run_witch() {
 			}else{
 				if(dur<=0){
 					Me.abilArray[1,1]=Me.abilArray[1,2]
+					Me.scarecrow_deathx=x
+					Me.scarecrow_deathy=y
+					Me.scarecrow_deathtimer=40
 					instance_destroy()
 				}
 			}
@@ -5522,9 +5528,12 @@ function _abil_run_burger() {
 
 						if(chance==1){
 							Me.hsp=Me.hsp*-0.7
+							Me.hsp=clamp(Me.hsp,-5.5,5.5)
+							Me.remhsp=Me.hsp
 							chance=6
 						}else{
 							Me.vsp=Me.vsp*-0.8
+							Me.vsp=clamp(Me.vsp,-5.5,5.5)
 							chance=8
 						}
 
@@ -5703,6 +5712,8 @@ function _abil_run_burger() {
 						if(abs(vsp)>abs(hsp)&&vsp<0){
 							vsp=vsp*2
 						}
+						hsp=clamp(hsp,-5.5,5.5)
+						vsp=clamp(vsp,-5.5,5.5)
 						stun=7
 
 							//Tomatot
@@ -7854,6 +7865,7 @@ function _abil_run_crab() {
 			if(instance_place(x,y,Me)){
 				Me.vsp=vsp-0.35
 				Me.hsp=hsp+hsp*0.01
+				Me.remhsp=Me.hsp
 				Me.stun=2
 				releasew=1
 			}
@@ -9705,37 +9717,87 @@ function _abil_run_super() {
 							}
 						}else{
 							//Hit Dough
-							if(hit.pin==52){	
+							if(hit.pin==52){
 								if(hit.phase==1){
-									chance=hit.sped*2
-									hit.dur+=10
+									chance=hit.sped*3.5
+									hit.dur+=30
 									if(opt==1){
 										hit.hsp=chance
-										hit.vsp=-1					
+										hit.vsp=-2.5
 									}else{
 										if(opt==-1){
 											hit.hsp=-chance
-											hit.vsp=-1				
+											hit.vsp=-2.5
 										}else{
 											if(opt==2){
 												hit.hsp=0
-												hit.vsp=chance
+												hit.vsp=-chance
 
 												Me.vsp=chancethree
 											}else{
 												if(opt==3){
 													hit.hsp=0
-													hit.vsp=-chance	
+													hit.vsp=-chance
 													Me.vsp=chancefour
 												}else{
 
-												}					
-											}					
-										}					
-									}								
-								}	
+												}
+											}
+										}
+									}
+								}
 							}
 						}
+							//Hit Bacon (breakfast items)
+							if(hit.pin==53){
+								if(hit.phase==999){
+									//Punch launches from orbit into slow flight
+									hit.phase=0
+									hit.dur=160
+									hit.diddmg=0
+									//Remove from orbit slots
+									for(var _s=0;_s<5;_s+=1){
+										if(Me.passivefourArray[1,30+_s]==hit){
+											Me.passivefourArray[1,30+_s]=0
+											break
+										}
+									}
+									chance=1.5
+									if(opt==1){
+										hit.hsp=chance
+										hit.vsp=0
+									}else if(opt==-1){
+										hit.hsp=-chance
+										hit.vsp=0
+									}else if(opt==2){
+										hit.hsp=0
+										hit.vsp=chance
+									}else if(opt==3){
+										hit.hsp=0
+										hit.vsp=-chance
+									}
+								}else if(hit.phase==0){
+									//Punch while flying: convert to gravity projectile
+									hit.phase=2
+									hit.dur=200
+									hit.grav=0.15
+									hit.diddmg=0
+									chance=2.5
+									if(opt==1){
+										hit.hsp=chance
+										hit.vsp=-1
+									}else if(opt==-1){
+										hit.hsp=-chance
+										hit.vsp=-1
+									}else if(opt==2){
+										hit.hsp=0
+										hit.vsp=chance
+									}else if(opt==3){
+										hit.hsp=0
+										hit.vsp=-chance
+									}
+								}
+							}
 					}
 
 
@@ -9767,21 +9829,32 @@ function _abil_run_super() {
 
 
 									if(chancefour==1){
-										phase=0					
+										phase=0
 										diddmg=1
+										Me.immunetwo=20
 
+									//Toaster Pastry - % chance to drop pop tart on hit
 									if(Control.talentmapArray[19,1]>0){
-											if(Me.passivefourArray[1,11]==0&&Me.passivefourArray[1,12]==0){
-												Me.passivefourArray[1,12]=1
-											}else{
-												if(Me.passivefourArray[1,13]==0&&Me.passivefourArray[1,14]==0){
-													Me.passivefourArray[1,14]=1
-												}else{
-													if(Me.passivefourArray[1,15]==0&&Me.passivefourArray[1,16]==0){
-														Me.passivefourArray[1,16]=1
-													}	
-												}
+										if(irandom(99)<10+Control.talentmapArray[20,1]*2){
+											created=instance_create_depth(x,y,0,Part)
+											with(created){
+												pin=2
+												type=4
+												depth=other.depth+1
+												spin=0
+												sprite_index=abil_super_two_spr
+												img=choose(402,403,404)
+												image_index=img
+												imgcap=0
+												imgsped=0
+												image_speed=0
+												dur=400
+												durtotal=dur
+												vsp=-1.5
+												hsp=random_range(-0.3,0.3)
+												grav=0.06
 											}
+										}
 									}
 
 									//Milk Particle
@@ -10175,7 +10248,7 @@ function _abil_run_super() {
 										}				
 										dur=0
 										if(Control.talentmapArray[19,1]>0){
-											Me.passivefourArray[1,16]=1
+											if(irandom(99)<10+Control.talentmapArray[20,1]*2){ created=instance_create_depth(x,y,0,Part); with(created){ pin=2; type=4; depth=other.depth+1; spin=0; sprite_index=abil_super_two_spr; img=choose(402,403,404); image_index=img; imgcap=0; imgsped=0; image_speed=0; dur=400; durtotal=dur; vsp=-1.5; hsp=random_range(-0.3,0.3); grav=0.06 } }
 										}									
 									}
 								}	
@@ -10528,7 +10601,7 @@ function _abil_run_super() {
 											dmg-=2
 										}
 										if(Control.talentmapArray[19,1]>0){
-											Me.passivefourArray[1,16]=1
+											if(irandom(99)<10+Control.talentmapArray[20,1]*2){ created=instance_create_depth(x,y,0,Part); with(created){ pin=2; type=4; depth=other.depth+1; spin=0; sprite_index=abil_super_two_spr; img=choose(402,403,404); image_index=img; imgcap=0; imgsped=0; image_speed=0; dur=400; durtotal=dur; vsp=-1.5; hsp=random_range(-0.3,0.3); grav=0.06 } }
 										}									
 									}
 								}	
@@ -10745,10 +10818,11 @@ function _abil_run_super() {
 										dur=0
 										if(phase==0){
 											Me.hsp=Me.hsp*-0.9
+											Me.remhsp=Me.hsp
 											stun=5
 										}
 										if(Control.talentmapArray[19,1]>0){
-											Me.passivefourArray[1,14]=1
+											if(irandom(99)<10+Control.talentmapArray[20,1]*2){ created=instance_create_depth(x,y,0,Part); with(created){ pin=2; type=4; depth=other.depth+1; spin=0; sprite_index=abil_super_two_spr; img=choose(402,403,404); image_index=img; imgcap=0; imgsped=0; image_speed=0; dur=400; durtotal=dur; vsp=-1.5; hsp=random_range(-0.3,0.3); grav=0.06 } }
 										}									
 									}
 								}
@@ -10834,12 +10908,12 @@ function _abil_run_super() {
 			}
 
 			if(Control.talentmapArray[6,1]>0){
-				if(global.con_p_q||global.conp_p_q||dur==1){
+				if(global.con_p_q||global.conp_p_q||dur==1||collision_rectangle(x-3,y-3,x+3,y+3,Block,false,true)){
 					grav=0.2
 					gravtwo=0.05
 					hsp=Me.hsp*0.7
 					vsp=Me.vsp
-					dur=80
+					dur=200
 					dmg=dmg*0.8
 					phase=1	
 					Me.animysave=0
@@ -10874,25 +10948,86 @@ function _abil_run_super() {
 							}else{
 								hsp=0
 							}
-						}			
+						}
 					}
 					if(vsp<4){
 						vsp+=grav
 					}
 
-					if(instance_place(x,y+vsp,Block)){
-						if(abs(vsp)>1.5){
-							vsp=vsp*-0.5
+					//Collision rectangle hitbox (3px radius around center)
+					var _r=3
+
+					//Horizontal pixel-stepping
+					var _xmove=hsp
+					var _xsign=sign(_xmove)
+					while(abs(_xmove)>0){
+						var _step=min(abs(_xmove),1)*_xsign
+						if(!collision_rectangle(x+_step-_r,y-_r,x+_step+_r,y+_r,Block,false,true)){
+							x+=_step
+							_xmove-=_step
 						}else{
-							vsp=0
+							//Try corner slide vertically
+							var _slid=false
+							for(var _nudge=1;_nudge<=4;_nudge+=1){
+								if(!collision_rectangle(x+_step-_r,y-_nudge-_r,x+_step+_r,y-_nudge+_r,Block,false,true)){
+									y-=_nudge
+									x+=_step
+									_xmove-=_step
+									_slid=true
+									break
+								}
+								if(!collision_rectangle(x+_step-_r,y+_nudge-_r,x+_step+_r,y+_nudge+_r,Block,false,true)){
+									y+=_nudge
+									x+=_step
+									_xmove-=_step
+									_slid=true
+									break
+								}
+							}
+							if(!_slid){
+								hsp=hsp*-0.5
+								break
+							}
 						}
 					}
-					if(instance_place(x,y+hsp,Block)){
-						hsp=hsp*-0.5
-					}
 
-					x+=hsp
-					y+=vsp
+					//Vertical pixel-stepping
+					var _ymove=vsp
+					var _ysign=sign(_ymove)
+					while(abs(_ymove)>0){
+						var _step=min(abs(_ymove),1)*_ysign
+						if(!collision_rectangle(x-_r,y+_step-_r,x+_r,y+_step+_r,Block,false,true)){
+							y+=_step
+							_ymove-=_step
+						}else{
+							//Try corner slide horizontally
+							var _slid=false
+							for(var _nudge=1;_nudge<=4;_nudge+=1){
+								if(!collision_rectangle(x+_nudge-_r,y+_step-_r,x+_nudge+_r,y+_step+_r,Block,false,true)){
+									x+=_nudge
+									y+=_step
+									_ymove-=_step
+									_slid=true
+									break
+								}
+								if(!collision_rectangle(x-_nudge-_r,y+_step-_r,x-_nudge+_r,y+_step+_r,Block,false,true)){
+									x-=_nudge
+									y+=_step
+									_ymove-=_step
+									_slid=true
+									break
+								}
+							}
+							if(!_slid){
+								if(abs(vsp)>1.5){
+									vsp=vsp*-0.5
+								}else{
+									vsp=0
+								}
+								break
+							}
+						}
+					}
 				}
 			}
 			if(dur==0){
@@ -10949,6 +11084,8 @@ function _abil_run_super() {
 								stun=1
 								visible=false
 								vsp=-grav
+								//Super armor: 50% damage reduction while in toaster
+								dmgrecieved*=0.5
 							}
 
 							if(dur mod 25==0){
@@ -10988,8 +11125,9 @@ function _abil_run_super() {
 								chance=dmg
 
 								dmg+=dmg*(Control.talentmapArray[9,1]*0.25)
+								dmg+=dmg*(Control.talentmapArray[20,1]*0.05)
 
-								dmg+=chance*(Control.invenArray[25,3]*0.01)						
+								dmg+=chance*(Control.invenArray[25,3]*0.01)
 							}
 						}
 
@@ -11075,11 +11213,13 @@ function _abil_run_super() {
 								chance=1.25+(Control.talentmapArray[23,1]*0.025)
 								if(global.con_h_right||global.conp_h_right){
 									Me.hsp=chance
+									Me.remhsp=Me.hsp
 									Me.dir=1
 									imgangle+=5
 								}else{
 									if(global.con_h_left||global.conp_h_left){
 										Me.hsp=-chance
+										Me.remhsp=Me.hsp
 										Me.dir=-1
 										imgangle-=5
 									}else{
@@ -11125,7 +11265,7 @@ function _abil_run_super() {
 											}
 											stun=5
 										if(Control.talentmapArray[19,1]>0){
-											Me.passivefourArray[1,14]=1
+											if(irandom(99)<10+Control.talentmapArray[20,1]*2){ created=instance_create_depth(x,y,0,Part); with(created){ pin=2; type=4; depth=other.depth+1; spin=0; sprite_index=abil_super_two_spr; img=choose(402,403,404); image_index=img; imgcap=0; imgsped=0; image_speed=0; dur=400; durtotal=dur; vsp=-1.5; hsp=random_range(-0.3,0.3); grav=0.06 } }
 										}											
 									}
 								}
@@ -11149,6 +11289,7 @@ function _abil_run_super() {
 											dmg=8
 
 											dmg+=dmg*(Control.talentmapArray[9,1]*0.25)
+											dmg+=dmg*(Control.talentmapArray[20,1]*0.05)
 											dmg+=dmg*(Control.invenArray[25,3]*0.01)
 											Me.passive=1
 										type=0
@@ -11205,7 +11346,7 @@ function _abil_run_super() {
 													dur=0
 												}
 												if(Control.talentmapArray[19,1]>0){
-													Me.passivefourArray[1,14]=1
+													if(irandom(99)<10+Control.talentmapArray[20,1]*2){ created=instance_create_depth(x,y,0,Part); with(created){ pin=2; type=4; depth=other.depth+1; spin=0; sprite_index=abil_super_two_spr; img=choose(402,403,404); image_index=img; imgcap=0; imgsped=0; image_speed=0; dur=400; durtotal=dur; vsp=-1.5; hsp=random_range(-0.3,0.3); grav=0.06 } }
 												}												
 											}	
 									}
@@ -11302,7 +11443,7 @@ function _abil_run_super() {
 										}
 									}	
 										if(Control.talentmapArray[19,1]>0){
-											Me.passivefourArray[1,14]=1
+											if(irandom(99)<10+Control.talentmapArray[20,1]*2){ created=instance_create_depth(x,y,0,Part); with(created){ pin=2; type=4; depth=other.depth+1; spin=0; sprite_index=abil_super_two_spr; img=choose(402,403,404); image_index=img; imgcap=0; imgsped=0; image_speed=0; dur=400; durtotal=dur; vsp=-1.5; hsp=random_range(-0.3,0.3); grav=0.06 } }
 										}									
 								if(dur==0||image_index>=img+9){
 									instance_destroy()
@@ -11325,6 +11466,7 @@ function _abil_run_super() {
 		if(pin==53){
 			//Bacon
 			if(phase==0){
+					if(stun>0){ stun-=1 }
 
 							abil_dmg_scr()
 
@@ -11454,11 +11596,88 @@ function _abil_run_super() {
 				}
 
 			}else{
-				if(phase==0){
+				//Gravity projectile (punched while flying)
+				if(phase==2){
 
-				}else{
+					imgangle+=hsp*5
 
-				}		
+					if(vsp<5){
+						vsp+=grav
+					}
+
+					//Block collision
+					var _r=3
+					//Horizontal
+					if(collision_rectangle(x+hsp-_r,y-_r,x+hsp+_r,y+_r,Block,false,true)){
+						hsp=hsp*-0.3
+					}else{
+						x+=hsp
+					}
+					//Vertical
+					if(collision_rectangle(x-_r,y+vsp-_r,x+_r,y+vsp+_r,Block,false,true)){
+						if(abs(vsp)>1){
+							vsp=vsp*-0.3
+						}else{
+							vsp=0
+						}
+					}else{
+						y+=vsp
+					}
+
+					//Friction
+					if(abs(hsp)>0.02){
+						hsp-=sign(hsp)*0.02
+					}else{
+						hsp=0
+					}
+
+					abil_dmg_scr()
+					if(hit!=noone){
+						if(hit.team!=0){
+							with(hit){
+								hurttick=1
+								dmgrecieved+=other.dmg
+								Me.damagedone+=dmgrecieved
+								Control.target=id
+							}
+							dur=0
+						}
+					}
+
+					if(dur==0){
+						for(i=0;i<2;i+=1){
+							created=instance_create_depth(x,y,0,Part)
+							with(created){
+								type=2
+								pin=1
+								pintwo=1
+								depth=other.depth+1
+								spin=1
+								img=371+(other.imgrem*2)+other.i
+								imgcap=3
+								imgsped=0
+								sprite_index=abil_super_two_spr
+								image_speed=0
+								image_index=img
+								image_angle=other.imgangle
+								dur=35+irandom(70)
+								direction=other.i*90+other.imgangle+45
+								speed=-random_range(0.4,1)
+								durtotal=dur
+								hsp=hspeed
+								vsp=vspeed
+								grav=0.06
+								gravtwo=0.03
+								chance=1
+								xscale=chance
+								yscale=chance
+								phase=1
+								speed=0
+							}
+						}
+						instance_destroy()
+					}
+				}
 			}
 		}
 		}
@@ -13775,6 +13994,7 @@ function _abil_run_candy() {
 					if(Me.y<y&&Me.vsp>=0){
 						Me.vsp=0-Me.grav
 						Me.hsp=hsp
+						Me.remhsp=Me.hsp
 					}	
 				}
 
@@ -14136,10 +14356,18 @@ function _abil_run_candy() {
 						if(instance_place(x,y+vsp,Block)){
 							vsp=vsp*-1
 							delay=30
+							// Push out vertically if overlapping
+							while(instance_place(x,y+sign(vsp),Block)){
+								y-=sign(vsp)
+							}
 						}
 						if(instance_place(x+hsp,y,Block)){
 							hsp=hsp*-1
 							delay=30
+							// Push out horizontally if overlapping
+							while(instance_place(x+sign(hsp),y,Block)){
+								x-=sign(hsp)
+							}
 						}
 
 					}else{
@@ -14147,8 +14375,11 @@ function _abil_run_candy() {
 
 					}
 
-					if(instance_place(x,y,Block)){
+					// Push out if stuck inside a block
+					var _unstuck=0
+					while(instance_place(x,y,Block)&&_unstuck<8){
 						y-=1
+						_unstuck+=1
 					}
 
 					x+=hsp
@@ -14263,7 +14494,7 @@ function _abil_run_candy() {
 									with(Me){
 										if(jumps<=0&&vsp>=-1){
 											if(con_h_space){
-												if(y>other.y-5){
+												if(y<other.y-5){
 													vsp=-5.2
 													if(other.dur>other.durmin){
 														other.dur=other.durmin
@@ -14586,6 +14817,8 @@ function _abil_run_candy() {
 					}
 				}
 
+				x=x+hsp
+
 				if(place_meeting(x,y+vsp,Block)){
 					while(!place_meeting(x,y+sign(vsp),Block)){
 						y = y + sign(vsp)
@@ -14598,7 +14831,6 @@ function _abil_run_candy() {
 					}
 				}
 
-				x=x+hsp
 				y=y+vsp
 
 
@@ -15620,6 +15852,41 @@ function _abil_run_enemy() {
 					hsp=hsp*-0.4
 					audio_play_sound_at(choose(snd_pumpkin_thud_4,snd_pumpkin_thud_5,snd_pumpkin_thud_6),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
 					}
+					//Acorn Break Particles on timeout or hit
+					if(dur<=1){
+						for(i=0;i<4;i+=1){
+							created=instance_create_depth(x,y,0,Part)
+							with(created){
+								type=2
+								pin=1
+								pintwo=1
+								depth=other.depth+1
+								spin=1
+								img=70+other.i
+								imgcap=3
+								imgsped=0
+
+								sprite_index=abil_tree_spr
+								image_speed=0
+								image_index=img
+								image_angle=other.imgangle
+								dur=35+irandom(30)
+								direction=other.i*90+other.imgangle+45
+								speed=-random_range(0.5,1.4)
+								durtotal=dur
+								hsp=hspeed
+								vsp=vspeed
+								grav=0.06
+								gravtwo=0.03
+								chance=1
+								xscale=chance
+								yscale=chance
+								phase=1
+								speed=0
+							}
+						}
+						instance_destroy()
+					}
 	#endregion
 	#region Acorn Explosion
 				//____________________________________________________________________________---------------------(ENEMY Acorn explosion)---------------------____________________________________________________________________________		
@@ -15669,6 +15936,124 @@ function _abil_run_enemy() {
 
 					}
 
+
+		//Goblin E Attack Deflect/Return
+		if(blockable==1&&Me.class==10&&Control.talentmapArray[19,1]>0){
+			var _whack=noone
+			with(Abil){
+				if(pin==90&&en==0&&phase==1){
+					if(place_meeting(x,y,other)){
+						_whack=id
+						break
+					}
+				}
+			}
+			if(_whack!=noone){
+				if(returnable==1&&Control.talentmapArray[20,1]>0){
+					//Return: reverse direction and mark as returned (2 = grace frame)
+					returned=2
+					diddmg=1
+					blockable=0
+					dur=durtotal
+					if(_whack.opt==1){
+						//Side whack - send horizontal
+						hsp=(abs(hsp)+1.5)*_whack.dir
+						vsp=vsp*-0.5
+					}else if(_whack.opt==2){
+						//Down whack - send down
+						vsp=abs(vsp)+1.5
+						hsp=random_range(-0.3,0.3)
+					}else{
+						//Up whack - send up
+						vsp=-(abs(vsp)+1.5)
+						hsp=random_range(-0.3,0.3)
+					}
+					audio_play_sound_at(choose(snd_pumpkin_thud_4,snd_pumpkin_thud_5,snd_pumpkin_thud_6),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+				}else{
+					//Deflect: destroy
+					dur=0
+					diddmg=1
+					if(sndone!=0){
+						audio_play_sound_at(choose(sndone,sndtwo),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+					}
+				}
+				//Block icon
+				created=instance_create_depth(Me.x,Me.y-14,0,Part)
+				with(created){
+					type=1
+					pin=1
+					sprite_index=icons_spr
+					img=100
+					image_index=100
+					imgcap=0
+					imgsped=0
+					image_speed=0
+					dur=20
+					durtotal=dur
+					hsp=0
+					vsp=-0.3
+					xscale=1
+					yscale=1
+				}
+			}
+		}
+
+		//Goblin Shield Block
+		if(blockable==1&&Me.class==10&&instance_exists(Me.goblin_shield)){
+			if(place_meeting(x,y,Me.goblin_shield)){
+				var _approaching=(Me.dir==1&&hsp>=0)||(Me.dir==-1&&hsp<=0)
+				if(_approaching){
+					if(pin==30){
+						hsp=hsp*-0.4
+						vsp=vsp*-yrebound
+						diddmg=1
+						audio_play_sound_at(choose(snd_pumpkin_thud_4,snd_pumpkin_thud_5,snd_pumpkin_thud_6),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+					}else{
+						dur=0
+						diddmg=1
+						if(sndone!=0){
+							audio_play_sound_at(choose(sndone,sndtwo),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+						}
+					}
+					//Shield block icon above head
+					created=instance_create_depth(Me.x,Me.y-14,0,Part)
+					with(created){
+						type=1
+						pin=1
+						sprite_index=icons_spr
+						img=100
+						image_index=100
+						imgcap=0
+						imgsped=0
+						image_speed=0
+						dur=20
+						durtotal=dur
+						hsp=0
+						vsp=-0.3
+						xscale=1
+						yscale=1
+					}
+				}
+			}
+		}
+
+		//Returned projectile is neutral - can hit enemies AND player
+		if(returned>1){
+			returned-=1
+			diddmg=0
+		}else if(returned==1){
+			with(Enemy){
+				if(team!=0){
+					if(instance_place(x,y,other)){
+						hurttick=1
+						dmgrecieved+=other.dmg
+						Me.damagedone+=other.dmg
+						Control.target=id
+						other.dur=0
+					}
+				}
+			}
+		}
 
 		hit=instance_place(x,y,Me)
 						if(diddmg==0){
@@ -16130,6 +16515,833 @@ function _abil_run_items() {
 
 }
 
+function _abil_run_goblin() {
+#region Goblin
+#region Goblin Abil 1 Whack
+	//____________________________________________________________________________---------------------(Goblin Whack)---------------------____________________________________________________________________________
+	if(pin==90){
+
+		//Follow player position and update dir
+		if(opt==1){
+			dir=Me.dir
+			if(dir==1){
+				x=Me.x+18+Me.hsp
+			}else{
+				x=Me.x-18+Me.hsp
+			}
+			y=Me.y+2+Me.vsp
+			imgangle=0
+		}else{
+			dir=1
+			if(opt==2){
+				//Down
+				x=Me.x+Me.hsp
+				y=Me.y+18+Me.vsp
+				imgangle=270
+			}else{
+				//Up
+				x=Me.x+Me.hsp
+				y=Me.y-18+Me.vsp
+				imgangle=90
+			}
+		}
+
+		//Animate through slash frames
+		if(dur mod max(1,floor(1/imgsped))==0){
+			if(image_index<img+imgcap){
+				image_index+=1
+			}
+		}
+
+		//Damage enemies - each enemy hit once, swipe continues
+		chancefour=0
+		if(phase==1){
+			with(Enemy){
+				if(team!=0){
+					if(instance_place(x,y,other)){
+						chancethree=0
+						for(i=0;i<other.hurtnum;i+=1){
+							if(other.hurtArray[i]==id){
+								chancethree=1
+							}
+						}
+						if(chancethree==0){
+							hurttick=1
+							dmgrecieved+=other.dmg
+							Me.damagedone+=dmgrecieved
+							Control.target=id
+							other.hurtArray[other.hurtnum]=id
+							other.hurtnum+=1
+							other.chancefour=1
+						}
+					}
+				}
+			}
+			//Momentum on hit - bounce up from down attack, push down from up attack
+			if(chancefour==1){
+				if(opt==2){
+					Me.vsp=-3
+				}else{
+					if(opt==3){
+						Me.vsp=2.25
+					}
+				}
+			}
+		}
+
+		if(dur<=0||image_index>=img+imgcap){
+			instance_destroy()
+		}
+
+#endregion
+
+#region Goblin Abil 2 Selector
+	//____________________________________________________________________________---------------------(Goblin Selector)---------------------____________________________________________________________________________
+	} else if(pin==91){
+		if(phase==0){
+			//Follow player
+			x=Me.x
+			y=Me.y-23
+
+			//Freeze player during selection
+			Me.stun=2
+
+			//Keep alive while selecting
+			dur=10
+			chance=0
+
+			//Directional input
+			if(global.con_p_up||global.conp_p_up){
+				image_index=img+1
+				chance=1
+			}else{
+				if(global.con_p_right||global.conp_p_right){
+					image_index=img+2
+					chance=1
+				}else{
+					if(global.con_p_down||global.conp_p_down){
+						image_index=img+3
+						chance=1
+					}else{
+						if(global.con_p_left||global.conp_p_left){
+							image_index=img+4
+							chance=1
+						}
+					}
+				}
+			}
+
+			//Direction chosen
+			if(chance==1){
+				Me.stun=0
+
+				//UP - Fishing
+				if(image_index==img+1){
+					//Set cooldown now that selection was made
+					Me.abilArray[1,1]=Me.abilArray[1,2]
+
+					//Transform selector into cast bar
+					pin=94
+					phase=-1
+					dur=999
+					durtotal=dur
+					depth=-1
+
+					//Bobber sprite (hidden during cast bar)
+					sprite_index=spr_items
+					img=440
+					image_index=img
+					imgcap=0
+					imgsped=0
+					image_speed=0
+
+					//Cast direction
+					dir=Me.dir
+
+					//Rod tip position
+					chance=Me.x+(dir*6)
+					chancetwo=Me.y-8
+
+					//Init bobber at rod tip
+					x=chance
+					y=chancetwo
+
+					//Init counters
+					chancethree=0
+					spin=1
+					move=0
+					diddmg=0
+					test=0
+
+				//RIGHT - Placeholder (no cooldown)
+				}else{
+					if(image_index==img+2){
+						instance_destroy()
+
+					//DOWN - Digging
+					}else{
+						if(image_index==img+3){
+							//Set cooldown now that selection was made
+							Me.abilArray[1,1]=Me.abilArray[1,2]
+							phase=2
+							dur=60
+							durtotal=dur
+							sprite_index=abil_goblin_effect_spr
+							img=1
+							imgcap=3
+							imgsped=0.3
+							image_index=img
+							dir=Me.dir
+
+						//LEFT - Placeholder (no cooldown)
+						}else{
+							if(image_index==img+4){
+								instance_destroy()
+							}
+						}
+					}
+				}
+			}
+
+		}else{
+
+			//Phase 1 - Mining Active
+			if(phase==1){
+				Me.stun=2
+				if(dir==1){
+					x=Me.x+18+Me.hsp
+				}else{
+					x=Me.x-18+Me.hsp
+				}
+				y=Me.y+2+Me.vsp
+				imgangle=0
+
+				//Animate
+				if(dur mod max(1,floor(1/imgsped))==0){
+					if(image_index<img+imgcap){
+						image_index+=1
+					}
+				}
+
+				//Mining progress bar
+				chancethree=1-(dur/durtotal)
+				var _bw=20
+				var _bh=3
+				var _bx=Me.x-(_bw/2)
+				var _by=Me.y-16
+				draw_set_alpha(1)
+				draw_rectangle_color(_bx,_by,_bx+_bw,_by+_bh,c_black,c_black,c_black,c_black,false)
+				//Striped green fill
+				var _fw=floor(_bw*chancethree)
+				for(var _s=0;_s<_fw;_s+=1){
+					if(_s mod 2==0){
+						draw_rectangle_color(_bx+_s,_by,_bx+_s+1,_by+_bh,$5F9148,$5F9148,$5F9148,$5F9148,false)
+					}else{
+						draw_rectangle_color(_bx+_s,_by,_bx+_s+1,_by+_bh,$7FD09F,$7FD09F,$7FD09F,$7FD09F,false)
+					}
+				}
+
+				if(dur<=0){
+					Me.stun=0
+					//Spawn 1-3 mineral drops
+					chancetwo=1+irandom(2)
+					for(i=0;i<chancetwo;i+=1){
+						created=instance_create_depth(Me.x-4+irandom(8),Me.y-4+irandom(4),0,Part)
+						with(created){
+							pin=2
+							type=5
+							depth=other.depth+1
+							spin=3
+							sprite_index=spr_items
+							//Rarity roll
+							chance=irandom(99)
+							if(chance<3){
+								img=186 //Crystal
+							}else{
+								if(chance<15){
+									img=103 //Mithril Ore
+								}else{
+									if(chance<40){
+										img=choose(101,102) //Copper or Dark Iron Ore
+									}else{
+										img=choose(100,109) //Stone or Coal
+									}
+								}
+							}
+							image_index=img
+							imgcap=0
+							imgsped=0
+							image_speed=0
+							dur=600
+							durtotal=dur
+							hsp=random_range(-0.8,0.8)
+							vsp=random_range(-1.5,-2)
+							grav=0.05
+							gravtwo=0.02
+						}
+					}
+					instance_destroy()
+				}
+
+			//Phase 2 - Digging Active
+			}else{
+				if(phase==2){
+					Me.stun=2
+					x=Me.x+Me.hsp
+					y=Me.y+18+Me.vsp
+					imgangle=270
+					dir=1
+
+					//Animate
+					if(dur mod max(1,floor(1/imgsped))==0){
+						if(image_index<img+imgcap){
+							image_index+=1
+						}
+					}
+
+					//Spawn dirt particles while digging
+					if(dur mod 4==0){
+						var _pc=1+irandom(2)
+						for(var _p=0;_p<_pc;_p+=1){
+							created=instance_create_depth(Me.x-6+irandom(12),Me.y+4+irandom(4),depth-1,Part)
+							with(created){
+								pin=1
+								type=3
+								sprite_index=spr_particle
+								img=5+irandom(3)
+								image_index=img
+								imgcap=0
+								imgsped=0
+								image_speed=0
+								spin=1
+								hsp=random_range(-1,1)
+								vsp=random_range(-1.5,-0.5)
+								grav=0.11
+								gravtwo=0.03
+								dur=irandom_range(30,45)
+								durtotal=dur
+							}
+						}
+					}
+
+					//Digging progress bar
+					chancethree=1-(dur/durtotal)
+					var _bw=20
+					var _bh=3
+					var _bx=Me.x-(_bw/2)
+					var _by=Me.y-16
+					draw_set_alpha(1)
+					draw_rectangle_color(_bx,_by,_bx+_bw,_by+_bh,c_black,c_black,c_black,c_black,false)
+					var _fw=floor(_bw*chancethree)
+					for(var _s=0;_s<_fw;_s+=1){
+						if(_s mod 2==0){
+							draw_rectangle_color(_bx+_s,_by,_bx+_s+1,_by+_bh,$5F9148,$5F9148,$5F9148,$5F9148,false)
+						}else{
+							draw_rectangle_color(_bx+_s,_by,_bx+_s+1,_by+_bh,$7FD09F,$7FD09F,$7FD09F,$7FD09F,false)
+						}
+					}
+
+					if(dur<=0){
+						Me.stun=0
+						//Burst of dirt particles on dig complete
+						for(var _p=0;_p<6;_p+=1){
+							created=instance_create_depth(Me.x-4+irandom(8),Me.y+2+irandom(4),depth-1,Part)
+							with(created){
+								pin=1
+								type=3
+								sprite_index=spr_particle
+								img=5+irandom(3)
+								image_index=img
+								imgcap=0
+								imgsped=0
+								image_speed=0
+								spin=1
+								hsp=random_range(-1.5,1.5)
+								vsp=random_range(-2.5,-1)
+								grav=0.11
+								gravtwo=0.03
+								dur=irandom_range(35,50)
+								durtotal=dur
+							}
+						}
+						//Spawn 1 dig item drop popping out of ground
+						chancetwo=1
+						for(i=0;i<chancetwo;i+=1){
+							created=instance_create_depth(Me.x,Me.y,0,Part)
+							with(created){
+								pin=2
+								type=5
+								depth=Me.depth-1
+								spin=3
+								sprite_index=spr_items
+								image_speed=0
+								//Rarity roll
+								chance=irandom(99)
+								if(chance<50){
+									img=97 //Grass Clump (common)
+								}else{
+									if(chance<75){
+										img=choose(100,115) //Stone or Wood
+									}else{
+										if(chance<85){
+											img=choose(112,113,114) //Sapphire, Emerald, or Ruby
+										}else{
+											img=96 //Coin
+											type=6 //Mark as coin drop
+										}
+									}
+								}
+								image_index=img
+								imgcap=0
+								imgsped=0
+								dur=600
+								durtotal=dur
+								hsp=random_range(-0.8,0.8)
+								vsp=random_range(-1.5,-2)
+								grav=0.12
+								gravtwo=0.02
+							}
+						}
+						//Place dig hole on ground below feet (not on slopes)
+						var _ground_block=instance_position(Me.x,Me.y+8,Block)
+						if(_ground_block==noone||(_ground_block.image_index!=2&&_ground_block.image_index!=3)){
+							Me.dig_hole=1
+						}
+						instance_destroy()
+				}
+			}
+		}
+		}
+	} else if(pin==93){
+		//Goblin Mining Node (passive)
+
+		//Shake decay
+		if(shake_amount>0.1){
+			shake_amount*=0.9
+			shake_x=random_range(-shake_amount,shake_amount)
+			shake_y=random_range(-shake_amount,shake_amount)
+		}else{
+			shake_amount=0
+			shake_x=0
+			shake_y=0
+		}
+		x=startx+shake_x
+		y=starty+shake_y
+
+		if(phase==0){
+			//Idle - keep alive
+			dur=10
+
+			//Check player adjacent to node + holding direction toward it
+			var _dx=Me.x-(startx+8)
+			var _dy=Me.y-(starty+8)
+			var _near=abs(_dx)<12&&abs(_dy)<20
+			if(_near&&Me.stun==0){
+				var _pressing_toward=false
+				if(_dx<0){
+					//Player is left of node, must press right
+					if(global.con_h_right||global.conp_h_right){
+						_pressing_toward=true
+					}
+				}else{
+					//Player is right of node, must press left
+					if(global.con_h_left||global.conp_h_left){
+						_pressing_toward=true
+					}
+				}
+				if(_pressing_toward){
+					phase=1
+					dur=60
+					durtotal=60
+				}
+			}
+		}
+
+		if(phase==1){
+			//Mining active
+
+			//Check player still holding direction into node
+			var _still_pressing=false
+			if(Me.x<startx+8){
+				if(global.con_h_right||global.conp_h_right){
+					_still_pressing=true
+				}
+			}else{
+				if(global.con_h_left||global.conp_h_left){
+					_still_pressing=true
+				}
+			}
+
+			//Cancel if not holding direction
+			if(!_still_pressing){
+				phase=0
+				dur=10
+			}else{
+				//Mining hit every 15 frames
+				if(dur mod 15==0&&dur<durtotal){
+					shake_amount=3
+
+					//Spawn mining particles
+					var _pcount=1+irandom(1)
+					for(var _p=0;_p<_pcount;_p+=1){
+						created=instance_create_depth(startx+8+random_range(-10,10),starty+8+random_range(-10,10),0,Part)
+						with(created){
+							pin=1
+							type=2
+							pintwo=1
+							phase=1
+							sprite_index=spr_particle
+							image_speed=0
+							if(other.type==0){
+								//Stone particles
+								image_index=irandom_range(17,20)
+								grav=0.15
+							}else{
+								//Tree particles
+								image_index=irandom_range(13,16)
+								grav=0.08
+							}
+							img=image_index
+							imgcap=0
+							imgsped=0
+							hsp=random_range(-0.4,0.4)
+							vsp=random_range(-0.8,-0.3)
+							gravtwo=0.01
+							dur=35+irandom(30)
+							durtotal=dur
+						}
+					}
+				}
+
+				//Mining progress bar
+				chancethree=1-(dur/durtotal)
+				var _bw=20
+				var _bh=3
+				var _bx=startx+8-(_bw/2)
+				var _by=starty-5
+				draw_set_alpha(1)
+				draw_rectangle_color(_bx,_by,_bx+_bw,_by+_bh,c_black,c_black,c_black,c_black,false)
+				var _fw=floor(_bw*chancethree)
+				for(var _s=0;_s<_fw;_s+=1){
+					if(_s mod 2==0){
+						draw_rectangle_color(_bx+_s,_by,_bx+_s+1,_by+_bh,$5F9148,$5F9148,$5F9148,$5F9148,false)
+					}else{
+						draw_rectangle_color(_bx+_s,_by,_bx+_s+1,_by+_bh,$7FD09F,$7FD09F,$7FD09F,$7FD09F,false)
+					}
+				}
+
+				//Completion
+				if(dur<=0){
+					//Destruction particles
+					var _dcount=5
+					if(type==1){ _dcount=8 }
+					for(var _p=0;_p<_dcount;_p+=1){
+						created=instance_create_depth(startx+8+random_range(-12,12),starty+8+random_range(-12,12),0,Part)
+						with(created){
+							pin=1
+							type=2
+							pintwo=1
+							phase=1
+							sprite_index=spr_particle
+							image_speed=0
+							if(other.type==0){
+								image_index=irandom_range(17,20)
+								grav=0.18
+							}else{
+								image_index=irandom_range(13,16)
+								grav=0.1
+							}
+							img=image_index
+							imgcap=0
+							imgsped=0
+							hsp=random_range(-0.8,0.8)
+							vsp=random_range(-1.2,-0.5)
+							gravtwo=0.01
+							dur=35+irandom(30)
+							durtotal=dur
+						}
+					}
+
+					//Spawn 1-3 item drops
+					chancetwo=1+irandom(2)
+					for(i=0;i<chancetwo;i+=1){
+						created=instance_create_depth(startx+4+irandom(8),starty+irandom(4),0,Part)
+						with(created){
+							pin=2
+							type=5
+							depth=other.depth+1
+							spin=3
+							sprite_index=spr_items
+							image_speed=0
+
+							if(other.type==0){
+								//Stone drops
+								chance=irandom(99)
+								if(chance<3){
+									img=186 //Crystal
+								}else{
+									if(chance<15){
+										img=103 //Mithril Ore
+									}else{
+										if(chance<40){
+											img=choose(101,102) //Copper or Dark Iron Ore
+										}else{
+											img=choose(100,109) //Stone or Coal
+										}
+									}
+								}
+							}else{
+								//Tree drops
+								img=115 //Wood
+							}
+
+							image_index=img
+							imgcap=0
+							imgsped=0
+							dur=600
+							durtotal=dur
+							hsp=random_range(-0.8,0.8)
+							vsp=random_range(-1.5,-2)
+							grav=0.12
+							gravtwo=0.02
+						}
+					}
+
+					//Destroy collision Block
+					if(instance_exists(node_block)){
+						with(node_block){ instance_destroy() }
+					}
+					instance_destroy()
+				}
+			}
+		}
+	} else if(pin==94){
+#endregion
+#region Goblin Fishing
+	//____________________________________________________________________________---------------------(Goblin Fishing)---------------------____________________________________________________________________________
+
+		//Stun player during fishing
+		Me.stun=2
+		Me.animstop=2
+
+		//Fishing animation: slowly alternate between frames 18 and 19
+		move+=0.02
+		if(move>=2) move=0
+		Me.image_index=18+floor(move)
+
+		//Rod tip position based on animation frame
+		if(floor(move)==0){
+			chance=Me.x+(dir*9)
+			chancetwo=Me.y-5
+		}else{
+			chance=Me.x+(dir*7)
+			chancetwo=Me.y-7
+		}
+
+		//Phase -1 - Cast bar (ping-pong oscillation)
+		if(phase==-1){
+			dur=999
+
+			//Oscillate cast power: spin=direction (1 or -1), diddmg=power (0-60)
+			diddmg+=1.5*spin
+			if(diddmg>=60){
+				diddmg=60
+				spin=-1
+			}else if(diddmg<=0){
+				diddmg=0
+				spin=1
+			}
+
+			//Stay at rod tip
+			x=chance
+			y=chancetwo
+
+			//Confirm cast with Q or E
+			if(global.con_p_q||global.conp_p_q||global.con_p_e||global.conp_p_e){
+				var _power=diddmg/60
+
+				//Seaweed reduction based on zone
+				if(_power>=0.75){
+					test=10 //Red: -10% seaweed
+				}else if(_power>=0.40){
+					test=5 //Yellow: -5% seaweed
+				}else{
+					test=0 //Green: normal
+				}
+
+				//Cast velocity scales with power (red = 1.5 max)
+				hsp=dir*(0.3+_power*1.2)
+				vsp=-2.0
+				grav=0.12
+
+				phase=0
+				dur=30
+				durtotal=dur
+				diddmg=0
+			}
+
+		//Phase 0 - Casting
+		}else if(phase==0){
+			//Keep dur alive so main loop doesn't destroy (it kills phase==0 when dur<=0)
+			dur=10
+
+			x+=hsp
+			y+=vsp
+			vsp+=grav
+
+			//Transition when bobber descends past water line (80% screen height)
+			var _water_y=Control.camy+floor(Control.camytwo*0.6)
+			if(vsp>0&&y>=_water_y){
+				//Splash particles
+				var _pc=2+irandom(1)
+				for(var _p=0;_p<_pc;_p+=1){
+					created=instance_create_depth(x-4+irandom(8),y,depth-1,Part)
+					with(created){
+						pin=1
+						type=3
+						sprite_index=spr_particle
+						img=1+irandom(2)
+						image_index=img
+						imgcap=0
+						imgsped=0
+						image_speed=0
+						spin=1
+						hsp=random_range(-0.8,0.8)
+						vsp=random_range(-1.2,-0.4)
+						grav=0.08
+						gravtwo=0.02
+						dur=irandom_range(20,35)
+						durtotal=dur
+					}
+				}
+
+				vsp=0
+				hsp=0
+				grav=0
+				phase=1
+				chancethree=y //Store water level Y
+				chancefour=0 //Vertical offset
+				dur=120+irandom(240)
+				durtotal=dur
+				diddmg=0
+			}
+
+		//Phase 1 - Waiting for bite
+		}else if(phase==1){
+			diddmg+=1
+			//Move bobber
+			if(global.con_h_left||global.conp_h_left){ x-=0.5 }
+			if(global.con_h_right||global.conp_h_right){ x+=0.5 }
+			if(global.con_h_up||global.conp_h_up){ chancefour-=0.3 }
+			if(global.con_h_down||global.conp_h_down){ chancefour+=0.3 }
+			chancefour=clamp(chancefour,0,12)
+			//Gentle bob
+			y=chancethree+chancefour+sin(diddmg*0.05)*1.5
+
+			if(dur<=0){
+				phase=2
+				dur=90
+				durtotal=dur
+				spin=0
+				diddmg=0
+			}
+
+		//Phase 2 - Tug / Bite alert
+		}else if(phase==2){
+			diddmg+=1
+			//Move bobber
+			if(global.con_h_left||global.conp_h_left){ x-=0.5 }
+			if(global.con_h_right||global.conp_h_right){ x+=0.5 }
+			if(global.con_h_up||global.conp_h_up){ chancefour-=0.3 }
+			if(global.con_h_down||global.conp_h_down){ chancefour+=0.3 }
+			chancefour=clamp(chancefour,0,12)
+			if(spin<3){
+				spin+=0.1
+			}
+			//Aggressive bob with dip
+			y=chancethree+chancefour+sin(diddmg*0.2)*3-2
+
+			//Check for reel input (Q or E)
+			if(global.con_p_q||global.conp_p_q||global.con_p_e||global.conp_p_e){
+				phase=3
+				dur=30
+				durtotal=dur
+
+				//Roll fish loot now and store in phasecheck
+				var _seaweed_chance=50-test
+				var _roll=irandom(99)
+				if(_roll<_seaweed_chance){
+					phasecheck=129 //Seaweed
+				}else if(_roll<_seaweed_chance+25){
+					phasecheck=135 //Small fish
+				}else if(_roll<_seaweed_chance+40){
+					phasecheck=130 //Big fish
+				}else if(_roll<_seaweed_chance+45){
+					phasecheck=128 //Treasure chest
+				}else{
+					phasecheck=129 //Seaweed
+				}
+			}
+
+			//Timeout - fish escapes
+			if(dur<=0){
+				phase=4
+				dur=20
+				durtotal=dur
+			}
+
+		//Phase 3 - Reeling (success, fish attached to bobber)
+		}else if(phase==3){
+			x=lerp(x,chance,0.15)
+			y=lerp(y,chancetwo,0.15)
+
+			if(dur<=0){
+				Me.stun=0
+				Me.animstop=0
+
+				//Spawn fish loot at rod tip using stored roll
+				created=instance_create_depth(x,y,0,Part)
+				with(created){
+					pin=2
+					type=5
+					depth=Me.depth-1
+					spin=3
+					sprite_index=spr_items
+					image_speed=0
+					img=other.phasecheck
+					image_index=img
+					imgcap=0
+					imgsped=0
+					dur=600
+					durtotal=dur
+					hsp=random_range(-0.8,0.8)
+					vsp=random_range(-1.5,-2)
+					grav=0.12
+					gravtwo=0.02
+				}
+				instance_destroy()
+			}
+
+		//Phase 4 - Fail (fish escaped)
+		}else if(phase==4){
+			x=lerp(x,chance,0.2)
+			y=lerp(y,chancetwo,0.2)
+
+			if(dur<=0){
+				Me.stun=0
+				Me.animstop=0
+				instance_destroy()
+			}
+		}
+
+		//Drawing handled in Abil Draw_0
+
+#endregion
+	}
+#endregion
+#endregion
+}
+
 function abil_run_scr() {
 
 	if(instance_exists(Abil)){
@@ -16147,6 +17359,7 @@ function abil_run_scr() {
 			else if(pin>=50&&pin<=53){ _abil_run_super(); }
 			else if(pin>=60&&pin<=64){ _abil_run_tree(); }
 			else if(pin>=70&&pin<=83){ _abil_run_candy(); }
+			else if(pin>=90&&pin<=99){ _abil_run_goblin(); }
 		} else if(en==1){
 			_abil_run_enemy();
 		} else if(en==2){

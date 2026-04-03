@@ -51,7 +51,11 @@ function class_scr() {
 				abilArray[1,2]=99999999999
 				abilArray[2,2]=640
 				passive=noone
-				
+				passivetwo=noone
+				scarecrow_deathx=0
+				scarecrow_deathy=0
+				scarecrow_deathtimer=0
+
 				abilArray[16,0]=100
 				abilArray[16,1]=0
 				abilArray[16,2]=0
@@ -213,6 +217,11 @@ function class_scr() {
 		
 		
 		
+		//Scarecrow death X timer
+		if(scarecrow_deathtimer>0){
+			scarecrow_deathtimer-=1
+		}
+
 		//Abil Cooldowns
 		//Broom
 		if(Control.talentmapArray[4,1]>0){
@@ -1339,7 +1348,7 @@ if(Control.talentmapArray[23,1]>0){
 								
 								img=50+Control.talentmapArray[15,1]*10
 								image_index=img
-								depth=other-1
+								depth=other.depth-1
 								starty=-2
 							}	
 						}	
@@ -1762,7 +1771,7 @@ if(Control.talentmapArray[23,1]>0){
 				imgcap=2
 				sprite_index=abil_crab_spr
 				image_index=img
-				depth=Me.depth+1
+				depth=-1
 				image_speed=0
 				dur=150
 				durtotal=dur
@@ -1774,7 +1783,7 @@ if(Control.talentmapArray[23,1]>0){
 						imgsped=0
 						sprite_index=abil_crab_spr
 						image_index=img
-						depth=Me.depth		
+						depth=-1
 						dur=150
 						durtotal=dur
 						phase=-1
@@ -2187,22 +2196,20 @@ if(Control.talentmapArray[23,1]>0){
 						//CAP
 						passivefourArray[1,3]=100
 						
-						//BB Overall
+						//Sugar Rush timer
 						passivefourArray[1,10]=0
-						//Item 1
-						passivefourArray[1,11]=0
-						//Item 1 tick
-						passivefourArray[1,12]=0	
-						//Item 2
-						passivefourArray[1,13]=0						
-						//Item 2 tick
-						passivefourArray[1,14]=0	
-						//Item 3
-						passivefourArray[1,15]=0						
-						//Item 3 tick
-						passivefourArray[1,16]=0	
+						//Sugar Rush max (for bar display)
+						passivefourArray[1,17]=300
 						//Sped amount
 						passivefourArray[1,20]=0
+						//Orbiting breakfast items (instances)
+						passivefourArray[1,30]=0
+						passivefourArray[1,31]=0
+						passivefourArray[1,32]=0
+						passivefourArray[1,33]=0
+						passivefourArray[1,34]=0
+						//Orbit angle
+						passivefourArray[1,35]=0
 
 					passivefourArray[100,0]=180
 					passivefourArray[100,1]=0
@@ -2213,47 +2220,45 @@ if(Control.talentmapArray[23,1]>0){
 		}
 		passivefourArray[1,20]=spedsave
 		
-		//Balanced Breakfast
-		if(Control.talentmapArray[19,1]>0){
-			//Milk
-			passivefourArray[1,11]=0
-			//Douhnut
-			if(Control.talentmapArray[4,1]>0){
-				passivefourArray[1,13]=1
-			}else{
-				//Toaster
-				if(Control.talentmapArray[7,1]>0){
-					passivefourArray[1,13]=2
-				}else{
-					passivefourArray[1,13]=0
-				}
+		//Toaster Pastry (handled on hit in abil_run_scr)
+
+		//Sugar Rush buff
+		if(passivefourArray[1,10]>0){
+			passivefourArray[1,10]-=1
+			passivefourArray[1,20]+=spedsave*0.25
+			//25% faster cooldowns - extra tick every 4 frames
+			if(passivefourArray[1,10] mod 4==0){
+				if(abilArray[0,1]>0){ abilArray[0,1]-=1 }
+				if(abilArray[1,1]>0){ abilArray[1,1]-=1 }
+				if(abilArray[2,1]>0){ abilArray[2,1]-=1 }
 			}
-		
-			//Waffle
-			if(Control.talentmapArray[10,1]>0){
-				passivefourArray[1,15]=1
-			}else{
-				//Cereal
-				if(Control.talentmapArray[13,1]>0){
-					passivefourArray[1,15]=2
-				}else{
-					passivefourArray[1,15]=0
-				}
-			}
-			
-			//Super Toast
-			if(passivefourArray[1,10]<=0){
-				if(passivefourArray[1,12]==1&&passivefourArray[1,14]==1&&passivefourArray[1,16]==1){
-					passivefourArray[1,10]=300
-				}
-			}else{
-				passivefourArray[1,10]-=1
-				passivefourArray[1,20]+=(Control.talentmapArray[20,1]*0.017)+(Control.talentmapArray[19,1]*0.085)
-				
-				if(passivefourArray[1,10]==0){
-					passivefourArray[1,12]=0
-					passivefourArray[1,14]=0
-					passivefourArray[1,16]=0				
+			//Sugar particles
+			if(passivefourArray[1,10] mod 8==0){
+				created=instance_create_depth(x-4+random(8),y-2+random(6),0,Part)
+				with(created){
+					type=2
+					pin=1
+					pintwo=1
+					depth=other.depth+choose(-1,1)
+					spin=1
+					sprite_index=abil_super_two_spr
+					img=choose(405,406,407,408)
+					image_index=img
+					imgcap=0
+					imgsped=0
+					image_speed=0
+					dur=20+irandom(15)
+					durtotal=dur
+					direction=random_range(60,120)
+					speed=0
+					hsp=random_range(-0.2,0.2)
+					vsp=-0.3-random(0.2)
+					grav=0.01
+					chance=1
+					xscale=chance
+					yscale=chance
+					phase=1
+					speed=0
 				}
 			}
 		}
@@ -2312,65 +2317,13 @@ chance=2
 		passivethree=1
 		//Hover length
 		passivefourArray[1,0]=(Control.talentmapArray[17,1]*11)+(Control.talentmapArray[16,1]*10)
+		//Reset spawn tick
+		passivefourArray[1,2]=0
 	}
 
 
 					
-					//Super Bacon
-					for(i=0;i<passivefourArray[1,1];i+=1){
-						if(Control.talentmapArray[18,1]>0){
-							created=instance_create_depth(x-3+random(6),y-6+random(6),0,Abil)
-							with(created){
-			
-								type=1
-								pin=53
-								phase=0
-								move=0
-								diddmg=0
-								dmg=0.5
-				
-								chance=dmg
-			
-			
-								//dmg+=chance*(Control.talentmapArray[3,1]*0.25)
-								dmg+=chance*(Control.invenArray[25,3]*0.01)
-								if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
-			
-								creator=other.id
-			
-								depth=other.depth-1
-								spin=1
-								extra=0
-									sprite_index=abil_super_two_spr
-									img=342
-									imgcap=1
-			
-								image_speed=0
-								image_index=img+irandom(2)
-								dur=45
-								count=0
-								durtotal=dur
-								phase=0
-							
-								direction=random_range(30,60)
-								speed=1
-								sped=speed
-								hsp=hspeed
-								vsp=vspeed
-								grav=0.05
-								gravtwo=0.001
-				
-								hsp=hsp*Me.dir
-								speed=0
-								tick=0
-								starty=y
-								tickamount=0
-								imgangle=random(360)
-				
-							}						
-						}
-					}
-					passivefourArray[1,1]=0
+					//Super Bacon (removed - now handled by orbiting breakfast items)
 
 	//Bacon Cape
 		if(global.con_h_space||global.conp_h_space){
@@ -2413,10 +2366,70 @@ chance=2
 				}
 			}
 			if(chancetwo==1){
-				
-				//Flight passive
-				if(passivefourArray[1,2]<passivefourArray[1,3]){
+
+				//Spawn orbiting breakfast item every 20 ticks while hovering
+				if(Control.talentmapArray[18,1]>0){
 					passivefourArray[1,2]+=1
+					if(passivefourArray[1,2]>=20){
+						passivefourArray[1,2]=0
+						var _slot=-1
+						for(var _s=0;_s<5;_s+=1){
+							if(passivefourArray[1,30+_s]==0||!instance_exists(passivefourArray[1,30+_s])){
+								_slot=_s
+								break
+							}
+						}
+						if(_slot!=-1){
+							var _item=instance_create_depth(x,y,depth+choose(-2,2),Abil)
+							with(_item){
+								pin=53
+								phase=999
+								en=0
+								move=0
+								diddmg=0
+								dmg=1
+								dmg+=dmg*(Control.invenArray[25,3]*0.01)
+								if(Control.rogue_mode){ dmg+=dmg*(Me.rogue_statatt*0.05) }
+								creator=other.id
+								spin=1
+								sprite_index=abil_super_two_spr
+								imgrem=0
+								if(_slot<3){
+									img=342+_slot
+									image_index=img
+								}else{
+									if(_slot==3){
+										img=345
+										imgrem=3
+										image_index=img
+									}else{
+										img=346
+										imgrem=4
+										image_index=img
+									}
+								}
+								imgcap=1
+								imgsped=0
+								image_speed=0
+								dur=99999
+								durtotal=dur
+								fly=0
+								hsp=0
+								vsp=0
+								grav=0
+								speed=0
+								imgangle=0
+								tick=0
+								ticktwo=0
+								extrax=0
+								extray=0
+								startx=0
+								starty=0
+								stun=0
+							}
+							passivefourArray[1,30+_slot]=_item
+						}
+					}
 				}
 				
 				//Cereal Part
@@ -2460,11 +2473,58 @@ chance=2
 		}
 	//}
 
+		//Hover breakfast items near player
+		if(Control.talentmapArray[18,1]>0){
+			for(var _s=0;_s<5;_s+=1){
+				if(passivefourArray[1,30+_s]!=0&&instance_exists(passivefourArray[1,30+_s])){
+					with(passivefourArray[1,30+_s]){
+						//Wander within radius, drifting to a new spot
+						if(tick==0){
+							tick=80+irandom(60)
+							//Pick target outside player body zone
+							var _tries=0
+							do{
+								startx=-23+random(46)
+								starty=-18+random(36)
+								_tries+=1
+							}until(!(startx>=-6&&startx<=12&&starty>=-8&&starty<=16)||_tries>=10)
+						}else{
+							tick-=1
+						}
+						//Smooth drift toward target offset
+						extrax+=(startx-extrax)*0.0105
+						extray+=(starty-extray)*0.0105
+						//Snap to player, smooth hover offset
+						x=Me.x+extrax
+						y=Me.y+extray
+						dur=99999
+						//Damage enemies while hovering
+						diddmg=0
+						abil_dmg_scr()
+						if(hit!=noone){
+							if(hit.team!=0){
+								with(hit){
+									hurttick=1
+									dmgrecieved+=other.dmg
+									Me.damagedone+=dmgrecieved
+									Control.target=id
+								}
+								other.passivefourArray[1,30+_s]=0
+								instance_destroy()
+							}
+						}
+					}
+				}else{
+					passivefourArray[1,30+_s]=0
+				}
+			}
+		}
+
 #endregion
 		}else{
-		
+
 #region Super Class
-	//____________________________________________________________________________---------------------(Tree)---------------------____________________________________________________________________________	
+	//____________________________________________________________________________---------------------(Tree)---------------------____________________________________________________________________________
 	if(class==7){
 		if(classcheck==1){
 			//In use for punch momentum
@@ -2494,13 +2554,11 @@ chance=2
 						passivefourArray[0,2]=0
 						passivefourArray[0,3]=0
 						
-						//Float Leaf
-						passivefourArray[1,0]=0
-						//Bacon create
+						//Float Leaf Abil
+						passivefourArray[1,55]=noone
+						//Unused (inherited from other class template)
 						passivefourArray[1,1]=0
-						//Pancake Bacon flight time
 						passivefourArray[1,2]=0
-						//CAP
 						passivefourArray[1,3]=100
 						
 						//Tree Stump
@@ -2517,20 +2575,10 @@ chance=2
 						//Charge amount CD
 						passivefourArray[1,9]=0
 						
-						//BB Overall
+						//Sugar Rush timer
 						passivefourArray[1,10]=0
-						//Item 1
-						passivefourArray[1,11]=0
-						//Item 1 tick
-						passivefourArray[1,12]=0	
-						//Item 2
-						passivefourArray[1,13]=0						
-						//Item 2 tick
-						passivefourArray[1,14]=0	
-						//Item 3
-						passivefourArray[1,15]=0						
-						//Item 3 tick
-						passivefourArray[1,16]=0	
+						//Sugar Rush max (for bar display)
+						passivefourArray[1,17]=300
 						//Sped amount
 						passivefourArray[1,20]=0
 						
@@ -2638,27 +2686,24 @@ chance=2
 			}
 		}
 	
-	
 		//Float Leaf
 		if(Control.talentmapArray[23,1]>0){
-				chance=0.75
-				if(global.con_h_space&&vsp>chance&&grounded==0||global.conp_h_space&&vsp>chance&&grounded==0){
-					chancetwo=0
+				var _floatthresh=0.75
+				if(global.con_h_space&&vsp>_floatthresh&&grounded==0||global.conp_h_space&&vsp>_floatthresh&&grounded==0){
 					vsp=2-Control.talentmapArray[23,1]*0.25
-				
-					if(passivefourArray[1,0]==0){
-						chancetwo=1
-					
-						passivefourArray[1,0]=instance_create_depth(xpos,ypos,0,Abil)
-						with(passivefourArray[1,0]){
-			
+
+					if(passivefourArray[1,55]==noone){
+
+						passivefourArray[1,55]=instance_create_depth(xpos,ypos,0,Abil)
+						with(passivefourArray[1,55]){
+
 							startx=x
 							starty=y
-			
-							count=7			
+
+							count=7
 							sprite_index=abil_tree_spr
 							depth=other.depth+1
-						
+
 							image_speed=0
 							type=1
 							pin=69
@@ -2671,7 +2716,7 @@ chance=2
 							dmg=0
 							creator=other.id
 							spin=1
-						
+
 							if(other.passivefourArray[1,5]==0){
 								img=44
 							}else{
@@ -2690,12 +2735,12 @@ chance=2
 							vsp=0
 							speed=0
 							image_angle=0
-						}						
-					
+						}
+
 					}else{
-					
-						if(instance_exists(passivefourArray[1,0])){
-							with(passivefourArray[1,0]){
+
+						if(instance_exists(passivefourArray[1,55])){
+							with(passivefourArray[1,55]){
 								x=other.x+2
 								if(other.passivefourArray[1,5]==0){
 									y=other.y-2
@@ -2703,27 +2748,27 @@ chance=2
 									y=other.y-12
 								}
 								dur=10
-							}					
-					
-						chancetwo=1
+							}
+
 						if(grounded==1){
-							with(passivefourArray[1,0]){
+							with(passivefourArray[1,55]){
 								instance_destroy()
 							}
-							passivefourArray[1,0]=0
-						}	
-						}else{
-							passivefourArray[1,0]=0
+							passivefourArray[1,55]=noone
 						}
+						}else{
+							passivefourArray[1,55]=noone
+						}
+
 					}
-				
+
 				}else{
-						if(instance_exists(passivefourArray[1,0])){
-							with(passivefourArray[1,0]){
+						if(passivefourArray[1,55]!=noone&&instance_exists(passivefourArray[1,55])){
+							with(passivefourArray[1,55]){
 								instance_destroy()
 							}
-							passivefourArray[1,0]=0	
-						}			
+							passivefourArray[1,55]=noone
+						}
 				}
 			}
 		
@@ -3373,13 +3418,100 @@ if(passivefourArray[1,0] < passivefourArray[1,5] && wep == 0){
 
 		
 	}else{
-	
+#region Goblin Class
+	//____________________________________________________________________________---------------------(Goblin)---------------------____________________________________________________________________________
+	if(class==10){
+		if(classcheck==1){
+			classcheck=0
+			hp=14
+			hptotalback=hp
+			mespr=me_spr
+			wep=0
+			maskextra=0
+			maskdraw=0
+			mespr=me_mask_goblin_spr
+			animsave=9
+
+				abilArray[0,2]=60
+				abilArray[1,2]=720
+				abilArray[2,2]=640
+				passive=noone
+
+				abilArray[16,0]=100
+				abilArray[16,1]=0
+				abilArray[16,2]=0
+				abilArray[16,3]=0
+				abilArray[16,4]=1000
+
+				abilArray[16,5]=0
+				abilArray[16,6]=0
+				abilArray[16,7]=0
+				abilArray[16,8]=0
+				abilArray[16,9]=0
+				abilArray[16,10]=0
+				//x
+				abilArray[16,11]=0
+				//y
+				abilArray[16,12]=0
+
+				wepanim=0
+
+				//Shield hitbox instance
+				goblin_shield=instance_create_depth(x,y,depth+1,Abil)
+				with(goblin_shield){
+					sprite_index=abil_goblin_shield_spr
+					mask_index=abil_goblin_shield_spr
+					image_speed=0
+					pin=95
+					en=0
+					phase=-1
+					move=0
+					dur=99999999
+					durtotal=dur
+					visible=false
+				}
+
+		}
+
+		//Goblin per-frame logic
+
+		//Shield follow player
+		if(instance_exists(goblin_shield)){
+			goblin_shield.x=x+hsp
+			goblin_shield.y=y+vsp
+			goblin_shield.image_xscale=dir
+		}
+
+		//Dig hole spawn
+		if(variable_instance_exists(id,"dig_hole")&&dig_hole==1){
+			dig_hole=0
+			created=instance_create_depth(x-8,y-7,depth+1,Part)
+			with(created){
+				pin=1
+				type=1
+				mask_index=dummy_spr
+				sprite_index=abil_goblin_node_spr
+				img=choose(7,8,9)
+				image_index=img
+				imgcap=0
+				imgsped=0
+				image_speed=0
+				hsp=0
+				vsp=0
+				dur=300
+				durtotal=dur
+			}
+		}
+
+	}else{
+
 	//Class
 	}
-#endregion	
+#endregion
+#endregion
 
 	}
-		}}}}}
+		}}}}}}
 		}
 	}
 	}

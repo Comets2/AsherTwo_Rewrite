@@ -13,10 +13,14 @@ diddmg=0
 partArray[0]=0
 partmake=0
 nodestroy=0
+blockable=0
+returnable=0
+returned=0
+durtotal=0
 	img=0
 	imgcap=0
 	imgsped=0
-	
+
 sndone=snd_thud_small_1
 sndtwo=snd_thud_small_2
 

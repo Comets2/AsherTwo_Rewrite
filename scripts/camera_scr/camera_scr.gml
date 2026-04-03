@@ -2,13 +2,19 @@ function camera_scr() {
 	xto=camtarget.x
 	yto=camtarget.y-8
 
-	if(hurtdraw>1){
-		hurtdraw=1
+	if(hurtdraw!=0){
+		if(instance_exists(Me)&&Me.hurttimer>Me.hurttimertotal-18){
+			if(hurtdraw>1){
+				hurtdraw=1
+			}
+		}else{
+			hurtdraw=0
+		}
 	}
 
 		if(screenshake>0){
 			screenshake-=1
-		
+
 			if(screenshaketick==0){
 				if(screenshakeamt<1){
 					screenshakeamt+=1
@@ -20,8 +26,11 @@ function camera_scr() {
 					screenshakeamt-=1
 				}else{
 					screenshaketick=0
-				}			
+				}
 			}
+		}else{
+			screenshakeamt=0
+			screenshaketick=0
 		}
 
 	if(players>1){
@@ -89,15 +98,15 @@ function camera_scr() {
 			yto=playercamy
 		}
 	
-	camx += ((xto - camx)/10)+Control.screenshakeamt
-	camy += ((yto - camy)/10)+Control.hurtdraw
+	camx += ((xto - camx)/10)
+	camy += ((yto - camy)/10)
 
 	if(camtarget==noone){
 		xto=0
 		yto=0
 	}
 
-	vm = matrix_build_lookat(camx,camy,-10,camx,camy,0,0,1,0)
+	vm = matrix_build_lookat(camx+Control.screenshakeamt,camy+Control.hurtdraw,-10,camx+Control.screenshakeamt,camy+Control.hurtdraw,0,0,1,0)
 	camera_set_view_mat(camera,vm)
 
 

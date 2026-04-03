@@ -108,6 +108,7 @@ function controls_scr(){
 	global.con_p_8=keyboard_check_pressed(ord("8"))
 	global.con_p_9=keyboard_check_pressed(ord("9"))
 	global.con_p_0=keyboard_check_pressed(ord("0"))
+	global.con_p_minus=keyboard_check_pressed(189)
 
 
 	    gamep1=0 // Use the first gamepad slot

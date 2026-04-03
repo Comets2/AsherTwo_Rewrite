@@ -42,6 +42,164 @@ function level_run_scr() {
 	stagetimer+=1
 	}
 
+#region Goblin Passive Node Spawning
+	if(Me.class==10&&pause==0){
+		//Timer: lvlArray[1000,30] counts down, spawns a node when it hits 0
+		//Starts at 0 so first node spawns on first eligible frame (stagetimer>2)
+		if(lvlArray[1000,30]<=0&&stagetimer>2){
+			//Reset timer for next node (every 600 ticks = 10 seconds)
+			lvlArray[1000,30]=600
+
+			//Raycast UP from player to find ceiling
+			var _ceiling_y=Me.y
+			for(var _cy=Me.y-1;_cy>mapy;_cy-=1){
+				if(position_meeting(Me.x,_cy,Block)){
+					break
+				}
+				_ceiling_y=_cy
+			}
+
+			//Skip if already at max nodes (3), recheck in 1 second
+			var _node_count=0
+			with(Abil){ if(pin==93){ _node_count+=1 } }
+			if(_node_count>=3){
+				lvlArray[1000,30]=60
+			}else{
+
+			//Find a valid position using raycast
+			var _placed=false
+			var _attempts=0
+			while(!_placed&&_attempts<15){
+				_attempts+=1
+
+				//Pick random horizontal target from player
+				var _target_x=Me.x+irandom(160)*choose(1,-1)
+
+				//Raycast HORIZONTALLY to check for walls
+				var _final_x=_target_x
+				if(collision_line(Me.x,Me.y,_target_x,Me.y,Block,false,true)){
+					var _dir_sign=sign(_target_x-Me.x)
+					_final_x=Me.x
+					for(var _cx=Me.x;_cx!=_target_x;_cx+=_dir_sign){
+						if(position_meeting(_cx,Me.y,Block)){
+							break
+						}
+						_final_x=_cx
+					}
+				}
+
+				//Skip if too close to player
+				if(abs(_final_x-Me.x)<32){ continue }
+
+				//Keep 32px buffer from walls (step back from wall)
+				var _dir_sign=sign(_final_x-Me.x)
+				while(position_meeting(_final_x+16*_dir_sign,Me.y,Block)&&abs(_final_x-Me.x)>32){
+					_final_x-=_dir_sign
+				}
+				if(abs(_final_x-Me.x)<32){ continue }
+
+				//Raycast DOWN from ceiling at target x to find floor
+				var _floor_y=-1
+				for(var _fy=_ceiling_y;_fy<mapy+(rmh+2)*16;_fy+=1){
+					if(position_meeting(_final_x,_fy,Block)){
+						_floor_y=_fy
+						break
+					}
+				}
+
+				//Skip if no floor found
+				if(_floor_y==-1){ continue }
+
+				//Skip if floor is a slope block (image_index 2 or 3)
+				var _floor_block=instance_position(_final_x,_floor_y,Block)
+				if(_floor_block!=noone&&(_floor_block.image_index==2||_floor_block.image_index==3)){ continue }
+
+				//Snap to 16x16 grid and place 1px down so it doesn't look floating
+				var _wx=floor((_final_x+8)/16)*16-8
+				var _wy=_floor_y-16+1
+
+				//Create narrow invisible Block as collision body early for overlap checks
+				var _block=instance_create_depth(_wx+2,_wy,0,Block)
+				with(_block){
+					sprite_index=abil_goblin_node_spr
+					image_index=0
+					image_speed=0
+					image_xscale=0.75
+					visible=false
+				}
+
+				//Check overlap with existing nodes (pin 93), player, and enemies
+				var _overlapping=false
+				with(Abil){
+					if(pin==93&&abs(x-_wx)<16&&abs(y-_wy)<16){
+						_overlapping=true
+						break
+					}
+				}
+				if(!_overlapping){
+					with(_block){
+						if(instance_place(x,y,Me)){ _overlapping=true }
+					}
+				}
+				if(!_overlapping){
+					with(_block){
+						if(instance_place(x,y,Enemy)){ _overlapping=true }
+					}
+				}
+				if(_overlapping){
+					instance_destroy(_block)
+					continue
+				}
+				var _nodeType=choose(0,1) //0=stone,1=tree
+
+				created=instance_create_depth(_wx,_wy,5,Abil)
+				with(created){
+					pin=93
+					en=0
+					type=_nodeType
+					phase=0
+					move=0
+					diddmg=0
+					sprite_index=abil_goblin_node_spr
+					image_speed=0
+
+					if(type==0){
+						img=choose(1,2,3) //Stone
+					}else{
+						img=choose(4,5,6) //Tree
+					}
+					image_index=img
+					imgcap=0
+					imgsped=0
+
+					dur=10
+					durtotal=60
+					dir=1
+					imgangle=0
+					hsp=0
+					vsp=0
+
+					//Base position for shake offset
+					startx=x
+					starty=y
+
+					//Shake state
+					shake_amount=0
+					shake_x=0
+					shake_y=0
+
+					//Reference to collision Block
+					node_block=_block
+				}
+
+				_placed=true
+			}
+			}
+		}else{
+			lvlArray[1000,30]-=1
+		}
+	}
+#endregion
 
 #region Monster Camps
 	if(lvlArray[1000,0]==1){
@@ -540,7 +698,7 @@ function level_run_scr() {
 		}
 	
 	//Timer
-	if(miniArray[0,1]==0){
+	if(miniArray[0,1]==0&&exitdoor==0){
 			exitdoor=1
 			mapdataArray[mapArray[mapdataArray[1001,0],mapdataArray[1001,1]],10]=floor(Control.lvlArray[1000,4]/10)
 			with(Abil){
@@ -565,102 +723,6 @@ function level_run_scr() {
 	if(lvlArray[1000,8] mod 200 ==0){
 
 	if(lvlArray[1000,8]>=3600){
-		if(lvlArray[1000,8]>=7200){
-		if(mapdataArray[1001,8]<5){
-		chance=8
-		}else{
-		chance=16
-		}
-	
-	
-		if(irandom(100)<=chance){
-		created=instance_create_depth(random_range(mapxspot+48,mapxspottotal-48),mapy+150,9,Enemy)
-							created.pin=3
-							created.enopt=5
-		}
-	}
-#region Leaf Attack							
-										enopt=lvlArray[1010,23]
-										chance=1
-										for(i=0;i<chance;i+=1){
-											created=instance_create_depth(random_range(mapxspot-8,mapxspottotal+8),mapy,10,Abil)
-											with(created){
-												sprite_index=enemy_abil_spr
-												pin=33
-												image_speed=0
-												imgsped=0
-											
-													if(other.enopt==0){
-														img=22+irandom(3)
-													}else{
-														img=22+irandom(3)+4
-													}
-														
-												image_index=img
-												imgcap=1	
-												en=1
-												sped=0.2
-												dmg=2
-												startx=x
-												starty=y
-												rangetick=other.i
-												range=24
-												diddmg=0
-												hsp=0
-												if(other.i==1){
-													vsp=0.1
-												}else{
-													if(other.i==2){
-														vsp=0.15
-													}else{
-														vsp=0.2
-													}
-												}
-												vsp+=random(0.2)
-												imgangle=0
-										
-												dur=2100
-												move=1
-												phasecheck=1
-												imgangle=choose(0,180)
-											}		
-										}
-#endregion		
-
-		if(irandom(100)<=66){
-				created=instance_create_depth(random_range(mapxspot+26,mapxspottotal-26),mapy+150,9,Abil)
-				with(created){
-					sprite_index=enemy_abil_spr
-					pin=30
-					spin=choose(random_range(-4,-2),random_range(2,4))
-					image_speed=0
-					imgsped=0
-					img=4+choose(0,1)
-			
-					image_index=img
-					imgcap=0
-					dmg=1
-					phase=0
-
-					dur=400
-					grav=0.01
-					vsp=0
-					hsp=0
-					imgangle=0
-					dir=1
-					yrebound=0.4
-					part=1
-						
-					en=1
-					type=1
-					move=1
-					diddmg=0
-					creator=other.id
-					phase=0
-					phasecheck=1	
-					imgangle=random(360)
-				}
-		}
 	}
 		for(i=0;i<2;i+=1){
 			created=instance_create_depth(random_range(mapxspot+26,mapxspottotal-26),mapy+150,9,Abil)
@@ -1034,7 +1096,7 @@ function level_run_scr() {
 
 	}
 	//Timer
-	if(miniArray[0,1]==0){
+	if(miniArray[0,1]==0&&exitdoor==0){
 			exitdoor=1
 			mapdataArray[mapArray[mapdataArray[1001,0],mapdataArray[1001,1]],10]=floor(Control.lvlArray[1000,4]/10)
 			with(Abil){

@@ -319,6 +319,7 @@ function map_gen_scr() {
 								}
 							}
 						}
+					chance = clamp(chance, 0, 4);
 					if(b<5){
 						if(b>2){
 							if(b==44){

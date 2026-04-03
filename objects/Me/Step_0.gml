@@ -25,6 +25,107 @@ if(hit!=noone){
 					}
 				}
 			}else{
+				//Pop Tart heal pickup
+				if(hit.type==4){
+					if(hp<hptotal||Control.talentmapArray[21,1]>0){
+						audio_play_sound(choose(snd_coin_1,snd_coin_2,snd_coin_3),8, false)
+						if(hp<hptotal){
+							healrecieved=1
+							healtick=1
+						}
+						//Sugar Rush buff on pickup
+						if(Control.talentmapArray[21,1]>0){
+							passivefourArray[1,10]+=300
+							passivefourArray[1,17]=passivefourArray[1,10]
+						}
+						with(hit){
+							instance_destroy()
+						}
+					}
+				}else{
+				//Goblin mining/digging ore pickup (delay pickup for 30 frames)
+				if((hit.type==5||hit.type==6)&&(hit.durtotal-hit.dur)>=60){
+					audio_play_sound(choose(snd_coin_1,snd_coin_2,snd_coin_3),8, false)
+
+					var _show_visual=true
+					var _hit_img=hit.img
+
+					if(hit.type==6){
+						//Coin drop - add gold
+						Control.mapdataArray[1000,5]+=1
+					}else if(_hit_img==97||_hit_img==129){
+						//Grass clump / Seaweed - no reward, no visual
+						_show_visual=false
+					}else if(_hit_img==135){
+						//Small fish - heal 0.5
+						hp=min(hp+0.5,hptotal)
+						healrecieved=1
+						healtick=1
+					}else if(_hit_img==130){
+						//Big fish - heal 1
+						hp=min(hp+1,hptotal)
+						healrecieved=1
+						healtick=1
+					}else if(_hit_img==128){
+						//Treasure chest - drop 2-4 coins
+						var _coins=irandom_range(2,4)
+						for(var _c=0;_c<_coins;_c+=1){
+							var _coin=instance_create_depth(hit.x,hit.y,0,Part)
+							with(_coin){
+								pin=2
+								type=6
+								sprite_index=spr_items
+								image_speed=0
+								img=96
+								image_index=img
+								imgcap=0
+								imgsped=0
+								dur=600
+								durtotal=dur
+								hsp=random_range(-1,1)
+								vsp=random_range(-2,-1)
+								grav=0.12
+								gravtwo=0.02
+							}
+						}
+					}else if(_hit_img==112||_hit_img==113||_hit_img==114){
+						//Gem (Sapphire/Emerald/Ruby) - give xp
+						Control.mapdataArray[1000,5]+=1
+						Control.xpamount+=5
+					}else{
+						//Stone/Wood/other - add gold
+						Control.mapdataArray[1000,5]+=1
+					}
+
+					if(_show_visual){
+						//Count existing pickup sprites to offset
+						var _pickup_count=0
+						with(Part){
+							if(pin==1&&type==1&&phase==2){ _pickup_count+=1 }
+						}
+						//Show picked up item over head (offset by existing count)
+						created=instance_create_depth(x,y-13,depth-10,Part)
+						with(created){
+							pin=1
+							type=1
+							sprite_index=other.hit.sprite_index
+							image_index=other.hit.image_index
+							image_speed=0
+							img=other.hit.img
+							imgcap=0
+							imgsped=0
+							hsp=0
+							vsp=-0.15
+							dur=40
+							durtotal=dur
+							phase=2
+							starty=-_pickup_count*6
+						}
+					}
+					with(hit){
+						instance_destroy()
+					}
+				}else{
 				if(class==4){
 					if(hit.type==3){
 						chance=hit.img
@@ -36,7 +137,7 @@ if(hit!=noone){
 							depth=other.depth+1
 							spin=1
 							img=113+(other.chance-22)*2
-					
+
 							imgcap=1
 							imgsped=0
 							image_speed=0
@@ -47,7 +148,7 @@ if(hit!=noone){
 							vsp=0.3+random(0.3)
 							image_angle-=15
 							image_angle+=random(30)
-							}		
+							}
 						}
 							passivefourArray[0,0]+=1
 							passivefourArray[passivefourArray[0,0],0]=30
@@ -56,6 +157,8 @@ if(hit!=noone){
 								instance_destroy()
 							}
 					}
+				}
+				}
 				}
 			}
 		}
@@ -349,7 +452,20 @@ if(global.con_p_1){
 											classcheck=1	
 										}
 									}else{
+										if(global.con_p_minus){
+											if(global.con_h_m){
 
+												with(Control){
+													lvlselect=6
+													worldgen_scr()
+												}
+											}else{
+												class=10
+												classcheck=1
+											}
+										}else{
+
+										}
 									}
 								}
 							}

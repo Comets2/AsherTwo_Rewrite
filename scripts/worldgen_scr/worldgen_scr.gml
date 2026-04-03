@@ -223,6 +223,8 @@ function worldgen_scr() {
 					lvlArray[1000,7]=0
 					//Level random option
 					lvlArray[1000,8]=0
+					//Goblin node spawn flag
+					lvlArray[1000,30]=0
 				
 					//Timer (60*180=3 minutes)
 					miniArray[1,1]=(60*180)+1

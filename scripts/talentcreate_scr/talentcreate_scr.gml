@@ -5,7 +5,7 @@ if(Me.class==0){
 	Me.class=2
 	Me.classcheck=1
 	//CLASS map 
-	for(a=0;a<10;a+=1){
+	for(a=0;a<11;a+=1){
 		for(b=0;b<10;b+=1){
 			if(b==1){
 				classArray[a,b]=1
@@ -23,9 +23,11 @@ if(Me.class==0){
 	classArray[6,0]="Super"
 	classArray[7,0]="Treeling"
 	classArray[8,0]="CakeQueen"
-	for(a=0;a<10;a+=1){
+	classArray[9,0]="Trash"
+	classArray[10,0]="Goblin"
+	for(a=0;a<11;a+=1){
 		//Level
-		classArray[a,1]=1
+		classArray[a,1]=30
 		//Experience Current
 		classArray[a,2]=0
 		//Experience Total
@@ -131,29 +133,30 @@ if(Me.class==2){
 		talentmapArray[6,9]="Damage +25%"
 		
 	//Q2
-		talentmapArray[7,0]="Sprout"
+		talentmapArray[7,0]="Scarecrow"
 		talentmapArray[7,6]=15
 		talentmapArray[7,4]=1
 		talentmapArray[7,3]=3
 		talentmapArray[7,2]=3
 		talentmapArray[7,7]="Ability"
-		talentmapArray[7,8]="Minion Control"
-		talentmapArray[7,9]="Area Damage"
+		talentmapArray[7,8]="Place Scarecrow"
+		talentmapArray[7,9]="Swap Positions"
 
-		talentmapArray[8,0]="Sprout"
+		talentmapArray[8,0]="Straw Stuffing"
 		talentmapArray[8,6]=20
 		talentmapArray[8,5]=7
 		talentmapArray[8,7]="Buff"
-		talentmapArray[8,8]="Spread Damage"
+		talentmapArray[8,8]="Cooldown -"
 
-		talentmapArray[9,0]="Sprout"
+		talentmapArray[9,0]="Haunted Scarecrow"
 		talentmapArray[9,2]=1
 		talentmapArray[9,3]=1
 		talentmapArray[9,4]=3
 		talentmapArray[9,6]=25
 		talentmapArray[9,5]=8
 		talentmapArray[9,7]="Modify"
-		talentmapArray[9,8]="Spread Damage"
+		talentmapArray[9,8]="Phase Through"
+		talentmapArray[9,9]="Cooldown -"
 	
 	//W
 		talentmapArray[10,0]="Haunt"
@@ -1119,7 +1122,7 @@ if(Me.class==6){
 		talentmapArray[7,8]="Minion Control"
 		talentmapArray[7,9]="Area Damage"
 
-		talentmapArray[8,0]="Toaster"
+		talentmapArray[8,0]="Extra Crispy"
 		talentmapArray[8,6]=20
 		talentmapArray[8,5]=7
 		talentmapArray[8,7]="Buff"
@@ -1211,29 +1214,29 @@ if(Me.class==6){
 		talentmapArray[18,8]="Large Area"
 		
 	//P2
-		talentmapArray[19,0]="BalancedBkfst"
+		talentmapArray[19,0]="ToasterPastry"
 		talentmapArray[19,6]=10
 		talentmapArray[19,4]=1
 		talentmapArray[19,3]=3
 		talentmapArray[19,2]=3
 		talentmapArray[19,7]="Passive"
-		talentmapArray[19,8]="Buff Attack"
+		talentmapArray[19,8]="10% Heal Drop"
 
-		talentmapArray[20,0]="BalancedBkfst"
+		talentmapArray[20,0]="LongerToasting"
 		talentmapArray[20,6]=20
 		talentmapArray[20,5]=19
 		talentmapArray[20,7]="Buff"
-		talentmapArray[20,8]="Large Area"
+		talentmapArray[20,8]="Drop +2%"
 
-		talentmapArray[21,0]="Super Crust"
+		talentmapArray[21,0]="Sugar Rush"
 		talentmapArray[21,2]=1
 		talentmapArray[21,3]=1
 		talentmapArray[21,4]=3
-		talentmapArray[21,6]=25	
+		talentmapArray[21,6]=25
 		talentmapArray[21,5]=20
 		talentmapArray[21,7]="Modify"
-		talentmapArray[21,8]="Large Area"
-	
+		talentmapArray[21,8]="Speed+Att Buff"
+
 	//Extra 1
 		talentmapArray[22,0]="The Arches"
 		talentmapArray[22,4]=1
@@ -1412,7 +1415,7 @@ if(Me.class==7){
 		talentmapArray[18,8]="Large Area"
 		
 	//P2
-		talentmapArray[19,0]="BalancedBkfst"
+		talentmapArray[19,0]="ToasterPastry"
 		talentmapArray[19,6]=10
 		talentmapArray[19,4]=1
 		talentmapArray[19,3]=3
@@ -1843,11 +1846,201 @@ if(Me.class==9){
 		talentmapArray[23,7]="Stat"
 		talentmapArray[23,8]="Speed +2%"
 }else{
+#region Goblin Talents
+if(Me.class==10){
+
+	//E ability
+		talentmapArray[1,0]="Goblin Strike"
+		talentmapArray[1,4]=1
+		talentmapArray[1,6]=1
+		talentmapArray[1,5]=0
+		talentmapArray[1,7]="Buff"
+		talentmapArray[1,8]="-5% Cooldown"
+
+		//Unlock level
+		talentmapArray[2,0]="Goblin Strike"
+		talentmapArray[2,6]=10
+		talentmapArray[2,4]=1
+		talentmapArray[2,7]="Buff"
+		talentmapArray[2,8]="Duration +5%"
+
+		talentmapArray[3,0]="Goblin Strike"
+		talentmapArray[3,2]=1
+		talentmapArray[3,3]=1
+		talentmapArray[3,6]=20
+		talentmapArray[3,5]=2
+		talentmapArray[3,7]="Modify"
+		talentmapArray[3,8]="Area +"
+		talentmapArray[3,9]="Damage +25%"
+
+	//Q
+		talentmapArray[4,0]="Goblin Trick"
+		talentmapArray[4,6]=5
+		talentmapArray[4,4]=1
+		talentmapArray[4,3]=3
+		talentmapArray[4,2]=3
+		talentmapArray[4,7]="Ability"
+		talentmapArray[4,8]="Spread Dmg"
+		talentmapArray[4,9]="Damage +5%"
+
+		talentmapArray[5,0]="Goblin Trick"
+		talentmapArray[5,6]=15
+		talentmapArray[5,5]=4
+		talentmapArray[5,7]="Buff"
+		talentmapArray[5,8]="+Duration"
+
+		talentmapArray[6,0]="Goblin Trick"
+		talentmapArray[6,2]=1
+		talentmapArray[6,3]=1
+		talentmapArray[6,4]=3
+		talentmapArray[6,6]=20
+		talentmapArray[6,5]=5
+		talentmapArray[6,7]="Modify"
+		talentmapArray[6,8]="Mobility +"
+		talentmapArray[6,9]="Damage +25%"
+
+	//Q2
+		talentmapArray[7,0]="Goblin Trap"
+		talentmapArray[7,6]=15
+		talentmapArray[7,4]=1
+		talentmapArray[7,3]=3
+		talentmapArray[7,2]=3
+		talentmapArray[7,7]="Ability"
+		talentmapArray[7,8]="Area Damage"
+		talentmapArray[7,9]="Area Damage"
+
+		talentmapArray[8,0]="Goblin Trap"
+		talentmapArray[8,6]=20
+		talentmapArray[8,5]=7
+		talentmapArray[8,7]="Buff"
+		talentmapArray[8,8]="+Duration"
+
+		talentmapArray[9,0]="Goblin Trap"
+		talentmapArray[9,2]=1
+		talentmapArray[9,3]=1
+		talentmapArray[9,4]=3
+		talentmapArray[9,6]=25
+		talentmapArray[9,5]=8
+		talentmapArray[9,7]="Modify"
+		talentmapArray[9,8]="Spread Damage"
+
+	//W
+		talentmapArray[10,0]="Goblin Rush"
+		talentmapArray[10,6]=10
+		talentmapArray[10,4]=1
+		talentmapArray[10,3]=3
+		talentmapArray[10,2]=3
+		talentmapArray[10,7]="Ability"
+		talentmapArray[10,8]="High Damage"
+		talentmapArray[10,9]="Area Damage"
+
+		talentmapArray[11,0]="Goblin Rush"
+		talentmapArray[11,6]=20
+		talentmapArray[11,5]=10
+		talentmapArray[11,7]="Buff"
+		talentmapArray[11,8]="-5% Cooldown"
+
+		talentmapArray[12,0]="Goblin Rush"
+		talentmapArray[12,2]=1
+		talentmapArray[12,3]=1
+		talentmapArray[12,4]=3
+		talentmapArray[12,6]=25
+		talentmapArray[12,5]=11
+		talentmapArray[12,7]="Modify"
+		talentmapArray[12,8]="AOE +"
+		talentmapArray[12,9]="Damage +25%"
+
+	//W2
+		talentmapArray[13,0]="Goblin Snare"
+		talentmapArray[13,6]=20
+		talentmapArray[13,4]=1
+		talentmapArray[13,3]=3
+		talentmapArray[13,2]=3
+		talentmapArray[13,7]="Ability"
+		talentmapArray[13,8]="Area Damage"
+		talentmapArray[13,9]="Mobility"
+
+		talentmapArray[14,0]="Goblin Snare"
+		talentmapArray[14,6]=25
+		talentmapArray[14,5]=13
+		talentmapArray[14,7]="Buff"
+		talentmapArray[14,8]="Damage +5%"
+
+		talentmapArray[15,0]="Goblin Snare"
+		talentmapArray[15,2]=1
+		talentmapArray[15,3]=1
+		talentmapArray[15,4]=3
+		talentmapArray[15,6]=25
+		talentmapArray[15,5]=14
+		talentmapArray[15,7]="Modify"
+		talentmapArray[15,8]="Gravity -"
+		talentmapArray[15,9]="Damage +25%"
+
+	//P
+		talentmapArray[16,0]="Goblin Passive"
+		talentmapArray[16,6]=0
+		talentmapArray[16,4]=1
+		talentmapArray[16,3]=3
+		talentmapArray[16,2]=3
+		talentmapArray[16,7]="Passive"
+		talentmapArray[16,8]="Block Damage"
+
+		talentmapArray[17,0]="Goblin Passive"
+		talentmapArray[17,6]=5
+		talentmapArray[17,5]=16
+		talentmapArray[17,7]="Buff"
+		talentmapArray[17,8]="Large Area"
+
+		talentmapArray[18,0]="Goblin Passive"
+		talentmapArray[18,2]=1
+		talentmapArray[18,3]=1
+		talentmapArray[18,4]=3
+		talentmapArray[18,6]=15
+		talentmapArray[18,5]=17
+		talentmapArray[18,7]="Modify"
+		talentmapArray[18,8]="Large Area"
+
+	//P2 E Deflect
+		talentmapArray[19,0]="Goblin Deflect"
+		talentmapArray[19,6]=10
+		talentmapArray[19,4]=1
+		talentmapArray[19,3]=3
+		talentmapArray[19,2]=3
+		talentmapArray[19,5]=1
+		talentmapArray[19,7]="Ability"
+		talentmapArray[19,8]="E Blocks Projectiles"
+
+		talentmapArray[20,0]="Goblin Deflect"
+		talentmapArray[20,6]=20
+		talentmapArray[20,5]=19
+		talentmapArray[20,2]=1
+		talentmapArray[20,3]=1
+		talentmapArray[20,4]=3
+		talentmapArray[20,7]="Modify"
+		talentmapArray[20,8]="Return Projectiles"
+
+	//Extra 1
+		talentmapArray[22,0]="Goblin Gold"
+		talentmapArray[22,4]=1
+		talentmapArray[22,6]=0
+		talentmapArray[22,5]=0
+		talentmapArray[22,7]="Modify"
+		talentmapArray[22,8]="Duration +20%"
+
+	//Extra 2
+		talentmapArray[23,0]="Goblin Speed"
+		talentmapArray[23,4]=1
+		talentmapArray[23,6]=5
+		talentmapArray[23,5]=0
+		talentmapArray[23,7]="Stat"
+		talentmapArray[23,8]="Speed +2%"
+}else{
 #endregion
 
 
 }
 
+}
 }
 }
 }
@@ -1910,14 +2103,13 @@ if(Me.class==9){
 	talentmapuiArray[5,4]=17 
 	talentmapuiArray[5,2]=18 
 	
-	//P2
-	talentmapuiArray[6,3]=19 
+	//P2 E Deflect
+	talentmapuiArray[6,3]=19
 	talentmapuiArray[6,1]=20
-	talentmapuiArray[6,0]=21 
 
 	//Extra 1
 	talentmapuiArray[4,5]=22
-	
+
 	//Extra 2
 	talentmapuiArray[4,4]=23
 

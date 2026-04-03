@@ -3,8 +3,14 @@ function part_run_scr() {
 		with(Part){
 			if(pin==1){
 				if(type==1){
-					x+=hsp
-					y+=vsp
+					if(phase==2){
+						x=Me.x
+						starty+=vsp
+						y=Me.y-13+starty
+					}else{
+						x+=hsp
+						y+=vsp
+					}
 				}else{
 				
 					if(type==2){
@@ -229,8 +235,75 @@ function part_run_scr() {
 								hsp=0
 							}
 						}
+						//Goblin ore/dig item player attraction (delay pickup for 30 frames)
+						if((type==5||type==6)&&(durtotal-dur)>=60){
+							var _dx=Me.x-x
+							var _dy=Me.y-y
+							var _dist=sqrt(_dx*_dx+_dy*_dy)
+							if(_dist<46&&_dist>1){
+								var _pull=0.15*(1-_dist/46)
+								hsp+=(_dx/_dist)*_pull
+								vsp+=(_dy/_dist)*_pull
+							}
+						}
+						//Pop Tart player attraction
+						if(type==4){
+							var _dx=Me.x-x
+							var _dy=Me.y-y
+							var _dist=sqrt(_dx*_dx+_dy*_dy)
+							if(_dist<46&&_dist>1){
+								var _pull=0.15*(1-_dist/46)
+								hsp+=(_dx/_dist)*_pull
+								vsp+=(_dy/_dist)*_pull
+							}
+						}
+						//Goblin ore solid collision
+						if(type==5||type==6){
+							if(instance_place(x+hsp,y,Block)){
+								hsp=0
+							}
+							if(instance_place(x,y+vsp,Block)){
+								vsp=0
+							}
+							hsp*=0.92
+							if(abs(hsp)<0.05){ hsp=0 }
+							if(dur<60){
+								visible=(dur mod 12)<6
+							}else{
+								visible=true
+							}
+						}
+						//Pop Tart solid collision
+						if(type==4){
+							if(instance_place(x+hsp,y,Block)){
+								while(!instance_place(x+sign(hsp),y,Block)){
+									x+=sign(hsp)
+								}
+								hsp=0
+							}
+							if(instance_place(x,y+vsp,Block)){
+								while(!instance_place(x,y+sign(vsp),Block)){
+									y+=sign(vsp)
+								}
+								vsp=0
+							}
+							//Push out if stuck
+							while(instance_place(x,y,Block)){
+								y-=1
+							}
+							//Decelerate
+							hsp*=0.92
+							if(abs(hsp)<0.05){ hsp=0 }
+							//Blink when almost expired
+							if(dur<60){
+								visible=(dur mod 12)<6
+							}else{
+								visible=true
+							}
+						}else{
 						if(instance_place(x,y+vsp,Block)){
 								vsp=0
+						}
 						}
 						x+=hsp
 						y+=vsp	

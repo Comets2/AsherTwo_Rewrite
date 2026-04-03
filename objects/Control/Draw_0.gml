@@ -9,11 +9,11 @@ chance=0
 	}
 }
 
-xps=camx-camxtwo
-yps=camy-camytwo
+xps=camx+screenshakeamt-camxtwo
+yps=camy+hurtdraw-camytwo
 
-xpstwo=camx+camxtwo
-ypstwo=camy+camytwo
+xpstwo=camx+screenshakeamt+camxtwo
+ypstwo=camy+hurtdraw+camytwo
 
 xpos=floor((xps-mapx)/blockwidth)
 xpostwo=xpos+18+chance*2
@@ -1120,8 +1120,8 @@ with(Enemy){
 #region UI
 
 #region Damage Array
-xps=camx-camxtwo
-yps=camy-camytwo
+xps=camx+screenshakeamt-camxtwo
+yps=camy+hurtdraw-camytwo
 
 //0,0=amount/0,1=timertotal//1,0=timer/1,1=dmg/1,2=x/1,3=y/1,4=typ
 if(dmgArray[0,0]>=0){
@@ -1237,8 +1237,8 @@ for(var i=0;i<Me.hp;i+=1){
 }
 
 #region Target UI
-xpstwo=camx+camxtwo
-ypstwo=camy+camytwo
+xpstwo=camx+screenshakeamt+camxtwo
+ypstwo=camy+hurtdraw+camytwo
 if(target!=noone){
 if(instance_exists(target)){	
 	with(target){
@@ -2307,9 +2307,61 @@ if(pause==2&&pauseopt==2){
 				draw_text_ext_transformed(xps-0.5+224,yps+43, talentmapArray[chance,7] ,0,1000,0.5,0.5,0)
 				
 				//Description
-				draw_text_ext_transformed(xps-0.5+197,yps+43+11, talentmapArray[chance,8] ,0,1000,0.5,0.5,0)
-				if(talentmapArray[chance,9]!=0){
-					draw_text_ext_transformed(xps-0.5+197,yps+43+22, talentmapArray[chance,9] ,0,1000,0.5,0.5,0)
+				if(Me.class==6&&chance>=1&&chance<=23){
+					var _desc=""
+					if(chance==1){
+						_desc="Extends punch reach by +"+string(talentmapArray[1,1]*0.3)+" per point"
+					}else if(chance==2){
+						_desc="Punch damage +"+string(talentmapArray[2,1]*5)+"% per point"
+					}else if(chance==3){
+						_desc="Unlocks a 3rd combo hit with a heavy punch"
+					}else if(chance==4){
+						_desc="Dash forward dealing "+string(5+floor(5*talentmapArray[6,1]*0.25))+" dmg and bouncing off enemies"
+					}else if(chance==5){
+						_desc="Doughnut cooldown reduced by "+string(talentmapArray[5,1]*5)+"% of base"
+					}else if(chance==6){
+						_desc="Doughnut dmg +"+string(talentmapArray[6,1]*25)+"% Press Q to extend flight"
+					}else if(chance==7){
+						_desc="Chargable toast attack 50% armor while toasting"
+					}else if(chance==8){
+						_desc="Toast CD -"+string(talentmapArray[8,1]*20)+" Flight +"+string(talentmapArray[8,1]*18)+" Speed +"+string(talentmapArray[8,1]*0.02)
+					}else if(chance==9){
+						_desc="Toast dmg +"+string(talentmapArray[9,1]*25)+"% CD -"+string(talentmapArray[9,1]*25)+"%"
+					}else if(chance==10){
+						_desc="Charge a waffle then release a projectile that slows enemies on hit"
+					}else if(chance==11){
+						_desc=talentmapArray[chance,8]
+					}else if(chance==12){
+						_desc="Unlocks extra charge stage Waffle dmg +"+string(talentmapArray[12,1]*25)+"%"
+					}else if(chance==13){
+						_desc="Drop a cereal bowl that deals "+string(15+floor(15*talentmapArray[15,1]*0.25+15*talentmapArray[14,1]*0.05))+" dmg scaling with fall speed"
+					}else if(chance==14){
+						_desc="Cereal damage +"+string(talentmapArray[14,1]*5)+"%"
+					}else if(chance==15){
+						_desc="Cereal damage +"+string(talentmapArray[15,1]*25)+"%"
+					}else if(chance==16){
+						_desc="Hold space to hover and glide Max fall speed reduced by "+string(talentmapArray[16,1]*0.35)
+					}else if(chance==17){
+						_desc="Extends hover time by +"+string(talentmapArray[17,1]*11)+" frames and reduces fall speed"
+					}else if(chance==18){
+						_desc="Spawns orbiting breakfast items while hovering that deal dmg on contact"
+					}else if(chance==19){
+						_desc=string(10+talentmapArray[20,1]*2)+"% chance to drop a healing pop tart when toast hits"
+					}else if(chance==20){
+						_desc="Pop tart drop +"+string(talentmapArray[20,1]*2)+"% Toast dmg +"+string(talentmapArray[20,1]*5)+"%"
+					}else if(chance==21){
+						_desc="Picking up pop tarts grants +25% speed and +25% faster cooldowns for 5s"
+					}else if(chance==22){
+						_desc=talentmapArray[chance,8]
+					}else if(chance==23){
+						_desc="Movement speed +"+string(talentmapArray[23,1]*3.4)+"%"
+					}
+					draw_text_ext_transformed(xps-0.5+197,yps+43+11,_desc,22,160,0.35,0.35,0)
+				}else{
+					draw_text_ext_transformed(xps-0.5+197,yps+43+11, talentmapArray[chance,8] ,0,1000,0.5,0.5,0)
+					if(talentmapArray[chance,9]!=0){
+						draw_text_ext_transformed(xps-0.5+197,yps+43+22, talentmapArray[chance,9] ,0,1000,0.5,0.5,0)
+					}
 				}
 				
 				//Cost
@@ -2865,48 +2917,8 @@ if(class!=0&&other.pause==0){
 				
 				//Super Toast
 				if(class==6){
-					//Bacon Breakfast
-					if(Control.talentmapArray[16,1]>0){	
-						chance=(passivefourArray[1,2]/passivefourArray[1,3])*9
-						
-						draw_sprite(abil_super_two_spr,353,other.xps-0.5+78+10-1,other.yps-0.5+138-2+1)
-						
-						if(chance>=9){					
-
-							//Pancake display
-							draw_sprite(abil_super_two_spr,365,other.xps-0.5+78+10-1,other.yps-0.5+138-2+2)	
-							//Full
-							draw_sprite(abil_super_two_spr,284,other.xps-0.5+78+10-1,other.yps-0.5+138-2+1)							
-						}else{
-							
-							//Pancake display
-							draw_sprite(abil_super_two_spr,355+chance,other.xps-0.5+78+10-1,other.yps-0.5+138-2+2)
-						}
-					}
-					//Balanced Breakfast 
-					if(Control.talentmapArray[19,1]>0){	
-						draw_sprite(abil_super_two_spr,276,other.xps-0.5+73-10,other.yps-0.5+140-2)
-						
-						//Item 1
-						draw_sprite(abil_super_two_spr,285+(5*passivefourArray[1,12]),other.xps-0.5+73-17,other.yps-0.5+141-2)
-						
-						//Item 2
-						if(passivefourArray[1,13]==0){
-							draw_sprite(abil_super_two_spr,285+(5*passivefourArray[1,14]),other.xps-0.5+73-10,other.yps-0.5+141-2)
-						}else{
-							draw_sprite(abil_super_two_spr,285+passivefourArray[1,13]+(5*passivefourArray[1,14]),other.xps-0.5+73-10,other.yps-0.5+141-2)
-						}
-						//Item 3
-						if(passivefourArray[1,15]==0){
-							draw_sprite(abil_super_two_spr,285+(5*passivefourArray[1,16]),other.xps-0.5+73-3,other.yps-0.5+141-2)
-						}else{
-							draw_sprite(abil_super_two_spr,285+2+passivefourArray[1,15]+(5*passivefourArray[1,16]),other.xps-0.5+73-3,other.yps-0.5+141-2)
-						}
-						
-						if(passivefourArray[1,10]>0){
-							draw_sprite(abil_super_two_spr,277,other.xps-0.5+73-10,other.yps-0.5+140-2)
-						}
-					}
+					//Bacon Breakfast (charge UI removed)
+					//Toaster Pastry (no UI needed)
 				}else{
 
 					//Tree
@@ -3001,6 +3013,220 @@ if(class!=0&&other.pause==0){
 	}
 }
 #endregion
+
+#region Scarecrow Off-Screen Indicator
+if(class==1&&Control.talentmapArray[7,1]>0&&passive!=noone&&instance_exists(passive)){
+	var _sx=passive.x
+	var _sy=passive.y
+	var _margin=8
+	var _onscreen=(_sx>other.xps+_margin&&_sx<other.xpstwo-_margin&&_sy>other.yps+_margin&&_sy<other.ypstwo-_margin)
+	if(!_onscreen){
+		var _cx=clamp(_sx,other.xps+_margin,other.xpstwo-_margin)
+		var _cy=clamp(_sy,other.yps+_margin,other.ypstwo-_margin)
+		var _angle=point_direction(_cx,_cy,_sx,_sy)
+		var _dir=round(_angle/45)*45
+
+		//Icon: 137 basic, 138 haunted
+		var _icon=137
+		if(Control.talentmapArray[9,1]>0){
+			_icon=138
+		}
+
+		//Flash when scarecrow is close to expiring (last 25%)
+		var _alpha=0.85
+		if(passive.dur<passive.durtotal*0.25){
+			_alpha=(passive.dur mod 10)<5 ? 0.3 : 0.85
+		}
+
+		//Draw icon at screen edge
+		draw_sprite_ext(abil_witch_spr,_icon,_cx,_cy,1,1,0,c_white,_alpha)
+
+		//Arrow offset from icon center (fixed per direction)
+		var _ox=0
+		var _oy=0
+		if(_dir==0||_dir==360){ _ox=7; _oy=0; }
+		else if(_dir==45){ _ox=5; _oy=-5; }
+		else if(_dir==90){ _ox=0; _oy=-7; }
+		else if(_dir==135){ _ox=-5; _oy=-5; }
+		else if(_dir==180){ _ox=-7; _oy=0; }
+		else if(_dir==225){ _ox=-5; _oy=5; }
+		else if(_dir==270){ _ox=0; _oy=7; }
+		else if(_dir==315){ _ox=5; _oy=5; }
+		var _ax=_cx+_ox
+		var _ay=_cy+_oy
+
+		var _ub=other.ui_border
+		var _cg=other.colorgold
+		var _cl=other.colorgoldlight
+
+		if(_dir==0||_dir==360){
+			//Right arrow
+			draw_rectangle_color(_ax+2,_ay,_ax+2,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay-1,_ax+1,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay+1,_ax+1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay-2,_ax,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay+2,_ax,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay-1,_ax-1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay,_ax+1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay-1,_ax,_ay-1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax,_ay+1,_ax,_ay+1,_cg,_cg,_cg,_cg,false)
+		}else if(_dir==180){
+			//Left arrow
+			draw_rectangle_color(_ax-2,_ay,_ax-2,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay-1,_ax-1,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay+1,_ax-1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay-2,_ax,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay+2,_ax,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay-1,_ax+1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay,_ax-1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay-1,_ax,_ay-1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax,_ay+1,_ax,_ay+1,_cg,_cg,_cg,_cg,false)
+		}else if(_dir==90){
+			//Up arrow
+			draw_rectangle_color(_ax,_ay-2,_ax,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay-1,_ax-1,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay-1,_ax+1,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-2,_ay,_ax-2,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+2,_ay,_ax+2,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay+1,_ax+1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay-1,_ax,_ay-1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax-1,_ay,_ax-1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax+1,_ay,_ax+1,_ay,_cg,_cg,_cg,_cg,false)
+		}else if(_dir==270){
+			//Down arrow
+			draw_rectangle_color(_ax,_ay+2,_ax,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay+1,_ax-1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay+1,_ax+1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-2,_ay,_ax-2,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+2,_ay,_ax+2,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay-1,_ax+1,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay+1,_ax,_ay+1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax-1,_ay,_ax-1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax+1,_ay,_ax+1,_ay,_cg,_cg,_cg,_cg,false)
+		}else if(_dir==45){
+			//Up-Right arrow
+			draw_rectangle_color(_ax+2,_ay-2,_ax+2,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+2,_ay-1,_ax+2,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay+2,_ax-1,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay-2,_ax,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay+1,_ax-1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay,_ax-1,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay-1,_ax+1,_ay-1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax+1,_ay,_ax+1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax,_ay+1,_ax,_ay+1,_cg,_cg,_cg,_cg,false)
+		}else if(_dir==135){
+			//Up-Left arrow
+			draw_rectangle_color(_ax-2,_ay-2,_ax-2,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-2,_ay-1,_ax-2,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay+2,_ax+1,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay-2,_ax,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay+1,_ax+1,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay,_ax+1,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay-1,_ax-1,_ay-1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax-1,_ay,_ax-1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax,_ay+1,_ax,_ay+1,_cg,_cg,_cg,_cg,false)
+		}else if(_dir==225){
+			//Down-Left arrow
+			draw_rectangle_color(_ax-2,_ay+2,_ax-2,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-2,_ay+1,_ax-2,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay-2,_ax+1,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay+2,_ax,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay-1,_ax+1,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay,_ax+1,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay+1,_ax-1,_ay+1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax-1,_ay,_ax-1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax,_ay-1,_ax,_ay-1,_cg,_cg,_cg,_cg,false)
+		}else if(_dir==315){
+			//Down-Right arrow
+			draw_rectangle_color(_ax+2,_ay+2,_ax+2,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+2,_ay+1,_ax+2,_ay+1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay-2,_ax-1,_ay-2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax,_ay+2,_ax,_ay+2,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay-1,_ax-1,_ay-1,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax-1,_ay,_ax-1,_ay,_ub,_ub,_ub,_ub,false)
+			draw_rectangle_color(_ax+1,_ay+1,_ax+1,_ay+1,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax+1,_ay,_ax+1,_ay,_cl,_cl,_cl,_cl,false)
+			draw_rectangle_color(_ax,_ay,_ax,_ay,_cg,_cg,_cg,_cg,false)
+			draw_rectangle_color(_ax,_ay-1,_ax,_ay-1,_cg,_cg,_cg,_cg,false)
+		}
+		draw_set_color(c_white)
+	}
+}
+#endregion
+
+#region Scarecrow Death X
+if(class==1&&scarecrow_deathtimer>0){
+	var _dx=scarecrow_deathx
+	var _dy=scarecrow_deathy
+	var _margin=8
+	var _offscreen=(_dx<=other.xps+_margin||_dx>=other.xpstwo-_margin||_dy<=other.yps+_margin||_dy>=other.ypstwo-_margin)
+	if(_offscreen){
+		var _cx=clamp(_dx,other.xps+_margin,other.xpstwo-_margin)
+		var _cy=clamp(_dy,other.yps+_margin,other.ypstwo-_margin)
+		var _ub=other.ui_border
+		var _cg=other.colorgold
+		var _cl=other.colorgoldlight
+
+		//Icon: 137 basic, 138 haunted (same position as live indicator)
+		var _icon=137
+		if(Control.talentmapArray[9,1]>0){
+			_icon=138
+		}
+		draw_sprite_ext(abil_witch_spr,_icon,_cx,_cy,1,1,0,c_white,0.85)
+
+		//X drawn below the icon
+		_cy+=6
+
+		//X border (ui_border) - 1px outline around each diagonal line
+		// \ diagonal border
+		draw_rectangle_color(_cx-3,_cy-2,_cx-3,_cy-2,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-2,_cy-3,_cx-2,_cy-3,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-2,_cy-1,_cx-2,_cy-1,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-1,_cy-2,_cx-1,_cy-2,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-1,_cy,_cx-1,_cy,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+1,_cy,_cx+1,_cy,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+1,_cy+2,_cx+1,_cy+2,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+2,_cy+1,_cx+2,_cy+1,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+2,_cy+3,_cx+2,_cy+3,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+3,_cy+2,_cx+3,_cy+2,_ub,_ub,_ub,_ub,false)
+		// / diagonal border
+		draw_rectangle_color(_cx+3,_cy-2,_cx+3,_cy-2,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+2,_cy-3,_cx+2,_cy-3,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+2,_cy-1,_cx+2,_cy-1,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx+1,_cy-2,_cx+1,_cy-2,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-1,_cy+2,_cx-1,_cy+2,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-2,_cy+1,_cx-2,_cy+1,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-2,_cy+3,_cx-2,_cy+3,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx-3,_cy+2,_cx-3,_cy+2,_ub,_ub,_ub,_ub,false)
+		//Center top/bottom border
+		draw_rectangle_color(_cx,_cy-1,_cx,_cy-1,_ub,_ub,_ub,_ub,false)
+		draw_rectangle_color(_cx,_cy+1,_cx,_cy+1,_ub,_ub,_ub,_ub,false)
+
+		//X fill - solid diagonal lines
+		// \ line
+		draw_rectangle_color(_cx-2,_cy-2,_cx-2,_cy-2,_cl,_cl,_cl,_cl,false)
+		draw_rectangle_color(_cx-1,_cy-1,_cx-1,_cy-1,_cl,_cl,_cl,_cl,false)
+		draw_rectangle_color(_cx,_cy,_cx,_cy,_cg,_cg,_cg,_cg,false)
+		draw_rectangle_color(_cx+1,_cy+1,_cx+1,_cy+1,_cg,_cg,_cg,_cg,false)
+		draw_rectangle_color(_cx+2,_cy+2,_cx+2,_cy+2,_cg,_cg,_cg,_cg,false)
+		// / line
+		draw_rectangle_color(_cx+2,_cy-2,_cx+2,_cy-2,_cl,_cl,_cl,_cl,false)
+		draw_rectangle_color(_cx+1,_cy-1,_cx+1,_cy-1,_cl,_cl,_cl,_cl,false)
+		draw_rectangle_color(_cx-1,_cy+1,_cx-1,_cy+1,_cg,_cg,_cg,_cg,false)
+		draw_rectangle_color(_cx-2,_cy+2,_cx-2,_cy+2,_cg,_cg,_cg,_cg,false)
+
+		draw_set_color(c_white)
+	}
+}
+#endregion
+
 } // end game_initialized check for ME UI
 }
 #region Active Item Draw
