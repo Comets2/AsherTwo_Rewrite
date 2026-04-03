@@ -593,7 +593,7 @@ function overworld_map_scr() {
 								animationtick=0
 							}	
 						}
-						if(animation<143){
+						if(animation<Control.camytwo*2){
 							animation+=0.015
 						}else{
 							animation=0

@@ -5,4 +5,5 @@ xscale=1
 yscale=1
 color=c_white
 gravtwo=0
+spin=0
 nodestroy=0

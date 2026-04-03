@@ -16,9 +16,9 @@ xpstwo=camx+screenshakeamt+camxtwo
 ypstwo=camy+hurtdraw+camytwo
 
 xpos=floor((xps-mapx)/blockwidth)
-xpostwo=xpos+18+chance*2
+xpostwo=xpos+ceil(camxres/blockwidth)+2+chance*2
 ypos=floor((yps-mapy)/blockwidth)
-ypostwo=ypos+12+chance*2
+ypostwo=ypos+ceil(camyres/blockwidth)+2+chance*2
 
 #region Title Menu (pause == 20)
 if(pause == 20){
@@ -26,7 +26,7 @@ if(pause == 20){
 	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
 
 	// Menu panel dimensions
-	var panel_x = xps + 127 - 50
+	var panel_x = xps + camxtwo - 50
 	var panel_y = yps + 12
 	var panel_w = 100
 	var panel_h = 118
@@ -144,7 +144,7 @@ if(quit_confirm){
 	draw_set_alpha(1)
 
 	// Popup panel
-	var qpop_x = xps + 127 - 50
+	var qpop_x = xps + camxtwo - 50
 	var qpop_y = yps + 50
 	var qpop_w = 100
 	var qpop_h = 45
@@ -445,12 +445,12 @@ if(pause == 21){
 		if(remap_active){
 			// Darken background
 			draw_set_alpha(0.5)
-			draw_rectangle_color(xps, yps, xps + 255, yps + 144,
+			draw_rectangle_color(xps, yps, xps + camxtwo*2, yps + camytwo*2,
 				c_black, c_black, c_black, c_black, false)
 			draw_set_alpha(1)
 
 			// Popup panel
-			var pop_x = xps + 127 - 55
+			var pop_x = xps + camxtwo - 55
 			var pop_y = yps + 50
 			var pop_w = 110
 			var pop_h = 40
@@ -551,7 +551,7 @@ if(pause == 22){
 	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
 
 	// Panel
-	var panel_x = xps + 127 - 50
+	var panel_x = xps + camxtwo - 50
 	var panel_y = yps + 12
 	var panel_w = 100
 	var panel_h = 118
@@ -642,7 +642,7 @@ if(pause == 25){
 	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
 
 	// Panel
-	var panel_x = xps + 127 - 70
+	var panel_x = xps + camxtwo - 70
 	var panel_y = yps + 12
 	var panel_w = 140
 	var panel_h = 110
@@ -701,7 +701,7 @@ if(pause == 23){
 	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
 
 	// Panel
-	var panel_x = xps + 127 - 50
+	var panel_x = xps + camxtwo - 50
 	var panel_y = yps + 12
 	var panel_w = 100
 	var panel_h = 105
@@ -841,10 +841,9 @@ if(pause == 27){
 			// Draw card using ui_button
 			ui_button(cx1, cy1, cx2, cy2, is_selected)
 
-			// Draw character sprite using mask_two_spr (same as inventory)
+			// Draw character sprite using map_icons_spr (same as overworld map)
 			var class_id = char_classes[char_index]
-			var mask_frame = class_id * 4
-			draw_sprite_ext(mask_two_spr, mask_frame, cell_cx, cell_cy - 3, 1, 1, 0, c_white, 1)
+			draw_sprite_ext(map_icons_spr, 15 + class_id, cell_cx - 8 + 1, cell_cy - 3 - 8 + 1, 1, 1, 0, c_white, 1)
 
 			// Draw character name
 			var text_color = is_selected ? colorbluelight : colorgold
@@ -865,18 +864,18 @@ if(pause == 24){
 	draw_sprite_ext(maptest_spr, 6, xps-0.5, yps-0.5, 1, 1, 0, c_white, 1)
 
 	// Game Over title
-	draw_text_ext_transformed_color(xps + 127 - 35, yps + 30, "GAME OVER", 0, 1000, 0.7, 0.7, 0,
+	draw_text_ext_transformed_color(xps + camxtwo - 35, yps + 30, "GAME OVER", 0, 1000, 0.7, 0.7, 0,
 		colorred, colorred, colorred, colorred, 1)
 
 	// Stats display
-	draw_text_ext_transformed_color(xps + 127 - 30, yps + 60, "Wave: " + string(rogue_wave), 0, 1000, 0.5, 0.5, 0,
+	draw_text_ext_transformed_color(xps + camxtwo - 30, yps + 60, "Wave: " + string(rogue_wave), 0, 1000, 0.5, 0.5, 0,
 		colorgold, colorgold, colorgold, colorgold, 1)
 
-	draw_text_ext_transformed_color(xps + 127 - 30, yps + 80, "Level: " + string(rogue_level), 0, 1000, 0.5, 0.5, 0,
+	draw_text_ext_transformed_color(xps + camxtwo - 30, yps + 80, "Level: " + string(rogue_level), 0, 1000, 0.5, 0.5, 0,
 		c_white, c_white, c_white, c_white, 1)
 
 	// Continue prompt
-	draw_text_ext_transformed_color(xps + 127 - 50, yps + 115, "Press SPACE to continue",
+	draw_text_ext_transformed_color(xps + camxtwo - 50, yps + 115, "Press SPACE to continue",
 		0, 1000, 0.4, 0.4, 0, colorgray, colorgray, colorgray, colorgray, 0.8)
 }
 #endregion
@@ -942,16 +941,16 @@ if(rogue_mode){
 	if(rogue_pause == 1){
 		// Darken background
 		draw_set_alpha(0.6)
-		draw_rectangle_color(xps, yps, xps + 255, yps + 143, c_black, c_black, c_black, c_black, false)
+		draw_rectangle_color(xps, yps, xps + camxtwo*2, yps + camytwo*2, c_black, c_black, c_black, c_black, false)
 		draw_set_alpha(1)
 
 		// Title
-		draw_text_ext_transformed_color(xps + 127 - 30, yps + 20, "LEVEL UP!",
+		draw_text_ext_transformed_color(xps + camxtwo - 30, yps + 20, "LEVEL UP!",
 			0, 1000, 0.6, 0.6, 0, colorgold, colorgold, colorgold, colorgold, 1)
 
 		// Draw cards
 		var card_spacing = 60
-		var card_start_x = xps + 127 - ((levelupselecttotal_rogue - 1) * card_spacing / 2)
+		var card_start_x = xps + camxtwo - ((levelupselecttotal_rogue - 1) * card_spacing / 2)
 
 		for(var i = 0; i < levelupselecttotal_rogue; i++){
 			var card_x = card_start_x + (i * card_spacing)
@@ -1031,7 +1030,7 @@ if(rogue_mode){
 		}
 
 		// Instructions
-		draw_text_ext_transformed_color(xps + 127 - 55, yps + 130, "Hold SPACE to select",
+		draw_text_ext_transformed_color(xps + camxtwo - 55, yps + 130, "Hold SPACE to select",
 			0, 1000, 0.5, 0.5, 0, c_white, c_white, c_white, c_white, 0.8)
 	}
 }
@@ -1318,11 +1317,11 @@ if(instance_exists(target)){
 #region Overworld Map
 if(pause==1){
 	
-	draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-143+animation,1,1,0,c_white,1)	
+	draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-camytwo*2+animation,1,1,0,c_white,1)	
 	draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5+animation,1,1,0,c_white,1)
 	
 	//Grass
-	draw_sprite_ext(maptest_spr,5+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-143+miniy,1,1,0,c_white,1)	
+	draw_sprite_ext(maptest_spr,5+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-camytwo*2+miniy,1,1,0,c_white,1)	
 	draw_sprite_ext(maptest_spr,5+mapdataArray[1003,0]*2,xps-0.5,yps-0.5+miniy,1,1,0,c_white,1)		
 
 	for(var a=0;a<10;a+=1){
@@ -1402,18 +1401,18 @@ if(pause==1){
 		if(phase==1){
 			if(starttimer<90){
 				draw_sprite_ext(maptest_spr,4,xps-0.5,yps-0.5-chance,1,1,0,c_white,1)
-				draw_text_ext_transformed(xps+(255/2)+4-(string_width(mapdataArray[1004,mapdataArray[1003,0]])/3),yps+(143/2)-4-chance,mapdataArray[1004,mapdataArray[1003,0]],0,1000,0.6,0.6,0)
+				draw_text_ext_transformed(xps+camxtwo+4-(string_width(mapdataArray[1004,mapdataArray[1003,0]])/3),yps+camytwo-4-chance,mapdataArray[1004,mapdataArray[1003,0]],0,1000,0.6,0.6,0)
 				draw_sprite_ext(map_icons_spr,42+(4*mapdataArray[1003,0]),xps-0.5+46+7,yps-0.5+63,1,1,0,c_white,1)	
 			}
 		}else{
 			//Level Details
 			if(phasetick==3&&miniy==toy){	
 				chancetwo=16
-					draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-143+animation,1,1,0,c_white,1)	
+					draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-camytwo*2+animation,1,1,0,c_white,1)	
 					draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5+animation,1,1,0,c_white,1)
 				draw_sprite_ext(maptest_spr,20,xps-0.5,yps-0.5-chance,1,1,0,c_white,1)
-				draw_text_ext_transformed(xps+(255/2)+2-(string_width(mapdataArray[1002,mapdataArray[mapArray[selectx,selecty],0]])/4)-24,yps+(143/2)-7.5-chancetwo-chance,mapdataArray[1002,mapdataArray[mapArray[selectx,selecty],0]],0,1000,0.5,0.5,0)
-				draw_text_ext_transformed(xps+(255/2)+4-20-35,yps+(143/2)+9.5-chance-chancetwo,mapdataArray[1005,mapdataArray[mapArray[selectx,selecty],0]],0,1000,0.5,0.5,0)
+				draw_text_ext_transformed(xps+camxtwo+2-(string_width(mapdataArray[1002,mapdataArray[mapArray[selectx,selecty],0]])/4)-24,yps+camytwo-7.5-chancetwo-chance,mapdataArray[1002,mapdataArray[mapArray[selectx,selecty],0]],0,1000,0.5,0.5,0)
+				draw_text_ext_transformed(xps+camxtwo+4-20-35,yps+camytwo+9.5-chance-chancetwo,mapdataArray[1005,mapdataArray[mapArray[selectx,selecty],0]],0,1000,0.5,0.5,0)
 				draw_sprite_ext(map_icons_spr,mapdataArray[mapArray[selectx,selecty],0],xps-0.5+46+10,yps-0.5+62-chancetwo,1,1,0,c_white,1)			
 				//Bounty
 				if(mapdataArray[mapArray[selectx,selecty],0]<12){
@@ -1422,12 +1421,12 @@ if(pause==1){
 				}
 			}
 			if(phasetick==2){
-					draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-143+animation,1,1,0,c_white,1)	
+					draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-camytwo*2+animation,1,1,0,c_white,1)	
 					draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5+animation,1,1,0,c_white,1)
 				draw_sprite_ext(maptest_spr,23,xps-0.5,yps-0.5-chance,1,1,0,c_white,1)	
 				chancetwo=24
-				draw_text_ext_transformed(xps+(255/2)+3-20-35,yps+(143/2)+8.5-chance-chancetwo-16,"Stage Complete",0,1000,0.5,0.5,0)
-				draw_text_ext_transformed(xps+(255/2)+3.5-20-35,yps+(143/2)+8.5-chance-chancetwo+1,"Reward",0,1000,0.5,0.5,0)
+				draw_text_ext_transformed(xps+camxtwo+3-20-35,yps+camytwo+8.5-chance-chancetwo-16,"Stage Complete",0,1000,0.5,0.5,0)
+				draw_text_ext_transformed(xps+camxtwo+3.5-20-35,yps+camytwo+8.5-chance-chancetwo+1,"Reward",0,1000,0.5,0.5,0)
 				draw_sprite_ext(map_icons_spr,mapdataArray[mapArray[selectx,selecty],0],xps-0.5+46+10,yps-0.5+62-chancetwo,1,1,0,c_white,1)		
 				//Bounty
 				if(mapdataArray[mapArray[selectx,selecty],0]<12){
@@ -1436,12 +1435,12 @@ if(pause==1){
 				}				
 			}else{
 				if(phasetick==4){
-						draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-143+animation,1,1,0,c_white,1)	
+						draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5-camytwo*2+animation,1,1,0,c_white,1)	
 						draw_sprite_ext(maptest_spr,6+mapdataArray[1003,0]*2,xps-0.5,yps-0.5+animation,1,1,0,c_white,1)
 					draw_sprite_ext(maptest_spr,41,xps-0.5,yps-0.5-chance,1,1,0,c_white,1)	
 					chancetwo=24
-					draw_text_ext_transformed(xps+(255/2)+3-20-35,yps+(143/2)+8.5-chance-chancetwo-16,"Stage Complete",0,1000,0.5,0.5,0)
-					draw_text_ext_transformed(xps+(255/2)+3.5-20-35,yps+(143/2)+8.5-chance-chancetwo+1,"Reward",0,1000,0.5,0.5,0)
+					draw_text_ext_transformed(xps+camxtwo+3-20-35,yps+camytwo+8.5-chance-chancetwo-16,"Stage Complete",0,1000,0.5,0.5,0)
+					draw_text_ext_transformed(xps+camxtwo+3.5-20-35,yps+camytwo+8.5-chance-chancetwo+1,"Reward",0,1000,0.5,0.5,0)
 					draw_sprite_ext(map_icons_spr,mapdataArray[mapArray[selectx,selecty],0],xps-0.5+46+10,yps-0.5+62-chancetwo,1,1,0,c_white,1)		
 					
 					//Bounty
@@ -1551,17 +1550,17 @@ if(pause==2){
 			}
 			if(mouse_x>=xps+1&&mouse_x<=xps+56&&mouse_y>=yps+73&&mouse_y<=yps+84){
 				chancetwo=1
-				draw_sprite_part_ext(maptest_spr,39,0,30,50,15,xps-0.5+11,yps+71-0.5,1,1,c_white,1)	
-				draw_sprite_ext(map_icons_spr,69+chance*6,xps-0.5-1,yps+71+targetpos/2,1,1,0,c_white,1)				
+				draw_sprite_part_ext(maptest_spr,39,0,30,50,15,xps-0.5+11,yps+camytwo-0.5,1,1,c_white,1)	
+				draw_sprite_ext(map_icons_spr,69+chance*6,xps-0.5-1,yps+camytwo+targetpos/2,1,1,0,c_white,1)				
 			}else{
 				chancetwo=0
-				draw_sprite_ext(map_icons_spr,69+chance*6,xps-0.5-1,yps+71,1,1,0,c_white,1)
+				draw_sprite_ext(map_icons_spr,69+chance*6,xps-0.5-1,yps+camytwo,1,1,0,c_white,1)
 			}	
 			if(chance==1){
 				if(pauseopt==0&&chancetwo==1){
-					draw_sprite_part_ext(maptest_spr,39,0,47,60,15,xps-0.5-1,yps+71-0.5,1,1,c_white,1)
+					draw_sprite_part_ext(maptest_spr,39,0,47,60,15,xps-0.5-1,yps+camytwo-0.5,1,1,c_white,1)
 				}else{
-					draw_sprite_part_ext(maptest_spr,39,0,13,15,15,xps-0.5-1,yps+71-0.5,1,1,c_white,1)
+					draw_sprite_part_ext(maptest_spr,39,0,13,15,15,xps-0.5-1,yps+camytwo-0.5,1,1,c_white,1)
 				}	
 				draw_text_ext_transformed(xps+15,yps+75,"Inventory",0,1000,0.5,0.5,0)
 			}else{
@@ -1580,17 +1579,17 @@ if(pause==2){
 			}
 			if(mouse_x>=xps+1&&mouse_x<=xps+56&&mouse_y>=yps+73+19&&mouse_y<=yps+84+19){
 				chancetwo=1
-				draw_sprite_part_ext(maptest_spr,39,0,30,50,15,xps-0.5+11,yps+71-0.5+19,1,1,c_white,1)	
-				draw_sprite_ext(map_icons_spr,70+chance*6,xps-0.5-1,yps+71+19+targetpos/2,1,1,0,c_white,1)		
+				draw_sprite_part_ext(maptest_spr,39,0,30,50,15,xps-0.5+11,yps+camytwo-0.5+19,1,1,c_white,1)	
+				draw_sprite_ext(map_icons_spr,70+chance*6,xps-0.5-1,yps+camytwo+19+targetpos/2,1,1,0,c_white,1)		
 			}else{
 				chancetwo=0
-				draw_sprite_ext(map_icons_spr,70+chance*6,xps-0.5-1,yps+71+19,1,1,0,c_white,1)	
+				draw_sprite_ext(map_icons_spr,70+chance*6,xps-0.5-1,yps+camytwo+19,1,1,0,c_white,1)	
 			}
 			if(chance==1){
 				if(pauseopt==1&&chancetwo==1){
-					draw_sprite_part_ext(maptest_spr,39,0,47,60,15,xps-0.5-1,yps+71-0.5+19,1,1,c_white,1)
+					draw_sprite_part_ext(maptest_spr,39,0,47,60,15,xps-0.5-1,yps+camytwo-0.5+19,1,1,c_white,1)
 				}else{
-					draw_sprite_part_ext(maptest_spr,39,0,13,15,15,xps-0.5-1,yps+71-0.5+19,1,1,c_white,1)
+					draw_sprite_part_ext(maptest_spr,39,0,13,15,15,xps-0.5-1,yps+camytwo-0.5+19,1,1,c_white,1)
 				}				
 					draw_text_ext_transformed(xps+15,yps+75+19,"Store",0,1000,0.5,0.5,0)
 			}else{
@@ -1609,17 +1608,17 @@ if(pause==2){
 			}
 			if(mouse_x>=xps+1&&mouse_x<=xps+56&&mouse_y>=yps+73+38&&mouse_y<=yps+84+38){
 				chancetwo=1
-				draw_sprite_part_ext(maptest_spr,39,0,30,50,15,xps-0.5+11,yps+71-0.5+38,1,1,c_white,1)	
-				draw_sprite_ext(map_icons_spr,71+chance*6,xps-0.5-1,yps+71+38+targetpos/2,1,1,0,c_white,1)		
+				draw_sprite_part_ext(maptest_spr,39,0,30,50,15,xps-0.5+11,yps+camytwo-0.5+38,1,1,c_white,1)	
+				draw_sprite_ext(map_icons_spr,71+chance*6,xps-0.5-1,yps+camytwo+38+targetpos/2,1,1,0,c_white,1)		
 			}else{
 				chancetwo=0
-				draw_sprite_ext(map_icons_spr,71+chance*6,xps-0.5-1,yps+71+38,1,1,0,c_white,1)	
+				draw_sprite_ext(map_icons_spr,71+chance*6,xps-0.5-1,yps+camytwo+38,1,1,0,c_white,1)	
 			}
 			if(chance==1){
 				if(pauseopt==2&&chancetwo==1){
-					draw_sprite_part_ext(maptest_spr,39,0,47,60,15,xps-0.5-1,yps+71-0.5+38,1,1,c_white,1)
+					draw_sprite_part_ext(maptest_spr,39,0,47,60,15,xps-0.5-1,yps+camytwo-0.5+38,1,1,c_white,1)
 				}else{
-					draw_sprite_part_ext(maptest_spr,39,0,13,15,15,xps-0.5-1,yps+71-0.5+38,1,1,c_white,1)
+					draw_sprite_part_ext(maptest_spr,39,0,13,15,15,xps-0.5-1,yps+camytwo-0.5+38,1,1,c_white,1)
 				}				
 					draw_text_ext_transformed(xps+15,yps+75+38,"Mask",0,1000,0.5,0.5,0)
 			}else{
@@ -1677,42 +1676,42 @@ if(pause==2){
 			if(i+ii==21){
 				if(invenArray[30,0]!=999){
 					if(itemArray[invenArray[invenArray[30,0],0],2]==1){
-						draw_sprite_ext(ui_med_spr,7,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+						draw_sprite_ext(ui_med_spr,7,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 					}
 				}
 			}
 			if(i+ii==23){
 				if(invenArray[30,0]!=999){
 					if(itemArray[invenArray[invenArray[30,0],0],2]==2){
-						draw_sprite_ext(ui_med_spr,9,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+						draw_sprite_ext(ui_med_spr,9,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 					}
 				}
 			}
 			if(invenArray[30,0]!=999){
 				if(i+ii>=24&&i+ii<27){				
 						if(itemArray[invenArray[invenArray[30,0],0],2]!=1&&itemArray[invenArray[invenArray[30,0],0],2]!=2||selected==i+ii&&i+ii==999){
-							draw_sprite_ext(ui_med_spr,5,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+							draw_sprite_ext(ui_med_spr,5,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 						}				
 				}
 
 			}
 				if(i+ii==selected){
 					if(selected<21){
-						draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+						draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 					}else{
 						if(selected==21){
 								if(invenArray[30,0]==999){
-								draw_sprite_ext(ui_med_spr,7,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+								draw_sprite_ext(ui_med_spr,7,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 								}
 						}else{
 							if(selected==23){
 								if(invenArray[30,0]==999){
-									draw_sprite_ext(ui_med_spr,9,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+									draw_sprite_ext(ui_med_spr,9,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 								}
 							}else{
 								if(selected>23&&selected<40){
 									if(invenArray[30,0]==999){
-										draw_sprite_ext(ui_med_spr,5,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+										draw_sprite_ext(ui_med_spr,5,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 									}
 								}else{
 		
@@ -1723,11 +1722,11 @@ if(pause==2){
 				}
 			if(pauseopt==1){
 				if(invenArray[30,0]>=40&&invenArray[30,0]<45&&i+ii<40&&invenArray[i+ii,0]==0||invenArray[30,0]>=40&&invenArray[30,0]&&invenArray[30,0]==i+ii){
-					draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+					draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 				}
 				if(i+ii==45){
 					if(invenArray[30,0]<21){
-						draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+						draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 					}
 					if(invenArray[45,0]!=0){
 						draw_sprite_ext(map_icons_spr,73,xps-0.5+58+chance,yps+70+15+chancetwo,1,1,0,c_white,1)
@@ -1772,12 +1771,12 @@ if(pause==2){
 			
 		}
 		if(i+ii==selected){
-			draw_sprite_ext(ui_med_spr,1,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,1)
+			draw_sprite_ext(ui_med_spr,1,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,1)
 			// Enhanced cursor for keyboard/controller mode
 			if(cursor_mode == 1){
 				// Draw an animated highlight without scaling
 				var pulse_alpha = 0.3 + sin(current_time * 0.005) * 0.3
-				draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+71-8+chancetwo,1,1,0,c_white,pulse_alpha)
+				draw_sprite_ext(ui_med_spr,2,xps-0.5+61-8+chance,yps-0.5+camytwo-8+chancetwo,1,1,0,c_white,pulse_alpha)
 			}
 		}
 			if(invenArray[i+ii,0]!=0){
@@ -1789,14 +1788,14 @@ if(pauseopt==0){
 	//Mask
 	var mask_selected = (cursor_mode == 1 && selected == 998) || (mouse_x>=xps+80&&mouse_y>=yps+10&&mouse_x<xps+80+16&&mouse_y<yps+10+16)
 	if(mask_selected){
-		draw_sprite_ext(mask_two_spr,Me.class*4,xps-1+88,yps-0.5+18+targetpos,1,1,0,c_white,1)
+		draw_sprite_ext(map_icons_spr,15+Me.class,xps-1+88-8+1,yps-0.5+18-8+1+targetpos,1,1,0,c_white,1)
 		// Draw cursor highlight in keyboard mode
 		if(cursor_mode == 1 && selected == 998){
 			var pulse_alpha = 0.3 + sin(current_time * 0.005) * 0.3
 			draw_sprite_ext(ui_med_spr,2,xps+80-8,yps+10-8,1,1,0,c_white,pulse_alpha)
 		}
 	}else{
-		draw_sprite_ext(mask_two_spr,Me.class*4,xps-1+88,yps-0.5+18,1,1,0,c_white,1)
+		draw_sprite_ext(map_icons_spr,15+Me.class,xps-1+88-8+1,yps-0.5+18-8+1,1,1,0,c_white,1)
 	}
 }
 	
@@ -2090,17 +2089,17 @@ if(game_initialized){
 	if(pause==0){
 		if(lvlArray[1000,7]>90){
 			draw_sprite_ext(maptest_spr,29,xps-0.5,yps-0.5-40,1,1,0,c_white,1)
-			draw_sprite(map_icons_spr,lvlArray[1000,0],xps-70+(255/2),yps+(143/2)-48)
+			draw_sprite(map_icons_spr,lvlArray[1000,0],xps-70+camxtwo,yps+camytwo-48)
 
-				draw_text_ext_transformed(xps+(255/2)-string_width( string(lvlArray[1010,24]))/3.5,yps+(143/2)-3.5-40, string(lvlArray[1010,24]) ,0,1000,0.5,0.5,0)
-				//draw_text_ext_transformed(xps+(255/2)-(string_width( " Waves Remain" + string(lvlArray[1000,2]+1))/3.5),yps+(143/2)-3.5-40, string(lvlArray[1000,2]+1) + " Waves Remain" ,0,1000,0.5,0.5,0)
+				draw_text_ext_transformed(xps+camxtwo-string_width( string(lvlArray[1010,24]))/3.5,yps+camytwo-3.5-40, string(lvlArray[1010,24]) ,0,1000,0.5,0.5,0)
+				//draw_text_ext_transformed(xps+camxtwo-(string_width( " Waves Remain" + string(lvlArray[1000,2]+1))/3.5),yps+camytwo-3.5-40, string(lvlArray[1000,2]+1) + " Waves Remain" ,0,1000,0.5,0.5,0)
 
 
 		}
 		if(lvlArray[1010,0]>1){
 			draw_sprite(maptest_spr,29,xps-0.5,yps-0.5-40)
-			draw_sprite(map_icons_spr,lvlArray[1000,0],xps-70+(255/2),yps+(143/2)-48)
-			draw_text_ext_transformed(xps+(255/2)-(string_width("Dream Stage Complete")/3.9),yps+(143/2)-3.5-40, "Dream Stage Complete" ,0,1000,0.5,0.5,0)
+			draw_sprite(map_icons_spr,lvlArray[1000,0],xps-70+camxtwo,yps+camytwo-48)
+			draw_text_ext_transformed(xps+camxtwo-(string_width("Dream Stage Complete")/3.9),yps+camytwo-3.5-40, "Dream Stage Complete" ,0,1000,0.5,0.5,0)
 		}
 	}
 }
@@ -3459,14 +3458,14 @@ if(pause==10){
 			
 			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
 			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-bonusWheelTransitionY,1,1,wheelAngle,c_white,1)	
-			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+61,yps-0.5+71-bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)
+			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+61,yps-0.5+camytwo-bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)
 
 		}else{
-			draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+71-150+bonusWheelTransitionY,1,1,0,c_white,1)
+			draw_sprite_ext(arc_fish_big_spin_spr,23+bonusWheelFrame,xps-0.5+126,yps-0.5+camytwo-150+bonusWheelTransitionY,1,1,0,c_white,1)
 
 			draw_sprite_ext(arc_fish_big_spin_spr,1,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)
 			draw_sprite_ext(arc_fish_big_spin_spr,14+currentWheelSegment,xps-0.5+126,yps-0.5+72-150+bonusWheelTransitionY,1,1,wheelAngle,c_white,1)
-			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+61,yps-0.5+71-150+bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)		
+			draw_sprite_ext(arc_fish_big_flipper_spr,0,xps-0.5+126+61,yps-0.5+camytwo-150+bonusWheelTransitionY,1,1,180+bonusFlipperAngle,c_white,1)		
 			
 		}
 	}	

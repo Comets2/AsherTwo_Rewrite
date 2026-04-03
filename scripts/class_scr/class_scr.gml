@@ -3478,7 +3478,7 @@ if(passivefourArray[1,0] < passivefourArray[1,5] && wep == 0){
 		//Shield follow player
 		if(instance_exists(goblin_shield)){
 			goblin_shield.x=x+hsp
-			goblin_shield.y=y+vsp
+			goblin_shield.y=y+vsp-(hog_mounted*7)
 			goblin_shield.image_xscale=dir
 		}
 

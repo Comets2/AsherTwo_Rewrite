@@ -16786,6 +16786,11 @@ function _abil_run_goblin() {
 			//Phase 2 - Digging Active
 			}else{
 				if(phase==2){
+					//E cancels dig early without attacking
+					if(global.con_p_e||global.conp_p_e){
+						Me.stun=0
+						instance_destroy()
+					}
 					Me.stun=2
 					x=Me.x+Me.hsp
 					y=Me.y+18+Me.vsp
@@ -16902,11 +16907,7 @@ function _abil_run_goblin() {
 								gravtwo=0.02
 							}
 						}
-						//Place dig hole on ground below feet (not on slopes)
-						var _ground_block=instance_position(Me.x,Me.y+8,Block)
-						if(_ground_block==noone||(_ground_block.image_index!=2&&_ground_block.image_index!=3)){
-							Me.dig_hole=1
-						}
+						//No longer leaves a dig hole
 						instance_destroy()
 				}
 			}
@@ -17336,6 +17337,121 @@ function _abil_run_goblin() {
 
 		//Drawing handled in Abil Draw_0
 
+#endregion
+
+	} else if(pin==96){
+#region Boar (Hog Dismount)
+		// Boar - runs forward with proper physics, charge damage, despawns
+
+		// Gravity
+		if(vsp<5){
+			vsp+=grav
+			if(vsp>5){ vsp=5 }
+		}
+
+		// Horizontal movement - run in dir, slow deceleration
+		hsp=sign(hsp)*max(abs(hsp)-0.005,0)
+
+		// Horizontal collision with slope stepping (like gravity_scr)
+		if(place_meeting(x+hsp,y,Block)){
+			var _yplus=0
+			while(place_meeting(x+hsp,y-_yplus,Block) && _yplus<=abs(3*hsp)){
+				_yplus+=1
+			}
+			if(place_meeting(x+hsp,y-_yplus,Block)){
+				while(!place_meeting(x+sign(hsp),y,Block)){
+					x+=sign(hsp)
+				}
+				hsp=0
+			}else{
+				y-=_yplus
+			}
+		}
+
+		x+=hsp
+
+		// Vertical collision
+		if(place_meeting(x,y+vsp,Block)){
+			while(!place_meeting(x,y+sign(vsp),Block)){
+				y+=sign(vsp)
+			}
+			vsp=0
+		}
+
+		y+=vsp
+
+		// Ground check
+		var _grnd=0
+		if(instance_place(x,y+1,Block)||instance_place(x,y+2,Block)){
+			_grnd=1
+		}
+
+		// Animation
+		if(_grnd){
+			if(abs(hsp)>0.1){
+				img=50; imgcap=3  // Walk
+			} else {
+				img=50; imgcap=0  // Idle
+			}
+		} else {
+			if(vsp<0){
+				img=54; imgcap=1  // Rise
+			} else {
+				img=56; imgcap=1  // Fall
+			}
+		}
+
+		if(image_index+imgsped<img+imgcap+1){
+			image_index+=imgsped
+		} else {
+			image_index=img
+		}
+
+		// Charge particles + hitbox
+		if(diddmg==1 && abs(hsp)>0.1){
+			// Dust particles in front
+			if(_grnd && dur mod 3==0){
+				var _px=x+(dir*10)
+				var _py=y+random_range(-4,4)
+				var _pcreated=instance_create_depth(_px,_py,depth-1,Part)
+				with(_pcreated){
+					type=1
+					pin=1
+					creator=other.id
+					spin=1
+					img=1
+					imgcap=3
+					imgsped=0.1
+					image_speed=0
+					image_index=irandom_range(img,img+imgcap)
+					dur=10+irandom(8)
+					durtotal=dur
+					hsp=-other.dir*random_range(0.2,0.5)
+					vsp=random_range(-0.3,0.1)
+					speed=0
+					image_angle=random(360)
+				}
+			}
+
+			// Damage enemies on contact
+			with(Enemy){
+				if(team!=0){
+					if(point_distance(other.x+(other.dir*10),other.y,x,y)<9){
+						hurttick=1
+						dmgrecieved+=other.dmg
+						Me.damagedone+=other.dmg
+						Control.target=id
+						other.diddmg=0
+					}
+				}
+			}
+		}
+
+		// Despawn
+		dur-=1
+		if(dur<=0){
+			instance_destroy()
+		}
 #endregion
 	}
 #endregion

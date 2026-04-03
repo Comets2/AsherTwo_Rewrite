@@ -119,6 +119,10 @@ hptotalback=hptotal
 
 image_index=img
 classsave=class
+goblin_shield=noone
+hog_mounted=0
+hog_charge=0
+hog_charge_img=1
 
 talentfivetwo=0
 mouse=0

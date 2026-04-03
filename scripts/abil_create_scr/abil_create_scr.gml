@@ -4828,7 +4828,35 @@ chance=1
 #endregion
 #region Goblin Abil 3
 		if(argument0==3){
-			//Goblin Abil 3 creation
+			//Goblin Abil 3 - Spawn Boar on Dismount
+			created=instance_create_depth(xpos,ypos,0,Abil)
+			with(created){
+				type=1
+				pin=96
+				en=0
+				creator=other.id
+				sprite_index=me_mask_goblin_spr
+				mask_index=Me.mask_index
+				img=50
+				imgcap=3
+				imgsped=0.1
+				image_index=50
+				image_speed=0
+				dur=180
+				durtotal=dur
+				phase=0
+				dir=Me.dir
+				hsp=1.5*dir
+				vsp=0
+				if(Me.grounded==0){
+					vsp=1
+				}
+				grav=0.3
+				dmg=6
+				image_xscale=dir
+				// Carry over charge state
+				diddmg=Me.hog_charge>=1 ? 1 : 0
+			}
 		}else{
 #endregion
 

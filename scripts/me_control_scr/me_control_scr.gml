@@ -37,7 +37,6 @@ function me_control_scr() {
 			if(Control.rogue_mode){
 				move_speed += sped * (rogue_statsped * 0.05)  // +5% per point
 			}
-
 			// Determine target speed from input
 			var _target=0
 			if(con_h_right){
@@ -46,7 +45,7 @@ function me_control_scr() {
 				moving=1
 				if(grounded==1){
 					if(class==10){
-						img=1
+						img=1+(hog_mounted*34)
 						imgcap=3
 					}else{
 						img=1
@@ -60,11 +59,64 @@ function me_control_scr() {
 				moving=1
 				if(grounded==1){
 					if(class==10){
-						img=1
+						img=1+(hog_mounted*34)
 						imgcap=3
 					}else{
 						img=1
 						imgcap=5
+					}
+				}
+			}
+			if(class==10 && hog_mounted==1){
+				// Hog charge: starts slow, builds up speed while running
+				if(moving==1){
+					if(hog_charge<1){ hog_charge+=0.012 }
+					if(hog_charge>1){ hog_charge=1 }
+				}else{
+					if(hog_charge>0){ hog_charge-=0.04 }
+					if(hog_charge<0){ hog_charge=0 }
+				}
+				move_speed = sped * (0.85 + hog_charge * 0.50)
+				_target=sign(_target)*move_speed
+				// Charge dust effect at full speed
+				if(hog_charge>=1 && grounded==1 && animtick mod 3==0){
+					created=instance_create_depth(x+(dir*10),y+random_range(-4,4),depth-1,Part)
+					with(created){
+						type=1
+						pin=1
+						creator=other.id
+						spin=1
+						img=1
+						imgcap=3
+						imgsped=0.1
+						image_speed=0
+						image_index=irandom_range(img,img+imgcap)
+						dur=10+irandom(8)
+						durtotal=dur
+						hsp=-other.dir*random_range(0.2,0.5)
+						vsp=random_range(-0.3,0.1)
+						speed=0
+						image_angle=random(360)
+					}
+				}
+				// Charge hit - damage enemy in front at full speed
+				if(hog_charge>=1){
+					var _hx=x+(dir*18)
+					var _hy=y
+					with(Enemy){
+						if(team!=0){
+							if(point_distance(_hx,_hy,x,y)<9){
+								hurttick=1
+								dmgrecieved+=6
+								Me.damagedone+=6
+								Control.target=id
+								// Stun player on impact + brief immunity
+								Me.stun=5
+								Me.immunetwo=20
+								Me.hog_charge=0
+								Me.remhsp=0
+							}
+						}
 					}
 				}
 			}

@@ -20,6 +20,10 @@ durtotal=0
 	img=0
 	imgcap=0
 	imgsped=0
+hsp=0
+vsp=0
+grav=0
+dur=0
 
 sndone=snd_thud_small_1
 sndtwo=snd_thud_small_2

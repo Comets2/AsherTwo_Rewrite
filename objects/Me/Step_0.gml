@@ -226,6 +226,7 @@ abil_scr()
 gravity_scr()
 
 	if(hp<=0){
+		hog_mounted=0
 		deathtick=1
 		deathcd=150
 		deathcdtotal=deathcd

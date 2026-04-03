@@ -443,8 +443,8 @@ yps=camy-camytwo
 						created=instance_create_depth(xps-4,yps+20,0,Arcade)
 						createdtwo=instance_create_depth(xps-6,yps+20,0,Arcade)
 					}else{
-						created=instance_create_depth(xps+255,yps+20,0,Arcade)
-						createdtwo=instance_create_depth(xps+255+2,yps+20,0,Arcade)
+						created=instance_create_depth(xps+camxres,yps+20,0,Arcade)
+						createdtwo=instance_create_depth(xps+camxres+2,yps+20,0,Arcade)
 					}
 					with(created){
 						
@@ -2313,7 +2313,7 @@ if(img==212){
 						if(pin==2){
 							if(beenhit==0){
 								if(dir==1){
-									if(x<other.xps+255){
+									if(x<other.xps+other.camxres){
 										x+=hsp
 									}else{
 										instance_destroy()
@@ -2389,7 +2389,7 @@ if(img==212){
 								if(image_index<=img+1&&move==0){
 									
 									if(hp<4){
-										if(x>other.xps+75&&x<other.xps+255-75){
+										if(x>other.xps+75&&x<other.xps+other.camxres-75){
 											hsp=random_range(0.5,1)*choose(1,-1)
 										}else{
 											if(x<other.xps+75){

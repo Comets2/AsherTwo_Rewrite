@@ -244,11 +244,11 @@ function abil_scr() {
 		}else{
 	//____________________________________________________________________________---------------------(Goblin Whack)---------------------____________________________________________________________________________
 		if(class==10){
-			//Goblin Abil 1
-			if(con_p_e){
+			//Goblin Abil 1 - only attack if not stunned (fishing/digging lock out attack)
+			if(con_p_e&&stun==0){
 				if(abilArray[0,1]==0){
 					anim=12
-					animsave=14
+					animsave=9+(hog_mounted*34)
 						abilArray[0,1]=abilArray[0,2]
 							if(abilArray[1,1]<globalcdtotal){
 								abilArray[1,1]=globalcdtotal
@@ -487,8 +487,8 @@ function abil_scr() {
 			}else{
 	//____________________________________________________________________________---------------------(Goblin Selector)---------------------____________________________________________________________________________
 			if(class==10){
-				//Goblin Abil 2 - Selector
-				if(abilArray[1,1]==0){
+				//Goblin Abil 2 - Selector (blocked during fishing/digging)
+				if(abilArray[1,1]==0&&stun==0){
 					anim=12
 					animsave=14
 						if(abilArray[0,1]<globalcdtotal){
@@ -720,7 +720,32 @@ function abil_scr() {
 			}else{
 	//____________________________________________________________________________---------------------(Goblin)---------------------____________________________________________________________________________
 			if(class==10){
-				//Goblin Abil 3
+				//Goblin Abil 3 - Hog Mount Toggle
+				if(stun==0){
+					if(hog_mounted==0){
+						// Mount
+						hog_mounted=1
+						hog_charge=0
+						image_index=35
+						img=35
+						imgcap=0
+					} else {
+						// Dismount
+						hog_mounted=0
+						hog_charge=0
+						image_index=1
+						img=1
+						imgcap=0
+						// Air dismount: push off the hog for a mini jump (hold up + W)
+						if(grounded==0 && (global.con_h_up||global.conp_h_up)){
+							vsp=-4.5
+						}
+						// Spawn boar entity
+						xpos=x
+						ypos=y
+						abil_create_scr(3)
+					}
+				}
 			}else{
 
 			}}}}}}}}

@@ -1088,7 +1088,7 @@ if(pauseopt!=2){
 						xps=camx-camxtwo
 						yps=camy-camytwo
 						chance=xps+61+0.5
-						chancetwo=yps+71+0.5
+						chancetwo=yps+camytwo+0.5
 
 						// Keyboard/Controller navigation
 						if(global.con_p_up || global.con_p_down || global.con_p_left || global.con_p_right || 
