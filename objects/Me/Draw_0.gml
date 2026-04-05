@@ -22,14 +22,6 @@ if(Control.pause==0){
 				draw_sprite(abil_super_two_spr,409+(_p mod 2),_bx+(_p mod 15),_by+_row*2)
 			}
 		}
-	// Charge hitbox sprite
-	if(class==10 && hog_mounted==1 && hog_charge>=1){
-		hog_charge_img+=0.05
-		if(hog_charge_img>=4){ hog_charge_img=1 }
-		draw_sprite_ext(abil_goblin_effect_charge_spr,floor(hog_charge_img),x+(dir*10),y,dir,1,0,c_white,1)
-	}else{
-		hog_charge_img=1
-	}
 }
 /*
 //draw_text_transformed(x,y-20,abilArray[0,1],0.5,0.5,0)

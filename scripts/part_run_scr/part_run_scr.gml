@@ -235,17 +235,6 @@ function part_run_scr() {
 								hsp=0
 							}
 						}
-						//Goblin ore/dig item player attraction (delay pickup for 30 frames)
-						if((type==5||type==6)&&(durtotal-dur)>=60){
-							var _dx=Me.x-x
-							var _dy=Me.y-y
-							var _dist=sqrt(_dx*_dx+_dy*_dy)
-							if(_dist<46&&_dist>1){
-								var _pull=0.15*(1-_dist/46)
-								hsp+=(_dx/_dist)*_pull
-								vsp+=(_dy/_dist)*_pull
-							}
-						}
 						//Pop Tart player attraction
 						if(type==4){
 							var _dx=Me.x-x
@@ -255,22 +244,6 @@ function part_run_scr() {
 								var _pull=0.15*(1-_dist/46)
 								hsp+=(_dx/_dist)*_pull
 								vsp+=(_dy/_dist)*_pull
-							}
-						}
-						//Goblin ore solid collision
-						if(type==5||type==6){
-							if(instance_place(x+hsp,y,Block)){
-								hsp=0
-							}
-							if(instance_place(x,y+vsp,Block)){
-								vsp=0
-							}
-							hsp*=0.92
-							if(abs(hsp)<0.05){ hsp=0 }
-							if(dur<60){
-								visible=(dur mod 12)<6
-							}else{
-								visible=true
 							}
 						}
 						//Pop Tart solid collision

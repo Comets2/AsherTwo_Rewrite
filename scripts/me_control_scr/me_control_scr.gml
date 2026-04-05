@@ -107,14 +107,17 @@ function me_control_scr() {
 						if(team!=0){
 							if(point_distance(_hx,_hy,x,y)<9){
 								hurttick=1
-								dmgrecieved+=6
-								Me.damagedone+=6
+								var _hog_dmg=6+Me.goblin_upgrade_hog*2
+								dmgrecieved+=_hog_dmg
+								Me.damagedone+=_hog_dmg
 								Control.target=id
-								// Stun player on impact + brief immunity
+								// Stun player on impact + brief immunity + attack anim
 								Me.stun=5
 								Me.immunetwo=20
 								Me.hog_charge=0
 								Me.remhsp=0
+								Me.anim=12
+								Me.animsave=9+(Me.hog_mounted*34)
 							}
 						}
 					}

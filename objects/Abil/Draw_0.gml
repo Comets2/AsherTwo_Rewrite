@@ -1,4 +1,4 @@
-
+if(Control.pause==0){
 //Fishing line + ripples + tug indicator (pin 94)
 if(pin==94){
 
@@ -194,7 +194,263 @@ if(pin==94){
 		}
 	}
 
+}else if(pin==91){
+	//Code-drawn Q selector / inventory / upgrade menus
+	//Copy UI colors to this instance for ui_panel/ui_button
+	ui_border=Control.ui_border
+	pathcolor=Control.pathcolor
+	colorbrown=Control.colorbrown
+	ui_btn_outline=Control.ui_btn_outline
+	colorgold=Control.colorgold
+	colorgoldmed=Control.colorgoldmed
+	colorgoldlight=Control.colorgoldlight
+	hurtcolor=Control.hurtcolor
+
+	if(phase==0){
+		//Selector diamond - 4 directional buttons
+		var _cx=Me.x
+		var _cy=Me.y-20
+		var _bw=22
+		var _bh=8
+		var _gap=2
+		var _anim_offset=sin(diddmg*0.05)*0.5
+
+		var _labels=["Fish","Mine","Dig","Pack"]
+		var _bx=[ _cx-_bw/2, _cx+_gap+2, _cx-_bw/2, _cx-_bw-_gap-2 ]
+		var _by=[ _cy-_bh-_gap-2+_anim_offset, _cy-_bh/2, _cy+_gap+2-_anim_offset, _cy-_bh/2 ]
+
+		var _highlight=0
+		if(global.con_h_up||global.conp_h_up){ _highlight=1 }
+		else if(global.con_h_right||global.conp_h_right){ _highlight=2 }
+		else if(global.con_h_down||global.conp_h_down){ _highlight=3 }
+		else if(global.con_h_left||global.conp_h_left){ _highlight=4 }
+
+		for(var _d=0;_d<4;_d+=1){
+			var _sel=(_highlight==_d+1)
+			ui_button(_bx[_d],_by[_d],_bx[_d]+_bw,_by[_d]+_bh,_sel)
+			var _tcol=_sel?Control.colorbluelight:Control.colorgold
+			var _talpha=_sel?1.0:0.7
+			draw_set_alpha(_talpha)
+			draw_text_ext_transformed_color(
+				_bx[_d]+_bw/2-string_width(_labels[_d])*0.15,
+				_by[_d]+2, _labels[_d], -1, 1000, 0.3, 0.3, 0,
+				_tcol, _tcol, _tcol, _tcol, _talpha)
+			draw_set_alpha(1)
+		}
+
+	}else if(phase==3){
+		//Inventory panel
+		var _px=Me.x-40
+		var _py=Me.y-45
+		var _pw=80
+		var _ph=62
+		ui_panel(_px,_py,_px+_pw,_py+_ph)
+
+		//Title
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width("Inventory")*0.225, _py+4, "Inventory", -1, 1000, 0.45, 0.45, 0,
+			Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, 1)
+
+		//Resource display
+		var _res_y=_py+16
+		var _stone_text="Stone: "+string(Me.goblin_stone)
+		var _wood_text="Wood: "+string(Me.goblin_wood)
+		draw_text_ext_transformed_color(
+			_px+8, _res_y, _stone_text, -1, 1000, 0.3, 0.3, 0,
+			Control.colorgold, Control.colorgold, Control.colorgold, Control.colorgold, 0.9)
+		draw_text_ext_transformed_color(
+			_px+_pw/2+4, _res_y, _wood_text, -1, 1000, 0.3, 0.3, 0,
+			Control.colorgold, Control.colorgold, Control.colorgold, Control.colorgold, 0.9)
+
+		//Menu items
+		var _inv_items=["Upgrade","Repair","Back"]
+		var _menu_y=_py+26
+		var _menu_spacing=11
+		var _item_pad=6
+
+		for(var _m=0;_m<3;_m+=1){
+			var _iy=_menu_y+(_m*_menu_spacing)
+			var _ix=_px+_item_pad
+			var _iw=_pw-_item_pad*2
+			var _ih=9
+			ui_button(_ix,_iy,_ix+_iw,_iy+_ih,_m==spin)
+			var _mtcol=(_m==spin)?Control.colorbluelight:Control.colorgold
+			var _mtalpha=(_m==spin)?1.0:0.7
+			draw_text_ext_transformed_color(
+				_ix+_iw/2-string_width(_inv_items[_m])*0.175, _iy+2, _inv_items[_m], -1, 1000, 0.35, 0.35, 0,
+				_mtcol, _mtcol, _mtcol, _mtcol, _mtalpha)
+		}
+
+		//Triangle arrows on selected item
+		var _sel_iy=_menu_y+(spin*_menu_spacing)
+		var _sel_ix=_px+_item_pad
+		var _sel_iw=_pw-_item_pad*2
+		var _sel_ih=9
+		var _tri_y=_sel_iy+_sel_ih/2
+		var _arrow_off=sin(diddmg*0.025)*0.75
+
+		var _tri_x=_sel_ix-5+_arrow_off
+		draw_rectangle_color(_tri_x,_tri_y-2,_tri_x,_tri_y+2,Control.ui_border,Control.ui_border,Control.ui_border,Control.ui_border,false)
+		draw_rectangle_color(_tri_x+1,_tri_y-1,_tri_x+1,_tri_y+1,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+		draw_rectangle_color(_tri_x+2,_tri_y,_tri_x+2,_tri_y,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+
+		var _tri_x2=_sel_ix+_sel_iw+5-_arrow_off
+		draw_rectangle_color(_tri_x2,_tri_y-2,_tri_x2,_tri_y+2,Control.ui_border,Control.ui_border,Control.ui_border,Control.ui_border,false)
+		draw_rectangle_color(_tri_x2-1,_tri_y-1,_tri_x2-1,_tri_y+1,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+		draw_rectangle_color(_tri_x2-2,_tri_y,_tri_x2-2,_tri_y,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+
+	}else if(phase==4){
+		//Upgrade panel
+		var _px=Me.x-45
+		var _py=Me.y-55
+		var _pw=90
+		var _ph=82
+		ui_panel(_px,_py,_px+_pw,_py+_ph)
+
+		//Title
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width("Upgrade")*0.225, _py+4, "Upgrade", -1, 1000, 0.45, 0.45, 0,
+			Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, 1)
+
+		//Upgrade items with levels
+		var _upg_names=["Club","Armor","Tools","Hog","Back"]
+		var _upg_levels=[Me.goblin_upgrade_club,Me.goblin_upgrade_armor,Me.goblin_upgrade_tools,Me.goblin_upgrade_hog,0]
+		var _menu_y=_py+16
+		var _menu_spacing=11
+		var _item_pad=6
+
+		for(var _m=0;_m<5;_m+=1){
+			var _iy=_menu_y+(_m*_menu_spacing)
+			var _ix=_px+_item_pad
+			var _iw=_pw-_item_pad*2
+			var _ih=9
+			ui_button(_ix,_iy,_ix+_iw,_iy+_ih,_m==spin)
+			var _mtcol=(_m==spin)?Control.colorbluelight:Control.colorgold
+			var _mtalpha=(_m==spin)?1.0:0.7
+
+			var _label=_upg_names[_m]
+			if(_m<4){
+				_label=_upg_names[_m]+" Lv."+string(_upg_levels[_m])
+			}
+			draw_text_ext_transformed_color(
+				_ix+_iw/2-string_width(_label)*0.15, _iy+2, _label, -1, 1000, 0.3, 0.3, 0,
+				_mtcol, _mtcol, _mtcol, _mtcol, _mtalpha)
+		}
+
+		//Cost display for selected upgrade
+		if(spin<4){
+			var _cost=(_upg_levels[spin]+1)*3
+			var _cost_text="Cost: "+string(_cost)+" Stone "+string(_cost)+" Wood"
+			var _can_afford=(Me.goblin_stone>=_cost&&Me.goblin_wood>=_cost)
+			var _cost_col=_can_afford?Control.colorgreen:Control.hurtcolor
+			draw_text_ext_transformed_color(
+				_px+_pw/2-string_width(_cost_text)*0.125, _py+_ph-10, _cost_text, -1, 1000, 0.25, 0.25, 0,
+				_cost_col, _cost_col, _cost_col, _cost_col, 0.9)
+		}
+
+		//Triangle arrows on selected item
+		var _sel_iy=_menu_y+(spin*_menu_spacing)
+		var _sel_ix=_px+_item_pad
+		var _sel_iw=_pw-_item_pad*2
+		var _sel_ih=9
+		var _tri_y=_sel_iy+_sel_ih/2
+		var _arrow_off=sin(diddmg*0.025)*0.75
+
+		var _tri_x=_sel_ix-5+_arrow_off
+		draw_rectangle_color(_tri_x,_tri_y-2,_tri_x,_tri_y+2,Control.ui_border,Control.ui_border,Control.ui_border,Control.ui_border,false)
+		draw_rectangle_color(_tri_x+1,_tri_y-1,_tri_x+1,_tri_y+1,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+		draw_rectangle_color(_tri_x+2,_tri_y,_tri_x+2,_tri_y,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+
+		var _tri_x2=_sel_ix+_sel_iw+5-_arrow_off
+		draw_rectangle_color(_tri_x2,_tri_y-2,_tri_x2,_tri_y+2,Control.ui_border,Control.ui_border,Control.ui_border,Control.ui_border,false)
+		draw_rectangle_color(_tri_x2-1,_tri_y-1,_tri_x2-1,_tri_y+1,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+		draw_rectangle_color(_tri_x2-2,_tri_y,_tri_x2-2,_tri_y,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,Control.colorgoldlight,false)
+
+	}else if(phase==5){
+		//Upgrade detail/confirm panel
+		var _upg_names=["Club","Armor","Tools","Hog"]
+		var _upg_levels=[Me.goblin_upgrade_club,Me.goblin_upgrade_armor,Me.goblin_upgrade_tools,Me.goblin_upgrade_hog]
+		var _cur_level=_upg_levels[test]
+		var _next_level=_cur_level+1
+		var _cost=_next_level*3
+
+		//Descriptions of what each upgrade does
+		var _desc=""
+		var _stat_text=""
+		if(test==0){
+			//Club
+			var _cur_bonus=floor(_cur_level*10)
+			var _next_bonus=floor(_next_level*10)
+			_desc="Whack damage"
+			_stat_text="+"+string(_cur_bonus)+"% > +"+string(_next_bonus)+"%"
+		}else if(test==1){
+			//Armor
+			var _cur_hp=Me.goblin_base_hp+_cur_level
+			var _next_hp=Me.goblin_base_hp+_next_level
+			_desc="Max HP"
+			_stat_text=string(_cur_hp)+" > "+string(_next_hp)
+		}else if(test==2){
+			//Tools
+			var _cur_spd=floor(_cur_level*5)
+			var _next_spd=floor(_next_level*5)
+			_desc="Mine/dig speed, fish CD"
+			_stat_text="+"+string(_cur_spd)+"% > +"+string(_next_spd)+"%"
+		}else if(test==3){
+			//Hog
+			var _cur_dmg=6+_cur_level*2
+			var _next_dmg=6+_next_level*2
+			_desc="Hog charge damage"
+			_stat_text=string(_cur_dmg)+" > "+string(_next_dmg)
+		}
+
+		var _px=Me.x-45
+		var _py=Me.y-45
+		var _pw=90
+		var _ph=58
+		ui_panel(_px,_py,_px+_pw,_py+_ph)
+
+		//Title: upgrade name + level
+		var _title=_upg_names[test]+" Lv."+string(_cur_level)
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width(_title)*0.225, _py+4, _title, -1, 1000, 0.45, 0.45, 0,
+			Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, 1)
+
+		//Description
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width(_desc)*0.15, _py+16, _desc, -1, 1000, 0.3, 0.3, 0,
+			Control.colorgold, Control.colorgold, Control.colorgold, Control.colorgold, 0.9)
+
+		//Stat change
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width(_stat_text)*0.15, _py+24, _stat_text, -1, 1000, 0.3, 0.3, 0,
+			Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, Control.colorbluelight, 1)
+
+		//Cost
+		var _cost_text="Cost: "+string(_cost)+" Stone "+string(_cost)+" Wood"
+		var _can_afford=(Me.goblin_stone>=_cost&&Me.goblin_wood>=_cost)
+		var _cost_col=_can_afford?Control.colorgreen:Control.hurtcolor
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width(_cost_text)*0.125, _py+34, _cost_text, -1, 1000, 0.25, 0.25, 0,
+			_cost_col, _cost_col, _cost_col, _cost_col, 0.9)
+
+		//Confirm button
+		var _btn_y=_py+43
+		var _btn_text=_can_afford?"Confirm":"Not enough"
+		ui_button(_px+6,_btn_y,_px+_pw-6,_btn_y+9,_can_afford)
+		var _btn_col=_can_afford?Control.colorbluelight:Control.colorgold
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width(_btn_text)*0.15, _btn_y+2, _btn_text, -1, 1000, 0.3, 0.3, 0,
+			_btn_col, _btn_col, _btn_col, _btn_col, _can_afford?1.0:0.5)
+
+		//Hint
+		var _hint="SPACE confirm / W back"
+		draw_text_ext_transformed_color(
+			_px+_pw/2-string_width(_hint)*0.1, _py+_ph-4, _hint, -1, 1000, 0.2, 0.2, 0,
+			Control.colorgold, Control.colorgold, Control.colorgold, Control.colorgold, 0.4)
+	}
+
 }else{
 	//Default Abil draw
 	draw_sprite_ext(sprite_index,image_index,x,y,dir,image_yscale,imgangle,c_white,1)
+}
 }

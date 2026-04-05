@@ -16,6 +16,7 @@ nodestroy=0
 blockable=0
 returnable=0
 returned=0
+shielded=0
 durtotal=0
 	img=0
 	imgcap=0
@@ -24,6 +25,7 @@ hsp=0
 vsp=0
 grav=0
 dur=0
+spin=0
 
 sndone=snd_thud_small_1
 sndtwo=snd_thud_small_2

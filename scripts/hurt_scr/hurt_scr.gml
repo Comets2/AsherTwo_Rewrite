@@ -40,6 +40,17 @@ function hurt_scr() {
 			}
 		hurttick=0
 		hp-=dmgrecieved
+		//Goblin durability damage (player only)
+		if(id==Me.id&&Me.class==10){
+			Me.goblin_durability-=dmgrecieved*2
+			if(Me.goblin_durability<=0){
+				Me.goblin_durability=0
+				Me.goblin_upgrade_club=0
+				Me.goblin_upgrade_armor=0
+				Me.goblin_upgrade_tools=0
+				Me.goblin_upgrade_hog=0
+			}
+		}
 		hurtamount+=dmgrecieved
 		hurtamount=dmgrecieved
 		hurttimer=90

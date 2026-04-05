@@ -2658,6 +2658,34 @@ with(Me){
 			
 			
 			
+			//Goblin durability bar (10px, left of XP bar)
+			if(class==10){
+				chance=1
+				for(var i=0;i<12;i+=1){
+					//Border
+					if(i==0||i==11){
+						draw_sprite_ext(icons_spr,77,xps+62+i*1,ypsthree+7,1,1,0,c_white,1)
+					}else{
+						if(i-1<(goblin_durability/goblin_durability_max)*10){
+							if(chance==0){
+								draw_sprite_ext(icons_spr,80,xps+62+i*1,ypsthree+7,1,1,0,c_white,1)
+							}else{
+								draw_sprite_ext(icons_spr,81,xps+62+i*1,ypsthree+7,1,1,0,c_white,1)
+							}
+						}else{
+							if(chance==0){
+								draw_sprite_ext(icons_spr,78,xps+62+i*1,ypsthree+7,1,1,0,c_white,1)
+							}else{
+								draw_sprite_ext(icons_spr,79,xps+62+i*1,ypsthree+7,1,1,0,c_white,1)
+							}
+						}
+					}
+					if(i mod 2==0){
+						if(chance==0){ chance=1 }else{ chance=0 }
+					}
+				}
+			}
+
 			chance=1
 			for(var i=0;i<102;i+=1){
 

@@ -11699,7 +11699,7 @@ function _abil_run_tree() {
 					chancethree=Me.passivefourArray[1,9]
 
 
-					if((global.con_h_e&&!global.con_r_e)||(global.conp_h_e&&!global.conp_r_e)){
+					if((global.con_h_e&&!global.con_r_e)||(global.conp_h_e&&!global.conp_r_e)||global.conp_h_r){
 						Me.passivefourArray[1,6]+=1
 
 						Me.passivefourArray[1,7]=floor(Me.passivefourArray[1,6]/chancethree)
@@ -11713,12 +11713,12 @@ function _abil_run_tree() {
 								if(abilArray[1,1]<globalcdtotal){
 									abilArray[1,1]=globalcdtotal
 									abilArray[1,4]=1
-								}					
+								}
 								if(abilArray[2,1]<globalcdtotal){
 									abilArray[2,1]=globalcdtotal
 									abilArray[2,4]=1
-								}	
-							}						
+								}
+							}
 
 					}else{
 
@@ -12394,7 +12394,7 @@ function _abil_run_tree() {
 					chancethree=Me.passivefourArray[1,9]
 
 
-					if((global.con_h_e&&!global.con_r_e)||(global.conp_h_e&&!global.conp_r_e)){
+					if((global.con_h_e&&!global.con_r_e)||(global.conp_h_e&&!global.conp_r_e)||global.conp_h_r){
 						Me.passivefourArray[1,6]+=1
 
 						Me.passivefourArray[1,7]=floor(Me.passivefourArray[1,6]/chancethree)
@@ -12408,12 +12408,12 @@ function _abil_run_tree() {
 								if(abilArray[1,1]<globalcdtotal){
 									abilArray[1,1]=globalcdtotal
 									abilArray[1,4]=1
-								}					
+								}
 								if(abilArray[2,1]<globalcdtotal){
 									abilArray[2,1]=globalcdtotal
 									abilArray[2,4]=1
-								}	
-							}						
+								}
+							}
 
 					}else{
 
@@ -15953,7 +15953,6 @@ function _abil_run_enemy() {
 					//Return: reverse direction and mark as returned (2 = grace frame)
 					returned=2
 					diddmg=1
-					blockable=0
 					dur=durtotal
 					if(_whack.opt==1){
 						//Side whack - send horizontal
@@ -16003,17 +16002,28 @@ function _abil_run_enemy() {
 			if(place_meeting(x,y,Me.goblin_shield)){
 				var _approaching=(Me.dir==1&&hsp>=0)||(Me.dir==-1&&hsp<=0)
 				if(_approaching){
-					if(pin==30){
-						hsp=hsp*-0.4
-						vsp=vsp*-yrebound
-						diddmg=1
-						audio_play_sound_at(choose(snd_pumpkin_thud_4,snd_pumpkin_thud_5,snd_pumpkin_thud_6),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+					if(returnable==1){
+						//Returnable projectiles get reflected
+						if(pin==30){
+							hsp=hsp*-0.4
+							vsp=vsp*-yrebound
+							diddmg=1
+							shielded=10
+							audio_play_sound_at(choose(snd_pumpkin_thud_4,snd_pumpkin_thud_5,snd_pumpkin_thud_6),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+						}else{
+							hsp=hsp*-0.4
+							diddmg=1
+							shielded=10
+							if(sndone!=0){
+								audio_play_sound_at(choose(sndone,sndtwo),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
+							}
+						}
 					}else{
-						dur=0
-						diddmg=1
+						//Non-returnable projectiles get destroyed
 						if(sndone!=0){
 							audio_play_sound_at(choose(sndone,sndtwo),x,y, 0, Control.falloff_ref, Control.falloff_max, Control.falloff_factor, false, 1)
 						}
+						instance_destroy()
 					}
 					//Shield block icon above head
 					created=instance_create_depth(Me.x,Me.y-14,0,Part)
@@ -16034,6 +16044,14 @@ function _abil_run_enemy() {
 						yscale=1
 					}
 				}
+			}
+		}
+
+		//Shield blocked grace timer - re-enable damage after delay
+		if(shielded>0){
+			shielded-=1
+			if(shielded<=0){
+				diddmg=0
 			}
 		}
 
@@ -16598,6 +16616,7 @@ function _abil_run_goblin() {
 #region Goblin Abil 2 Selector
 	//____________________________________________________________________________---------------------(Goblin Selector)---------------------____________________________________________________________________________
 	} else if(pin==91){
+		depth=-5
 		if(phase==0){
 			//Follow player
 			x=Me.x
@@ -16609,6 +16628,13 @@ function _abil_run_goblin() {
 			//Keep alive while selecting
 			dur=10
 			chance=0
+			diddmg+=1
+
+			//Q or W to cancel selector with no cooldown
+			if(global.con_p_q||global.conp_p_q||global.con_p_w||global.conp_p_w){
+				Me.stun=0
+				instance_destroy()
+			}
 
 			//Directional input
 			if(global.con_p_up||global.conp_p_up){
@@ -16637,15 +16663,37 @@ function _abil_run_goblin() {
 
 				//UP - Fishing
 				if(image_index==img+1){
+					//Dismount hog if mounted
+					if(Me.hog_mounted==1){
+						Me.hog_mounted=0
+						Me.hog_charge=0
+						Me.image_index=1
+						Me.img=1
+						Me.imgcap=0
+						var _hog_side=choose(-1,1)
+						with(Me){ xpos=x; ypos=y; abil_create_scr(3) }
+						//Send hog running to leash range on a random side
+						if(instance_exists(Me.pet)){
+							Me.pet.hsp=_hog_side*2
+							Me.pet.dir=_hog_side
+							Me.pet.image_xscale=_hog_side
+						}
+					}
+
 					//Set cooldown now that selection was made
 					Me.abilArray[1,1]=Me.abilArray[1,2]
+
+					//Apply tools upgrade to fishing CD
+					if(Me.goblin_upgrade_tools>0){
+						Me.abilArray[1,1]=floor(Me.abilArray[1,1]*(1-Me.goblin_upgrade_tools*0.05))
+					}
 
 					//Transform selector into cast bar
 					pin=94
 					phase=-1
 					dur=999
 					durtotal=dur
-					depth=-1
+					depth=-5
 
 					//Bobber sprite (hidden during cast bar)
 					sprite_index=spr_items
@@ -16673,7 +16721,7 @@ function _abil_run_goblin() {
 					diddmg=0
 					test=0
 
-				//RIGHT - Placeholder (no cooldown)
+				//RIGHT - Mining node interaction (no cooldown)
 				}else{
 					if(image_index==img+2){
 						instance_destroy()
@@ -16681,10 +16729,37 @@ function _abil_run_goblin() {
 					//DOWN - Digging
 					}else{
 						if(image_index==img+3){
+							//Dismount hog if mounted
+							if(Me.hog_mounted==1){
+								Me.hog_mounted=0
+								Me.hog_charge=0
+								Me.image_index=1
+								Me.img=1
+								Me.imgcap=0
+								var _hog_side=choose(-1,1)
+								with(Me){ xpos=x; ypos=y; abil_create_scr(3) }
+								//Send hog running to leash range on a random side
+								if(instance_exists(Me.pet)){
+									Me.pet.hsp=_hog_side*2
+									Me.pet.dir=_hog_side
+									Me.pet.image_xscale=_hog_side
+								}
+							}
+
 							//Set cooldown now that selection was made
 							Me.abilArray[1,1]=Me.abilArray[1,2]
+
+							//Apply tools upgrade to digging CD
+							if(Me.goblin_upgrade_tools>0){
+								Me.abilArray[1,1]=floor(Me.abilArray[1,1]*(1-Me.goblin_upgrade_tools*0.05))
+							}
+
 							phase=2
 							dur=60
+							//Apply tools upgrade to dig speed
+							if(Me.goblin_upgrade_tools>0){
+								dur=floor(dur*(1-Me.goblin_upgrade_tools*0.05))
+							}
 							durtotal=dur
 							sprite_index=abil_goblin_effect_spr
 							img=1
@@ -16692,11 +16767,15 @@ function _abil_run_goblin() {
 							imgsped=0.3
 							image_index=img
 							dir=Me.dir
+							move=0
 
-						//LEFT - Placeholder (no cooldown)
+						//LEFT - Inventory
 						}else{
 							if(image_index==img+4){
-								instance_destroy()
+								phase=3
+								spin=0
+								dur=999
+								diddmg=0
 							}
 						}
 					}
@@ -16743,41 +16822,27 @@ function _abil_run_goblin() {
 
 				if(dur<=0){
 					Me.stun=0
-					//Spawn 1-3 mineral drops
-					chancetwo=1+irandom(2)
+					//Spawn 2-3 stone drops
+					chancetwo=2+irandom(1)
 					for(i=0;i<chancetwo;i+=1){
-						created=instance_create_depth(Me.x-4+irandom(8),Me.y-4+irandom(4),0,Part)
+						created=instance_create_depth(Me.x-4+irandom(8),Me.y-4+irandom(4),0,Drop)
 						with(created){
-							pin=2
-							type=5
-							depth=other.depth+1
-							spin=3
-							sprite_index=spr_items
-							//Rarity roll
-							chance=irandom(99)
-							if(chance<3){
-								img=186 //Crystal
-							}else{
-								if(chance<15){
-									img=103 //Mithril Ore
-								}else{
-									if(chance<40){
-										img=choose(101,102) //Copper or Dark Iron Ore
-									}else{
-										img=choose(100,109) //Stone or Coal
-									}
-								}
-							}
+							img=100 //Stone
 							image_index=img
-							imgcap=0
-							imgsped=0
-							image_speed=0
-							dur=600
-							durtotal=dur
 							hsp=random_range(-0.8,0.8)
 							vsp=random_range(-1.5,-2)
 							grav=0.05
-							gravtwo=0.02
+						}
+					}
+					//10% chance to drop emerald (+2% per tools level)
+					if(irandom(99)<10+Me.goblin_upgrade_tools*2){
+						created=instance_create_depth(Me.x-4+irandom(8),Me.y-4+irandom(4),0,Drop)
+						with(created){
+							img=113 //Emerald
+							image_index=img
+							hsp=random_range(-0.8,0.8)
+							vsp=random_range(-1.5,-2)
+							grav=0.05
 						}
 					}
 					instance_destroy()
@@ -16796,6 +16861,12 @@ function _abil_run_goblin() {
 					y=Me.y+18+Me.vsp
 					imgangle=270
 					dir=1
+					visible=false
+
+					//Goblin digging animation (image 60-61)
+					Me.animstop=2
+					diddmg+=1
+					Me.image_index=60+min(floor(diddmg/30),2)
 
 					//Animate
 					if(dur mod max(1,floor(1/imgsped))==0){
@@ -16804,26 +16875,27 @@ function _abil_run_goblin() {
 						}
 					}
 
-					//Spawn dirt particles while digging
-					if(dur mod 4==0){
-						var _pc=1+irandom(2)
+					//Spawn dirt particles while digging (30% less, land on ground)
+					if(dur mod 6==0){
+						var _pc=1+irandom(1)
 						for(var _p=0;_p<_pc;_p+=1){
 							created=instance_create_depth(Me.x-6+irandom(12),Me.y+4+irandom(4),depth-1,Part)
 							with(created){
 								pin=1
-								type=3
+								type=2
+								pintwo=1
+								phase=1
 								sprite_index=spr_particle
 								img=5+irandom(3)
 								image_index=img
 								imgcap=0
 								imgsped=0
 								image_speed=0
-								spin=1
-								hsp=random_range(-1,1)
-								vsp=random_range(-1.5,-0.5)
-								grav=0.11
-								gravtwo=0.03
-								dur=irandom_range(30,45)
+								hsp=random_range(-0.8,0.8)
+								vsp=random_range(-1.2,-0.5)
+								grav=0.15
+								gravtwo=0.01
+								dur=35+irandom(30)
 								durtotal=dur
 							}
 						}
@@ -16848,70 +16920,187 @@ function _abil_run_goblin() {
 
 					if(dur<=0){
 						Me.stun=0
-						//Burst of dirt particles on dig complete
-						for(var _p=0;_p<6;_p+=1){
+						//Burst of dirt particles on dig complete (land on ground)
+						for(var _p=0;_p<4;_p+=1){
 							created=instance_create_depth(Me.x-4+irandom(8),Me.y+2+irandom(4),depth-1,Part)
 							with(created){
 								pin=1
-								type=3
+								type=2
+								pintwo=1
+								phase=1
 								sprite_index=spr_particle
 								img=5+irandom(3)
 								image_index=img
 								imgcap=0
 								imgsped=0
 								image_speed=0
-								spin=1
-								hsp=random_range(-1.5,1.5)
-								vsp=random_range(-2.5,-1)
-								grav=0.11
-								gravtwo=0.03
-								dur=irandom_range(35,50)
+								hsp=random_range(-1.2,1.2)
+								vsp=random_range(-2,-0.8)
+								grav=0.15
+								gravtwo=0.01
+								dur=35+irandom(30)
 								durtotal=dur
 							}
 						}
 						//Spawn 1 dig item drop popping out of ground
-						chancetwo=1
-						for(i=0;i<chancetwo;i+=1){
-							created=instance_create_depth(Me.x,Me.y,0,Part)
+						created=instance_create_depth(Me.x,Me.y,0,Drop)
+						with(created){
+							//50% wood, 50% stone
+							if(irandom(1)==0){
+								img=115 //Wood
+							}else{
+								img=100 //Stone
+							}
+							image_index=img
+							hsp=random_range(-0.8,0.8)
+							vsp=random_range(-1.5,-2)
+						}
+						//4% chance for emerald (+2% per tools level)
+						if(irandom(99)<4+Me.goblin_upgrade_tools*2){
+							created=instance_create_depth(Me.x,Me.y,0,Drop)
 							with(created){
-								pin=2
-								type=5
-								depth=Me.depth-1
-								spin=3
-								sprite_index=spr_items
-								image_speed=0
-								//Rarity roll
-								chance=irandom(99)
-								if(chance<50){
-									img=97 //Grass Clump (common)
-								}else{
-									if(chance<75){
-										img=choose(100,115) //Stone or Wood
-									}else{
-										if(chance<85){
-											img=choose(112,113,114) //Sapphire, Emerald, or Ruby
-										}else{
-											img=96 //Coin
-											type=6 //Mark as coin drop
-										}
-									}
-								}
+								img=113 //Emerald
 								image_index=img
-								imgcap=0
-								imgsped=0
-								dur=600
-								durtotal=dur
 								hsp=random_range(-0.8,0.8)
 								vsp=random_range(-1.5,-2)
-								grav=0.12
-								gravtwo=0.02
+							}
+						}
+						//1% chance for treasure chest (+1% per tools level)
+						if(irandom(99)<1+Me.goblin_upgrade_tools){
+							created=instance_create_depth(Me.x,Me.y,0,Drop)
+							with(created){
+								img=128 //Treasure chest
+								image_index=img
+								hsp=random_range(-0.8,0.8)
+								vsp=random_range(-1.5,-2)
 							}
 						}
 						//No longer leaves a dig hole
 						instance_destroy()
 				}
+				}else if(phase==3){
+		//____________________________________________________________________________---------------------(Goblin Inventory)---------------------____________________________________________________________________________
+			//Follow player
+			x=Me.x
+			y=Me.y-23
+			Me.stun=2
+			dur=999
+			diddmg+=1
+
+			//Navigation
+			if(global.con_p_up||global.conp_p_up){
+				spin-=1
+				if(spin<0) spin=2
 			}
-		}
+			if(global.con_p_down||global.conp_p_down){
+				spin+=1
+				if(spin>2) spin=0
+			}
+
+			//Confirm
+			if(global.con_p_space||global.conp_p_space||global.con_p_e||global.conp_p_e||global.con_p_q||global.conp_p_q){
+				if(spin==0){
+					//Upgrade submenu
+					phase=4
+					spin=0
+					diddmg=0
+				}else if(spin==1){
+					//Repair - costs 2 stone + 2 wood, restores 25 durability
+					if(Me.goblin_stone>=2&&Me.goblin_wood>=2&&Me.goblin_durability<Me.goblin_durability_max){
+						Me.goblin_stone-=2
+						Me.goblin_wood-=2
+						Me.goblin_durability=min(Me.goblin_durability+25,Me.goblin_durability_max)
+					}
+				}else if(spin==2){
+					//Back - close inventory
+					Me.stun=0
+					instance_destroy()
+				}
+			}
+
+			//W or ESC to close
+			if(global.con_p_escape||global.con_p_w||global.conp_p_w){
+				Me.stun=0
+				instance_destroy()
+			}
+
+				}else if(phase==4){
+		//____________________________________________________________________________---------------------(Goblin Upgrade Menu)---------------------____________________________________________________________________________
+			//Follow player
+			x=Me.x
+			y=Me.y-23
+			Me.stun=2
+			dur=999
+			diddmg+=1
+
+			//Navigation
+			if(global.con_p_up||global.conp_p_up){
+				spin-=1
+				if(spin<0) spin=4
+			}
+			if(global.con_p_down||global.conp_p_down){
+				spin+=1
+				if(spin>4) spin=0
+			}
+
+			//Confirm
+			if(global.con_p_space||global.conp_p_space||global.con_p_e||global.conp_p_e||global.con_p_q||global.conp_p_q){
+				if(spin==4){
+					//Back to inventory
+					phase=3
+					spin=0
+					diddmg=0
+				}else{
+					//Go to detail/confirm screen for this upgrade
+					test=spin
+					phase=5
+					diddmg=0
+				}
+			}
+
+			//W or ESC to go back to inventory
+			if(global.con_p_escape||global.con_p_w||global.conp_p_w){
+				phase=3
+				spin=0
+				diddmg=0
+			}
+
+				}else if(phase==5){
+		//____________________________________________________________________________---------------------(Goblin Upgrade Detail)---------------------____________________________________________________________________________
+			//Follow player
+			x=Me.x
+			y=Me.y-23
+			Me.stun=2
+			dur=999
+			diddmg+=1
+
+			//Confirm upgrade
+			if(global.con_p_space||global.conp_p_space||global.con_p_e||global.conp_p_e||global.con_p_q||global.conp_p_q){
+				var _upg_levels=[Me.goblin_upgrade_club,Me.goblin_upgrade_armor,Me.goblin_upgrade_tools,Me.goblin_upgrade_hog]
+				var _cur_level=_upg_levels[test]
+				var _cost=(_cur_level+1)*3
+				if(Me.goblin_stone>=_cost&&Me.goblin_wood>=_cost){
+					Me.goblin_stone-=_cost
+					Me.goblin_wood-=_cost
+					if(test==0) Me.goblin_upgrade_club+=1
+					else if(test==1) Me.goblin_upgrade_armor+=1
+					else if(test==2) Me.goblin_upgrade_tools+=1
+					else if(test==3) Me.goblin_upgrade_hog+=1
+					//Close menu after upgrading
+					Me.stun=0
+					instance_destroy()
+				}
+			}
+
+			//W or ESC to go back to upgrade list
+			if(global.con_p_escape||global.con_p_w||global.conp_p_w){
+				phase=4
+				spin=test
+				diddmg=0
+			}
+
+				}
+			}
 		}
 	} else if(pin==93){
 		//Goblin Mining Node (passive)
@@ -16953,7 +17142,11 @@ function _abil_run_goblin() {
 				if(_pressing_toward){
 					phase=1
 					dur=60
-					durtotal=60
+					//Apply tools upgrade to mining speed
+					if(Me.goblin_upgrade_tools>0){
+						dur=floor(dur*(1-Me.goblin_upgrade_tools*0.05))
+					}
+					durtotal=dur
 				}
 			}
 		}
@@ -17063,48 +17256,36 @@ function _abil_run_goblin() {
 						}
 					}
 
-					//Spawn 1-3 item drops
-					chancetwo=1+irandom(2)
+					if(type==0){
+						//Stone node: spawn 2-3 stone drops
+						chancetwo=2+irandom(1)
+					}else{
+						//Tree node: spawn 2-4 wood drops
+						chancetwo=2+irandom(2)
+					}
 					for(i=0;i<chancetwo;i+=1){
-						created=instance_create_depth(startx+4+irandom(8),starty+irandom(4),0,Part)
+						created=instance_create_depth(startx+4+irandom(8),starty+irandom(4),0,Drop)
 						with(created){
-							pin=2
-							type=5
-							depth=other.depth+1
-							spin=3
-							sprite_index=spr_items
-							image_speed=0
-
 							if(other.type==0){
-								//Stone drops
-								chance=irandom(99)
-								if(chance<3){
-									img=186 //Crystal
-								}else{
-									if(chance<15){
-										img=103 //Mithril Ore
-									}else{
-										if(chance<40){
-											img=choose(101,102) //Copper or Dark Iron Ore
-										}else{
-											img=choose(100,109) //Stone or Coal
-										}
-									}
-								}
+								img=100 //Stone
 							}else{
-								//Tree drops
 								img=115 //Wood
 							}
-
 							image_index=img
-							imgcap=0
-							imgsped=0
-							dur=600
-							durtotal=dur
 							hsp=random_range(-0.8,0.8)
 							vsp=random_range(-1.5,-2)
-							grav=0.12
-							gravtwo=0.02
+						}
+					}
+					//Stone node: 10% chance to drop emerald (+2% per tools level)
+					if(type==0){
+						if(irandom(99)<10+Me.goblin_upgrade_tools*2){
+							created=instance_create_depth(startx+4+irandom(8),starty+irandom(4),0,Drop)
+							with(created){
+								img=113 //Emerald
+								image_index=img
+								hsp=random_range(-0.8,0.8)
+								vsp=random_range(-1.5,-2)
+							}
 						}
 					}
 
@@ -17268,19 +17449,22 @@ function _abil_run_goblin() {
 				dur=30
 				durtotal=dur
 
-				//Roll fish loot now and store in phasecheck
-				var _seaweed_chance=50-test
+				//Roll fish loot: 25% seaweed, 5% treasure, then fish: 60% small, 35% med, 5% rare
 				var _roll=irandom(99)
-				if(_roll<_seaweed_chance){
+				if(_roll<25){
 					phasecheck=129 //Seaweed
-				}else if(_roll<_seaweed_chance+25){
-					phasecheck=135 //Small fish
-				}else if(_roll<_seaweed_chance+40){
-					phasecheck=130 //Big fish
-				}else if(_roll<_seaweed_chance+45){
+				}else if(_roll<30){
 					phasecheck=128 //Treasure chest
 				}else{
-					phasecheck=129 //Seaweed
+					//Fish sub-roll (70% of catches)
+					var _froll=irandom(99)
+					if(_froll<60){
+						phasecheck=135 //Small fish - heals 0.5
+					}else if(_froll<95){
+						phasecheck=130 //Medium fish - heals 1
+					}else{
+						phasecheck=132 //Rare fish - heals 2
+					}
 				}
 			}
 
@@ -17301,24 +17485,12 @@ function _abil_run_goblin() {
 				Me.animstop=0
 
 				//Spawn fish loot at rod tip using stored roll
-				created=instance_create_depth(x,y,0,Part)
+				created=instance_create_depth(x,y,0,Drop)
 				with(created){
-					pin=2
-					type=5
-					depth=Me.depth-1
-					spin=3
-					sprite_index=spr_items
-					image_speed=0
 					img=other.phasecheck
 					image_index=img
-					imgcap=0
-					imgsped=0
-					dur=600
-					durtotal=dur
 					hsp=random_range(-0.8,0.8)
 					vsp=random_range(-1.5,-2)
-					grav=0.12
-					gravtwo=0.02
 				}
 				instance_destroy()
 			}
@@ -17340,31 +17512,29 @@ function _abil_run_goblin() {
 #endregion
 
 	} else if(pin==96){
-#region Boar (Hog Dismount)
-		// Boar - runs forward with proper physics, charge damage, despawns
-
+#region Boar Pet
+		// ---- PHYSICS ----
 		// Gravity
 		if(vsp<5){
 			vsp+=grav
 			if(vsp>5){ vsp=5 }
 		}
 
-		// Horizontal movement - run in dir, slow deceleration
-		hsp=sign(hsp)*max(abs(hsp)-0.005,0)
-
-		// Horizontal collision with slope stepping (like gravity_scr)
-		if(place_meeting(x+hsp,y,Block)){
-			var _yplus=0
-			while(place_meeting(x+hsp,y-_yplus,Block) && _yplus<=abs(3*hsp)){
-				_yplus+=1
-			}
-			if(place_meeting(x+hsp,y-_yplus,Block)){
-				while(!place_meeting(x+sign(hsp),y,Block)){
-					x+=sign(hsp)
+		// Horizontal collision with slope stepping
+		if(hsp!=0){
+			if(place_meeting(x+hsp,y,Block)){
+				var _yplus=0
+				while(place_meeting(x+hsp,y-_yplus,Block) && _yplus<=abs(3*hsp)){
+					_yplus+=1
 				}
-				hsp=0
-			}else{
-				y-=_yplus
+				if(place_meeting(x+hsp,y-_yplus,Block)){
+					while(!place_meeting(x+sign(hsp),y,Block)){
+						x+=sign(hsp)
+					}
+					hsp=0
+				}else{
+					y-=_yplus
+				}
 			}
 		}
 
@@ -17384,32 +17554,276 @@ function _abil_run_goblin() {
 		var _grnd=0
 		if(instance_place(x,y+1,Block)||instance_place(x,y+2,Block)){
 			_grnd=1
+			test=2  // Reset double jump
 		}
 
-		// Animation
-		if(_grnd){
-			if(abs(hsp)>0.1){
-				img=50; imgcap=3  // Walk
-			} else {
-				img=50; imgcap=0  // Idle
+		// Cooldowns
+		if(phasecheck>0){ phasecheck-=1 }
+		if(timer>0){ timer-=1 }
+
+		// ---- CALLED STATE ----
+		// Block calls briefly after spawning (so dismount W doesn't immediately recall)
+		if(callblock>0){ callblock-=1 }
+		// Holding W keeps calling (only after block expires)
+		else if(Me.con_h_w){ called=1; calltimer=180 }
+
+		if(called==1){
+			calltimer-=1
+
+			// Auto-mount if holding W and colliding with player
+			if(Me.con_h_w && place_meeting(x,y,Me) && Me.stun==0){
+				Me.hog_mounted=1
+				Me.hog_charge=0
+				Me.image_index=35
+				Me.img=35
+				Me.imgcap=0
+				Me.pet=noone
+				instance_destroy()
+				exit
 			}
-		} else {
-			if(vsp<0){
-				img=54; imgcap=1  // Rise
-			} else {
-				img=56; imgcap=1  // Fall
+
+			var _xdiff_c=abs(Me.x-x)
+			if(_xdiff_c<6){
+				// Right next to player - stop being called
+				called=0
+				calltimer=0
+				hsp=0
+			}else if(calltimer<=0){
+				// Timed out - give up and return to normal
+				called=0
+				calltimer=0
+			}else{
+				// Rush toward player
+				phase=0
+				var _cdir=sign(Me.x-x)
+				if(_cdir!=0){ dir=_cdir }
+				image_xscale=dir
+				// Slow down as it gets close so it doesn't overshoot
+				var _spd = _xdiff_c < 16 ? slow*0.6 : slow*1.5
+				hsp=dir*_spd
+
+				// Jump if player is above or wall in the way
+				if(_grnd && test>0){
+					var _need_jump=false
+					if(Me.y<y-12){
+						_need_jump=true
+					}
+					if(place_meeting(x+dir*6,y,Block)){
+						_need_jump=true
+					}
+					if(_need_jump){
+						var _ydiff=abs(Me.y-y)
+						vsp=-clamp(2+_ydiff*0.1,3,5.5)
+						test-=1
+					}
+				}
 			}
 		}
 
-		if(image_index+imgsped<img+imgcap+1){
-			image_index+=imgsped
-		} else {
-			image_index=img
+		// ---- AI ----
+		if(called==0){
+		// Find nearest enemy
+		var _target=noone
+		var _tdist=80
+		with(Enemy){
+			if(team!=0 && hp>0){
+				var _d=point_distance(x,y,other.x,other.y)
+				if(_d<_tdist){
+					_tdist=_d
+					_target=id
+				}
+			}
 		}
 
-		// Charge particles + hitbox
+		var _pdist=point_distance(x,y,Me.x,Me.y)
+
+
+		if(timer<=0){
+			if(_target!=noone && _tdist<60){
+				// Enemy nearby - chase it
+				phase=1
+				var _xdiff=abs(_target.x-x)
+
+				// Only change direction if far enough apart to avoid flickering
+				if(_xdiff>6){
+					var _edir=sign(_target.x-x)
+					if(_edir!=0){ dir=_edir }
+					image_xscale=dir
+				}
+
+				if(phasecheck>0){
+					// Attack on cooldown - wander near enemy loosely
+					if(_tdist>48){
+						if(_xdiff>6){
+							hsp=dir*slow*0.4
+						}else{
+							hsp=0
+						}
+					}else if(_tdist<12){
+						// Too close, back off a bit
+						hsp=-dir*slow*0.3
+					}else{
+						// Comfortable range, drift randomly
+						if(spin>0){
+							spin-=1
+						}else{
+							hsp=0
+							if(_grnd && irandom(60)==0){
+								hsp=choose(-1,1)*slow*0.3
+								spin=irandom_range(15,35)
+							}
+						}
+					}
+				}else if(_tdist>14){
+					if(_xdiff>6){
+						hsp=dir*slow
+					}else{
+						hsp=0
+					}
+				}else{
+					// In range and ready - attack
+					phase=2
+					timer=16
+					phasecheck=160
+					hsp=0
+					hurtnum=0
+				}
+
+				// Jump toward enemy if above (only when ready to attack)
+				if(phasecheck<=0 && _target.y<y-8 && _tdist<50 && test>0){
+					var _ydiff=abs(_target.y-y)
+					vsp=-clamp(2+_ydiff*0.1,3,5.5)
+					test-=1
+				}
+			}else{
+				// Follow player loosely
+				phase=0
+				var _xdiff_p=abs(Me.x-x)
+				var _pdir=sign(Me.x-x)
+
+				if(_pdist>50){
+					// Too far - chase player, cancel any wander
+					spin=0
+					if(_xdiff_p>6 && _pdir!=0){
+						dir=_pdir
+						image_xscale=dir
+					}
+					hsp=dir*slow
+				}else if(_pdist>30){
+					// Drifting distance - move slowly, cancel wander
+					spin=0
+					if(_xdiff_p>6 && _pdir!=0){
+						dir=_pdir
+						image_xscale=dir
+					}
+					hsp=dir*slow*0.5
+				}else{
+					// Near player - wander / idle
+					if(spin>0){
+						// Currently in a wander action, let it play out
+						spin-=1
+					}else{
+						// Idle, count down to next action
+						hsp=0
+						if(_grnd){
+							phasecheck-=1
+							if(phasecheck<=0){
+								phasecheck=irandom_range(80,180)
+								var _roll=irandom(5)
+								if(_roll<=1){
+									// Wander in a direction
+									var _wander=choose(-1,1)
+									if(abs((x+_wander*20)-Me.x)<45){
+										dir=_wander
+										image_xscale=dir
+										hsp=dir*slow*0.3
+										spin=irandom_range(20,50)
+									}
+								}else if(_roll==2){
+									// Little hop
+									if(test>0){
+										vsp=-2
+										test-=1
+										spin=15
+									}
+								}else if(_roll==3){
+									// Look around
+									dir=choose(-1,1)
+									image_xscale=dir
+									spin=irandom_range(30,60)
+								}
+								// else: just stand still (do nothing)
+							}
+						}
+					}
+				}
+
+				// Jump if player is above (only when clearly on a different level)
+				if(Me.y<y-20 && _pdist<80 && _grnd && test>0){
+					// Only jump if there's a wall in the way or no ground path
+					var _pdir_j=sign(Me.x-x)
+					if(_pdir_j==0){ _pdir_j=dir }
+					if(place_meeting(x+_pdir_j*6,y,Block) || !instance_place(x+_pdir_j*12,y+2,Block)){
+						var _ydiff=abs(Me.y-y)
+						vsp=-clamp(2+_ydiff*0.1,3,5.5)
+						test-=1
+					}
+				}
+			}
+
+			// Jump over walls / up ledges
+			if(hsp!=0 && test>0){
+				var _wdir=sign(hsp)
+				if(place_meeting(x+_wdir*6,y,Block)){
+					// Measure wall height
+					var _wallH=0
+					for(var _jy=8;_jy<=64;_jy+=8){
+						if(place_meeting(x+_wdir*6,y-_jy,Block)){
+							_wallH=_jy
+						}else{
+							break
+						}
+					}
+
+					if(_wallH<=16){
+						// Short wall - small hop forward
+						vsp=-3.5
+						test-=1
+					}else if(_grnd && test>=2){
+						// Tall wall - first jump: straight up, cancel horizontal
+						vsp=-5.5
+						hsp=0
+						returned=_wdir  // Remember which direction to clear
+						test-=1
+					}else if(!_grnd && returned!=0){
+						// Mid-air second jump: up and forward to clear
+						vsp=-5
+						hsp=returned*slow
+						returned=0
+						test-=1
+					}
+				}
+			}
+
+			// Second jump for tall wall: if mid-air after a straight-up jump
+			if(!_grnd && returned!=0 && vsp>-1 && test>0){
+				// At or near peak of first jump, do the forward jump
+				vsp=-4.5
+				hsp=returned*slow
+				returned=0
+				test-=1
+			}
+
+			// Reset wall climb direction on landing
+			if(_grnd){ returned=0 }
+		}else{
+			// Attack animation active
+			hsp=0
+		}
+		} // end called==0
+
+		// ---- CHARGE (carried over from dismount) ----
 		if(diddmg==1 && abs(hsp)>0.1){
-			// Dust particles in front
 			if(_grnd && dur mod 3==0){
 				var _px=x+(dir*10)
 				var _py=y+random_range(-4,4)
@@ -17432,8 +17846,6 @@ function _abil_run_goblin() {
 					image_angle=random(360)
 				}
 			}
-
-			// Damage enemies on contact
 			with(Enemy){
 				if(team!=0){
 					if(point_distance(other.x+(other.dir*10),other.y,x,y)<9){
@@ -17447,9 +17859,66 @@ function _abil_run_goblin() {
 			}
 		}
 
-		// Despawn
-		dur-=1
-		if(dur<=0){
+		// ---- ATTACK DAMAGE ----
+		if(phase==2 && timer>8 && timer<14){
+			with(Enemy){
+				if(team!=0){
+					if(point_distance(other.x+(other.dir*10),other.y,x,y)<16){
+						// Check if already hit this attack
+						var _already=false
+						for(var _h=0;_h<other.hurtnum;_h++){
+							if(other.hurtArray[_h]==id){ _already=true; break }
+						}
+						if(!_already){
+							hurttick=1
+							dmgrecieved+=other.dmg
+							Me.damagedone+=other.dmg
+							Control.target=id
+							other.hurtArray[other.hurtnum]=id
+							other.hurtnum+=1
+						}
+					}
+				}
+			}
+		}
+
+		// ---- ANIMATION ----
+		var _newimg=img
+		var _newcap=imgcap
+		if(timer>0 && phase==2){
+			_newimg=58; _newcap=1
+		}else if(_grnd){
+			if(abs(hsp)>0.1){
+				_newimg=50; _newcap=3
+			} else {
+				_newimg=50; _newcap=0
+			}
+		} else {
+			if(vsp<0){
+				_newimg=54; _newcap=1
+			} else {
+				_newimg=56; _newcap=1
+			}
+		}
+
+		// Only reset image_index when animation state actually changes
+		if(_newimg!=img){
+			img=_newimg
+			imgcap=_newcap
+			image_index=img
+		}else{
+			imgcap=_newcap
+		}
+
+		if(image_index+imgsped<img+imgcap+1){
+			image_index+=imgsped
+		} else {
+			image_index=img
+		}
+
+		// ---- CLEANUP ----
+		if(Me.hp<=0 || Me.class!=10){
+			Me.pet=noone
 			instance_destroy()
 		}
 #endregion

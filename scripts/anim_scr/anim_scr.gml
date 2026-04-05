@@ -116,5 +116,10 @@ function anim_scr() {
 		}
 		}
 
+		// Mount safety: ensure image_index is always in mounted range
+		if(class==10 && hog_mounted==1 && image_index<35){
+			image_index=img
+		}
+
 
 }

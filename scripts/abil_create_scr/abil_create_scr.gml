@@ -2412,7 +2412,7 @@ function abil_create_scr(argument0) {
 					opt=-1
 				}
 				
-				if(global.con_h_down){
+				if(global.con_h_down||global.conp_h_down){
 					if(Control.talentmapArray[3,1]>0){
 						if(other.passivefourArray[0,1]==3){
 							img=320
@@ -2431,7 +2431,7 @@ function abil_create_scr(argument0) {
 							Me.vsp=2
 						}
 				}else{
-					if(global.con_h_up){
+					if(global.con_h_up||global.conp_h_up){
 						if(Control.talentmapArray[3,1]>0){
 							if(other.passivefourArray[0,1]==3){
 								img=327
@@ -4723,6 +4723,8 @@ chance=1
 				dmg+=dmg*(Control.talentmapArray[1,1]*0.05)
 				dmg+=chance*(Control.invenArray[25,3]*0.01)
 				if(Control.rogue_mode){ dmg += dmg * (Me.rogue_statatt * 0.05) }
+				//Club upgrade: +10% damage per level
+				if(Me.goblin_upgrade_club>0){ dmg += dmg * (Me.goblin_upgrade_club * 0.10) }
 
 				creator=other.id
 				depth=other.depth-1
@@ -4828,8 +4830,9 @@ chance=1
 #endregion
 #region Goblin Abil 3
 		if(argument0==3){
-			//Goblin Abil 3 - Spawn Boar on Dismount
-			created=instance_create_depth(xpos,ypos,0,Abil)
+			//Goblin Abil 3 - Spawn Boar Pet
+			created=instance_create_depth(xpos,ypos,2,Abil)
+			pet=created
 			with(created){
 				type=1
 				pin=96
@@ -4842,7 +4845,7 @@ chance=1
 				imgsped=0.1
 				image_index=50
 				image_speed=0
-				dur=180
+				dur=999999
 				durtotal=dur
 				phase=0
 				dir=Me.dir
@@ -4852,10 +4855,18 @@ chance=1
 					vsp=1
 				}
 				grav=0.3
-				dmg=6
+				dmg=2
 				image_xscale=dir
 				// Carry over charge state
 				diddmg=Me.hog_charge>=1 ? 1 : 0
+				// Pet AI variables
+				phasecheck=0    // attack cooldown
+				timer=0         // attack anim timer
+				slow=1.2        // move speed
+				test=1          // jumps remaining (double jump)
+				called=0        // 1 = called by player, rushing to them
+				calltimer=0     // frames remaining to reach player before giving up
+				callblock=10    // ignore calls for a few frames after spawning
 			}
 		}else{
 #endregion

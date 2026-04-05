@@ -1311,13 +1311,14 @@ if(pauseopt!=2){
 					if(selected == 998 && cursor_mode == 1){
 						if(global.con_p_space || global.conp_p_space){
 							// Cycle through classes when mask is selected
-							Me.class = (Me.class + 1) % 10
+							Me.class = (Me.class + 1) % 11
+							Me.classcheck = 1
 						}
 					}
 					// Handle mouse click on mask
 					if(pauseopt == 0 && mouse_x>=xps+80 && mouse_y>=yps+10 && mouse_x<xps+80+16 && mouse_y<yps+10+16){
 						if(mouse_check_button_pressed(mb_left) || touch_pressed_in_rect(xps+80, yps+10, xps+80+16, yps+10+16)){
-							Me.class = (Me.class + 1) % 10
+							Me.class = (Me.class + 1) % 11
 							Me.classcheck = 1
 						}
 					}
@@ -1618,15 +1619,15 @@ for(var i=0;i<3;i+=1){
 			if(mouse_check_button_pressed(mb_left) || 
 			   (global.touch_pressed && global.touch_x >= button_x && global.touch_x < button_x + button_width && 
 			    global.touch_y >= button_y && global.touch_y < button_y + button_height)){
-				Me.class = (Me.class + 1) % 10;
+				Me.class = (Me.class + 1) % 11;
 				Me.classcheck = 1;
 			}
 		}
-		
+
 		// Handle keyboard/gamepad selection of button
 		if(cursor_mode == 1 && selected == 997){
 			if(global.con_p_space || global.conp_p_space){
-				Me.class = (Me.class + 1) % 10;
+				Me.class = (Me.class + 1) % 11;
 				Me.classcheck = 1;
 			}
 		}

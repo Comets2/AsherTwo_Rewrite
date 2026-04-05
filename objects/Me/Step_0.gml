@@ -43,88 +43,8 @@ if(hit!=noone){
 						}
 					}
 				}else{
-				//Goblin mining/digging ore pickup (delay pickup for 30 frames)
-				if((hit.type==5||hit.type==6)&&(hit.durtotal-hit.dur)>=60){
-					audio_play_sound(choose(snd_coin_1,snd_coin_2,snd_coin_3),8, false)
-
-					var _show_visual=true
-					var _hit_img=hit.img
-
-					if(hit.type==6){
-						//Coin drop - add gold
-						Control.mapdataArray[1000,5]+=1
-					}else if(_hit_img==97||_hit_img==129){
-						//Grass clump / Seaweed - no reward, no visual
-						_show_visual=false
-					}else if(_hit_img==135){
-						//Small fish - heal 0.5
-						hp=min(hp+0.5,hptotal)
-						healrecieved=1
-						healtick=1
-					}else if(_hit_img==130){
-						//Big fish - heal 1
-						hp=min(hp+1,hptotal)
-						healrecieved=1
-						healtick=1
-					}else if(_hit_img==128){
-						//Treasure chest - drop 2-4 coins
-						var _coins=irandom_range(2,4)
-						for(var _c=0;_c<_coins;_c+=1){
-							var _coin=instance_create_depth(hit.x,hit.y,0,Part)
-							with(_coin){
-								pin=2
-								type=6
-								sprite_index=spr_items
-								image_speed=0
-								img=96
-								image_index=img
-								imgcap=0
-								imgsped=0
-								dur=600
-								durtotal=dur
-								hsp=random_range(-1,1)
-								vsp=random_range(-2,-1)
-								grav=0.12
-								gravtwo=0.02
-							}
-						}
-					}else if(_hit_img==112||_hit_img==113||_hit_img==114){
-						//Gem (Sapphire/Emerald/Ruby) - give xp
-						Control.mapdataArray[1000,5]+=1
-						Control.xpamount+=5
-					}else{
-						//Stone/Wood/other - add gold
-						Control.mapdataArray[1000,5]+=1
-					}
-
-					if(_show_visual){
-						//Count existing pickup sprites to offset
-						var _pickup_count=0
-						with(Part){
-							if(pin==1&&type==1&&phase==2){ _pickup_count+=1 }
-						}
-						//Show picked up item over head (offset by existing count)
-						created=instance_create_depth(x,y-13,depth-10,Part)
-						with(created){
-							pin=1
-							type=1
-							sprite_index=other.hit.sprite_index
-							image_index=other.hit.image_index
-							image_speed=0
-							img=other.hit.img
-							imgcap=0
-							imgsped=0
-							hsp=0
-							vsp=-0.15
-							dur=40
-							durtotal=dur
-							phase=2
-							starty=-_pickup_count*6
-						}
-					}
-					with(hit){
-						instance_destroy()
-					}
+				//Goblin drops now use Drop object (see below)
+				if(false){
 				}else{
 				if(class==4){
 					if(hit.type==3){
@@ -161,6 +81,102 @@ if(hit!=noone){
 				}
 				}
 			}
+		}
+	}
+}
+
+//Drop item pickup
+var _drop=instance_place(x,y,Drop)
+if(_drop!=noone){
+	if(_drop.dispenser==0&&(_drop.durtotal-_drop.dur)>=60){
+		audio_play_sound(choose(snd_coin_1,snd_coin_2,snd_coin_3),8, false)
+		var _hit_img=_drop.img
+		var _drop_spr=_drop.sprite_index
+		var _drop_imgidx=_drop.image_index
+		var _pickup_count=0
+		with(Part){
+			if(pin==1&&type==1&&phase==2){ _pickup_count+=1 }
+		}
+
+		if(_drop.type==6){
+			//Coin from treasure chest - add gold
+			Control.mapdataArray[1000,5]+=1
+			with(_drop){ instance_destroy() }
+		}else if(_hit_img==97||_hit_img==129){
+			//Grass clump / Seaweed - no reward
+			with(_drop){ instance_destroy() }
+		}else if(_hit_img==135||_hit_img==130||_hit_img==132){
+			//Fish pickup - shake then heal when done
+			var _heal=0.5
+			if(_hit_img==130){ _heal=1 }
+			else if(_hit_img==132){ _heal=2 }
+			with(_drop){
+				dispenser=1
+				dispenser_type=2
+				dispenser_count=0
+				dispenser_timer=30
+				dispenser_heal=_heal
+				dur=999
+				hsp=0
+				vsp=0
+				grav=0
+				gravtwo=0
+			}
+		}else if(_hit_img==128){
+			//Treasure chest - shake and pop coins one at a time
+			with(_drop){
+				dispenser=1
+				dispenser_type=0
+				dispenser_count=irandom_range(2,4)
+				dispenser_timer=0
+				dur=999
+				hsp=0
+				vsp=0
+				grav=0
+				gravtwo=0
+			}
+		}else if(_hit_img==112||_hit_img==113||_hit_img==114){
+			//Gem - shake and pop xp orbs one at a time
+			with(_drop){
+				dispenser=1
+				dispenser_type=1
+				dispenser_count=irandom_range(2,4)
+				dispenser_timer=0
+				dur=999
+				hsp=0
+				vsp=0
+				grav=0
+				gravtwo=0
+			}
+		}else{
+			//Stone/Wood/other - add resources for goblin, gold for others
+			if(class==10){
+				if(_hit_img==115){
+					goblin_wood+=1
+				}else{
+					goblin_stone+=1
+				}
+			}else{
+				Control.mapdataArray[1000,5]+=1
+			}
+			created=instance_create_depth(x,y-13,depth-10,Part)
+			with(created){
+				pin=1
+				type=1
+				sprite_index=_drop_spr
+				image_index=_drop_imgidx
+				image_speed=0
+				img=_hit_img
+				imgcap=0
+				imgsped=0
+				hsp=0
+				vsp=-0.15
+				dur=40
+				durtotal=dur
+				phase=2
+				starty=-_pickup_count*6
+			}
+			with(_drop){ instance_destroy() }
 		}
 	}
 }
@@ -227,6 +243,7 @@ gravity_scr()
 
 	if(hp<=0){
 		hog_mounted=0
+		if(instance_exists(pet)){ with(pet){ instance_destroy() } pet=noone }
 		deathtick=1
 		deathcd=150
 		deathcdtotal=deathcd

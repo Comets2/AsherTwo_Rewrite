@@ -23,6 +23,16 @@ function class_scr() {
 				abilArray[i,1]=0
 			}
 			sped=spedsave
+			//Destroy old passivetwo and its children (crab fishbarrel/box) on class switch
+			if(instance_exists(passivetwo)){
+				if(variable_instance_exists(passivetwo,"fishbarrel")&&instance_exists(passivetwo.fishbarrel)){
+					instance_destroy(passivetwo.fishbarrel)
+				}
+				if(variable_instance_exists(passivetwo,"box")&&instance_exists(passivetwo.box)){
+					instance_destroy(passivetwo.box)
+				}
+				instance_destroy(passivetwo)
+			}
 		}
 
 	if(class==0){
@@ -1771,7 +1781,7 @@ if(Control.talentmapArray[23,1]>0){
 				imgcap=2
 				sprite_index=abil_crab_spr
 				image_index=img
-				depth=-1
+				depth=2
 				image_speed=0
 				dur=150
 				durtotal=dur
@@ -1783,7 +1793,7 @@ if(Control.talentmapArray[23,1]>0){
 						imgsped=0
 						sprite_index=abil_crab_spr
 						image_index=img
-						depth=-1
+						depth=2
 						dur=150
 						durtotal=dur
 						phase=-1
@@ -3423,7 +3433,8 @@ if(passivefourArray[1,0] < passivefourArray[1,5] && wep == 0){
 	if(class==10){
 		if(classcheck==1){
 			classcheck=0
-			hp=14
+			goblin_base_hp=10
+			hp=goblin_base_hp
 			hptotalback=hp
 			mespr=me_spr
 			wep=0
@@ -3454,6 +3465,16 @@ if(passivefourArray[1,0] < passivefourArray[1,5] && wep == 0){
 				//y
 				abilArray[16,12]=0
 
+				//Goblin resources and upgrades
+				goblin_stone=0
+				goblin_wood=0
+				goblin_durability=100
+				goblin_durability_max=100
+				goblin_upgrade_club=0
+				goblin_upgrade_armor=0
+				goblin_upgrade_tools=0
+				goblin_upgrade_hog=0
+
 				wepanim=0
 
 				//Shield hitbox instance
@@ -3474,6 +3495,9 @@ if(passivefourArray[1,0] < passivefourArray[1,5] && wep == 0){
 		}
 
 		//Goblin per-frame logic
+
+		//Armor upgrade: +1 max HP per level
+		hptotalback=goblin_base_hp+goblin_upgrade_armor
 
 		//Shield follow player
 		if(instance_exists(goblin_shield)){

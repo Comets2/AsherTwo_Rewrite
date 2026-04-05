@@ -82,7 +82,9 @@ if(image_index+imgsped<=img+imgcap){
 }
 
 
-if(instance_place(x,y,Me)){
+if(pickupdelay>0){ pickupdelay-=1 }
+
+if(pickupdelay<=0&&instance_place(x,y,Me)){
 	audio_play_sound_at(choose(snd_ac_cute_1,snd_ac_cute_2,snd_ac_cute_3,snd_ac_cute_4),x,y, 0, Control.falloff_ref, Control.falloff_max, 2, false, 1)
 
 				// Add XP based on mode

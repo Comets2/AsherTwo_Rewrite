@@ -19,6 +19,7 @@ imgcap=0
 
 check=1
 color=c_white
+pickupdelay=0
 
 xscale=1
 yscale=1

@@ -490,7 +490,7 @@ function abil_scr() {
 				//Goblin Abil 2 - Selector (blocked during fishing/digging)
 				if(abilArray[1,1]==0&&stun==0){
 					anim=12
-					animsave=14
+					animsave=9+(hog_mounted*34)
 						if(abilArray[0,1]<globalcdtotal){
 							abilArray[0,1]=globalcdtotal
 							abilArray[0,4]=1
@@ -723,12 +723,27 @@ function abil_scr() {
 				//Goblin Abil 3 - Hog Mount Toggle
 				if(stun==0){
 					if(hog_mounted==0){
-						// Mount
-						hog_mounted=1
-						hog_charge=0
-						image_index=35
-						img=35
-						imgcap=0
+						// Check if boar pet exists nearby to remount
+						if(instance_exists(pet) && pet.pin==96 && point_distance(x,y,pet.x,pet.y)<24){
+							hog_mounted=1
+							hog_charge=0
+							image_index=35
+							img=35
+							imgcap=0
+							with(pet){ instance_destroy() }
+							pet=noone
+						} else if(instance_exists(pet) && pet.pin==96 && pet.callblock<=0){
+							// Pet exists but too far - call it to you
+							pet.called=1
+							pet.calltimer=180
+						} else {
+							// No boar exists - mount directly
+							hog_mounted=1
+							hog_charge=0
+							image_index=35
+							img=35
+							imgcap=0
+						}
 					} else {
 						// Dismount
 						hog_mounted=0
@@ -740,7 +755,7 @@ function abil_scr() {
 						if(grounded==0 && (global.con_h_up||global.conp_h_up)){
 							vsp=-4.5
 						}
-						// Spawn boar entity
+						// Spawn boar pet
 						xpos=x
 						ypos=y
 						abil_create_scr(3)

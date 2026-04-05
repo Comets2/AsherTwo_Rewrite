@@ -146,6 +146,14 @@ function level_run_scr() {
 						if(instance_place(x,y,Enemy)){ _overlapping=true }
 					}
 				}
+				if(!_overlapping){
+					with(Abil){
+						if(pin==96&&abs(x-_wx)<16&&abs(y-_wy)<16){
+							_overlapping=true
+							break
+						}
+					}
+				}
 				if(_overlapping){
 					instance_destroy(_block)
 					continue

@@ -149,6 +149,7 @@
     {"id":{"name":"BlockTwo","path":"objects/BlockTwo/BlockTwo.yy",},},
     {"id":{"name":"Character","path":"objects/Character/Character.yy",},},
     {"id":{"name":"Control","path":"objects/Control/Control.yy",},},
+    {"id":{"name":"Drop","path":"objects/Drop/Drop.yy",},},
     {"id":{"name":"Dummy","path":"objects/Dummy/Dummy.yy",},},
     {"id":{"name":"Enemy","path":"objects/Enemy/Enemy.yy",},},
     {"id":{"name":"Fakeblock","path":"objects/Fakeblock/Fakeblock.yy",},},
